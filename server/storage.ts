@@ -21,6 +21,15 @@ export interface IStorage {
 
   // Bids
   getBidsForArtwork(artworkId: number): Promise<Bid[]>;
+  getBidsForUser(userId: string): Promise<{ 
+    artworkId: number;
+    artwork: Artwork | null;
+    userHighestBid: number;
+    artworkHighestBid: number;
+    isHighest: boolean;
+    auctionEnded: boolean;
+    latestBidAt: Date | null;
+  }[]>;
   createBid(bid: InsertBid): Promise<Bid>;
 
   // Charities
@@ -78,6 +87,58 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(bids)
       .where(eq(bids.artworkId, artworkId))
       .orderBy(desc(bids.amount));
+  }
+
+  async getBidsForUser(userId: string): Promise<{ 
+    artworkId: number;
+    artwork: Artwork | null;
+    userHighestBid: number;
+    artworkHighestBid: number;
+    isHighest: boolean;
+    auctionEnded: boolean;
+    latestBidAt: Date | null;
+  }[]> {
+    const userBids = await db.select().from(bids)
+      .where(eq(bids.bidderId, userId))
+      .orderBy(desc(bids.createdAt));
+    
+    const artworkBidsMap = new Map<number, { userHighestBid: number; latestBidAt: Date | null }>();
+    
+    for (const bid of userBids) {
+      const existing = artworkBidsMap.get(bid.artworkId);
+      const bidAmount = Number(bid.amount);
+      if (!existing || bidAmount > existing.userHighestBid) {
+        artworkBidsMap.set(bid.artworkId, { 
+          userHighestBid: bidAmount,
+          latestBidAt: bid.createdAt
+        });
+      }
+    }
+    
+    const results = await Promise.all(
+      Array.from(artworkBidsMap.entries()).map(async ([artworkId, { userHighestBid, latestBidAt }]) => {
+        const artwork = await this.getArtwork(artworkId);
+        const artworkBids = await this.getBidsForArtwork(artworkId);
+        const artworkHighestBid = artworkBids.length > 0 ? Math.max(...artworkBids.map(b => Number(b.amount))) : userHighestBid;
+        const isHighest = userHighestBid >= artworkHighestBid;
+        
+        const auctionEndDate = new Date(artwork?.createdAt || new Date());
+        auctionEndDate.setDate(auctionEndDate.getDate() + 7);
+        const auctionEnded = auctionEndDate <= new Date();
+        
+        return {
+          artworkId,
+          artwork: artwork || null,
+          userHighestBid,
+          artworkHighestBid,
+          isHighest,
+          auctionEnded,
+          latestBidAt
+        };
+      })
+    );
+    
+    return results;
   }
 
   async createBid(bid: InsertBid): Promise<Bid> {

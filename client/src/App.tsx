@@ -10,6 +10,11 @@ import Dashboard from "@/pages/Dashboard";
 import ArtworkDetail from "@/pages/ArtworkDetail";
 import SubmitArtwork from "@/pages/SubmitArtwork";
 import Admin from "@/pages/Admin";
+import About from "@/pages/About";
+import FAQ from "@/pages/FAQ";
+import Terms from "@/pages/Terms";
+import Contact from "@/pages/Contact";
+import MyBids from "@/pages/MyBids";
 
 function Router() {
   return (
@@ -20,6 +25,11 @@ function Router() {
       <Route path="/artwork/:id" component={ArtworkDetail} />
       <Route path="/submit-artwork" component={SubmitArtwork} />
       <Route path="/admin" component={Admin} />
+      <Route path="/about" component={About} />
+      <Route path="/faq" component={FAQ} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/my-bids" component={MyBids} />
       <Route component={NotFound} />
     </Switch>
   );

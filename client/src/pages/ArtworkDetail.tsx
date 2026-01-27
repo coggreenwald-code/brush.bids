@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
+import { Footer } from "@/components/Footer";
 import { useArtwork } from "@/hooks/use-artworks";
 import { useBids, usePlaceBid } from "@/hooks/use-bids";
 import { useRoute } from "wouter";
@@ -13,12 +15,55 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Loader2, DollarSign, Clock, Heart, Share2 } from "lucide-react";
+import { Loader2, DollarSign, Clock, Heart, Share2, Sparkles, Twitter, Facebook, Link as LinkIcon, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const bidSchema = z.object({
   amount: z.coerce.number().min(1, "Bid must be at least $1"),
 });
+
+function CountdownTimer({ endDate }: { endDate: Date }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const diff = endDate.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        clearInterval(timer);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [endDate]);
+
+  return (
+    <div className="flex gap-2 text-center">
+      {[
+        { value: timeLeft.days, label: "Days" },
+        { value: timeLeft.hours, label: "Hours" },
+        { value: timeLeft.minutes, label: "Min" },
+        { value: timeLeft.seconds, label: "Sec" },
+      ].map(({ value, label }) => (
+        <div key={label} className="bg-muted rounded-lg px-3 py-2 min-w-[60px]">
+          <div className="text-xl font-mono font-bold">{value.toString().padStart(2, '0')}</div>
+          <div className="text-xs text-muted-foreground">{label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function ArtworkDetail() {
   const [match, params] = useRoute("/artwork/:id");
@@ -28,6 +73,8 @@ export default function ArtworkDetail() {
   const { user } = useAuth();
   const placeBid = usePlaceBid();
   const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(bidSchema),
@@ -40,6 +87,9 @@ export default function ArtworkDetail() {
   const currentPrice = bids && bids.length > 0 
     ? Math.max(...bids.map(b => Number(b.amount))) 
     : Number(artwork.price);
+
+  const auctionEndDate = new Date(artwork.createdAt || new Date());
+  auctionEndDate.setDate(auctionEndDate.getDate() + 7);
 
   const onSubmit = (data: { amount: number }) => {
     if (data.amount <= currentPrice) {
@@ -54,7 +104,7 @@ export default function ArtworkDetail() {
 
     placeBid.mutate({
       artworkId: artwork.id,
-      bidderId: user.id as unknown as number, // Casting because auth user type is string-based vs db int
+      bidderId: user.id as unknown as string,
       amount: data.amount.toString(),
     }, {
       onSuccess: () => {
@@ -64,16 +114,38 @@ export default function ArtworkDetail() {
     });
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({ title: "Link copied!", description: "Share this artwork with others" });
+  };
+
+  const handleSave = () => {
+    setSaved(!saved);
+    toast({ 
+      title: saved ? "Removed from watchlist" : "Added to watchlist",
+      description: saved ? "You won't receive updates for this artwork" : "You'll be notified of bid changes"
+    });
+  };
+
   const displayImage = artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800&auto=format&fit=crop";
+
+  const revenueSplit = {
+    artist: currentPrice * 0.70,
+    platform: currentPrice * 0.15,
+    charity: currentPrice * 0.15,
+  };
 
   return (
     <Layout>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pb-16">
         {/* Image Side */}
         <div className="space-y-6">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-muted aspect-[4/5]">
-            <img src={displayImage} alt={artwork.title} className="w-full h-full object-cover" />
+            <img src={displayImage} alt={artwork.title} className="w-full h-full object-cover" data-testid="img-artwork" />
           </div>
+          
           {artwork.aiFeedback && (
             <Card className="p-6 bg-primary/5 border-primary/20">
               <h3 className="font-semibold flex items-center gap-2 mb-2 text-primary">
@@ -83,7 +155,7 @@ export default function ArtworkDetail() {
               <div className="mt-4 flex items-center gap-2">
                 <div className="h-2 flex-1 bg-muted rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-primary" 
+                    className="h-full bg-primary transition-all" 
                     style={{ width: `${artwork.aiScore || 0}%` }} 
                   />
                 </div>
@@ -91,16 +163,41 @@ export default function ArtworkDetail() {
               </div>
             </Card>
           )}
+
+          {/* Revenue Split Info */}
+          <Card className="p-6">
+            <h3 className="font-semibold mb-4">Revenue Distribution</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Artist (70%)</span>
+                <span className="font-mono font-semibold">${revenueSplit.artist.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">BrushBids (15%)</span>
+                <span className="font-mono">${revenueSplit.platform.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center text-green-600">
+                <span className="text-sm">Charity (15%)</span>
+                <span className="font-mono font-semibold">${revenueSplit.charity.toFixed(2)}</span>
+              </div>
+            </div>
+            {artwork.charityId && (
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-sm text-muted-foreground">Supporting: <span className="font-medium text-foreground">Arts Education Foundation</span></p>
+              </div>
+            )}
+          </Card>
         </div>
 
         {/* Info Side */}
         <div className="space-y-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
               <Badge variant="secondary" className="uppercase tracking-wider">Original Art</Badge>
               {artwork.status === 'pending' && <Badge variant="outline" className="text-yellow-600 border-yellow-600">Pending Review</Badge>}
+              {artwork.status === 'approved' && <Badge variant="outline" className="text-green-600 border-green-600">Live Auction</Badge>}
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{artwork.title}</h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4" data-testid="text-artwork-title">{artwork.title}</h1>
             <div className="flex items-center gap-4">
               <Avatar className="w-10 h-10">
                 <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${artwork.artistId}`} />
@@ -120,18 +217,18 @@ export default function ArtworkDetail() {
           </p>
 
           <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Current Price</p>
-                <div className="text-3xl font-mono font-bold text-primary">
+                <div className="text-3xl font-mono font-bold text-primary" data-testid="text-current-price">
                   ${currentPrice.toLocaleString()}
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground mb-1">Time Remaining</p>
-                <div className="text-xl font-medium flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-muted-foreground" /> 3d 12h
-                </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
+                  <Clock className="w-4 h-4" /> Time Remaining
+                </p>
+                <CountdownTimer endDate={auctionEndDate} />
               </div>
             </div>
 
@@ -148,14 +245,34 @@ export default function ArtworkDetail() {
                           <div className="relative flex-1">
                             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <FormControl>
-                              <Input type="number" className="pl-9 h-12 text-lg" placeholder={(currentPrice + 10).toString()} {...field} />
+                              <Input 
+                                type="number" 
+                                className="pl-9 h-12 text-lg" 
+                                placeholder={(currentPrice + 10).toString()} 
+                                data-testid="input-bid-amount"
+                                {...field} 
+                              />
                             </FormControl>
                           </div>
-                          <Button type="submit" size="lg" className="h-12 px-8" disabled={placeBid.isPending}>
+                          <Button type="submit" size="lg" className="h-12 px-8" disabled={placeBid.isPending} data-testid="button-place-bid">
                             {placeBid.isPending ? "Placing..." : "Bid Now"}
                           </Button>
                         </div>
                         <FormMessage />
+                        <div className="flex gap-2 mt-2">
+                          {[10, 25, 50, 100].map((increment) => (
+                            <Button
+                              key={increment}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => form.setValue("amount", (currentPrice + increment).toString() as any)}
+                              data-testid={`button-increment-${increment}`}
+                            >
+                              +${increment}
+                            </Button>
+                          ))}
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -169,32 +286,59 @@ export default function ArtworkDetail() {
           </div>
 
           <div className="flex gap-4">
-            <Button variant="outline" className="flex-1 gap-2">
-              <Heart className="w-4 h-4" /> Save
+            <Button 
+              variant="outline" 
+              className={`flex-1 gap-2 ${saved ? 'text-red-500 border-red-200' : ''}`}
+              onClick={handleSave}
+              data-testid="button-save"
+            >
+              <Heart className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} /> {saved ? 'Saved' : 'Save'}
             </Button>
-            <Button variant="outline" className="flex-1 gap-2">
-              <Share2 className="w-4 h-4" /> Share
-            </Button>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="flex-1 gap-2" data-testid="button-share">
+                  <Share2 className="w-4 h-4" /> Share
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56">
+                <div className="space-y-2">
+                  <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => window.open(`https://twitter.com/intent/tweet?text=Check out this artwork: ${artwork.title}&url=${window.location.href}`, '_blank')}>
+                    <Twitter className="w-4 h-4" /> Twitter
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`, '_blank')}>
+                    <Facebook className="w-4 h-4" /> Facebook
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start gap-2" onClick={handleCopyLink}>
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div>
-            <h3 className="font-bold text-lg mb-4">Recent Activity</h3>
-            <div className="space-y-4">
+            <h3 className="font-bold text-lg mb-4">Bid History</h3>
+            <div className="space-y-4 max-h-64 overflow-y-auto">
               {loadingBids ? (
                 <p>Loading bids...</p>
               ) : bids?.length === 0 ? (
                 <p className="text-muted-foreground italic">No bids yet. Be the first!</p>
               ) : (
-                bids?.map((bid) => (
-                  <div key={bid.id} className="flex items-center justify-between py-3 border-b last:border-0">
+                bids?.map((bid, index) => (
+                  <div key={bid.id} className="flex items-center justify-between py-3 border-b last:border-0" data-testid={`bid-${bid.id}`}>
                     <div className="flex items-center gap-3">
                       <Avatar className="w-8 h-8">
                         <AvatarFallback>B</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium text-sm">Bidder #{bid.bidderId}</p>
+                        <p className="font-medium text-sm flex items-center gap-2">
+                          Bidder #{bid.bidderId}
+                          {index === 0 && <Badge variant="secondary" className="text-xs">Highest</Badge>}
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(bid.createdAt || "").toLocaleDateString()}
+                          {new Date(bid.createdAt || "").toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -208,30 +352,8 @@ export default function ArtworkDetail() {
           </div>
         </div>
       </div>
-    </Layout>
-  );
-}
 
-// Helper icons
-function Sparkles(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-      <path d="M5 3v4" />
-      <path d="M9 3v4" />
-      <path d="M3 5h4" />
-      <path d="M3 9h4" />
-    </svg>
+      <Footer />
+    </Layout>
   );
 }

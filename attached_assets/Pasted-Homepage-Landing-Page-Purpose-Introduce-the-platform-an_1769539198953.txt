@@ -1,0 +1,141 @@
+Homepage / Landing Page
+Purpose: Introduce the platform and encourage sign-ups (both artists and bidders).
+
+Key Components:
+
+Hero section: tagline + call-to-action (“Submit Your Art” / “Start Bidding”)
+
+Featured artworks carousel: top submissions or auction highlights
+
+How it works section: 3–4 simple steps for artists and buyers
+
+Testimonials or “Student Spotlight”
+
+Sign-up / login buttons
+
+Footer: About, Contact, Terms & Conditions, Social Media
+Artist Dashboard
+Purpose: Allow student artists to manage submissions and track auctions.
+
+Key Components:
+
+Profile overview: Name, school, bio, portfolio link
+
+Submit Artwork button
+
+Submission List: status (Pending, Accepted, Rejected)
+
+Earnings tracker: total earned + pending
+
+Auction Performance: highest bid, views, likes
+
+Settings: payment info, notification preferences
+Artwork Submission Page 
+Purpose: Let artists upload and describe their art for review.
+
+Key Components:
+
+Upload field for image / video
+
+Title, description, and category
+
+Optional: artist statement, charity selection
+
+Preview of how it will appear in the gallery
+
+Submit button with confirmation
+Curation / Admin Panel
+Purpose: Allow AI + manual curation of submitted works.
+
+Key Components:
+
+Artwork gallery view (grid or list)
+
+Status buttons: Accept / Reject / Request Revision
+
+Quick AI-based scoring: quality, category suggestions
+
+Notes field for feedback
+
+Search & filter by school, category, submission date
+Auction Gallery / Marketplace
+Purpose: Showcase artworks for bidding and encourage engagement.
+
+Key Components:
+
+Grid or card view of all active artworks
+
+Filter / sort: category, school, artist, bid amount, ending soon
+
+Card for each artwork: image, title, artist name, current bid, time remaining
+
+“Place Bid” button (with immediate login prompt if needed)
+
+Option to favorite / watchlist
+Artwork Detail Page
+Purpose: Provide a detailed view to encourage bidding.
+
+Key Components:
+
+Large artwork image / gallery view
+
+Artist bio / statement
+
+Current bid + bid history
+
+Countdown timer to auction close
+
+Place bid button (with bid increment suggestions)
+
+Share buttons (social media, email)
+
+Optional charity info if artist is donating
+Bid Management / Buyer Dashboard
+Purpose: Let buyers track and manage active bids.
+
+Key Components:
+
+Active bids list: current highest bid, ending time
+
+Outbid notifications
+
+Wishlist or favorite artworks
+
+Payment method management for winning bids
+Checkout / Payment Flow
+Purpose: Finalize winning bids safely and distribute revenue.
+
+Key Components:
+
+Payment info form (Stripe integration)
+
+Revenue split breakdown: Artist / Auction house / Charity
+
+Confirmation page & receipt
+
+Shipping / pickup options
+Notifications / Alerts
+Purpose: Keep users engaged and informed.
+
+Key Components:
+
+Email or in-app alerts: outbid, auction ending, artwork accepted
+
+Optional push notifications (later MVP)
+Additional Pages
+About / Mission statement
+
+FAQ / How it Works
+
+Terms & Conditions / Privacy Policy
+
+Contact / Support form
+Optional Future Enhancements
+Leaderboards: top-selling or most-bid artworks
+
+Social features: following artists, liking, commenting
+
+Dynamic AI suggestions: recommended artworks for buyers
+
+Mobile app design: responsive or native
+

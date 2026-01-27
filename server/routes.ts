@@ -116,5 +116,14 @@ export async function registerRoutes(
     res.json(charities);
   });
 
+  // My Bids (user's bids)
+  app.get("/api/my-bids", async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    const bids = await storage.getBidsForUser(req.user.id);
+    res.json(bids);
+  });
+
   return httpServer;
 }

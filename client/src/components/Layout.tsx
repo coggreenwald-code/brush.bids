@@ -8,7 +8,8 @@ import {
   Menu, 
   X,
   Gavel,
-  Home
+  Home,
+  Heart
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { label: "Home", href: "/", icon: Home, roles: ["all"] },
     { label: "Gallery", href: "/gallery", icon: Palette, roles: ["all"] },
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["artist", "buyer"] },
+    { label: "My Bids", href: "/my-bids", icon: Heart, roles: ["buyer", "artist"] },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["artist"] },
     { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
   ];
 
