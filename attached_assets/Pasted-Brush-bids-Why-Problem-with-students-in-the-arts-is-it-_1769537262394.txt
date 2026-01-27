@@ -1,0 +1,165 @@
+Brush bids
+
+Why: Problem with students in the arts is it is difficult to be discovered early in their career. Want to create a company that gives students a similar opportunity to be in the arts as his high school. Give students an opportunity to be discovered without going to an online school. Really talented artists don’t always sell their art or put it out. Age range: 10-28.
+Pros of solution: AI feedback allows for quick, specific, and instructive feedback for users. Social media-like platforms allow many people to see someone's art. Driving towards marketable work creates a positive feedback loop by building confidence through sales. 
+Cons of solutions: Potentially embarrassing, barrier to putting work up. AI could be harsh to inherently subjective works. Dependent on a consistent and relatively large customer base. Difficult to maintain balance between AI help and human touch.
+
+What will the experience look like?
+
+Opening screen: Cycling stack of all art that is currently available, name of artists and place to click to buy. Beneath that is a description, quote, testimonial speaking to brush bids. Tabs for live auction, gallery, FAQs, contact, account creation for artists, mentors, or students, artwork submission, students, mentors.
+Home page(a bit redundant with opening screen): Hero section (tagline, call to action, etc), featured art, footer on bottom with contacts
+Artist Dashboard: artist bio, artists genres, artist's payment info through stripe, social media based (how many likes, how many sales, performance tracking), highest bid on their current piece
+Artist dashboard(for themselves): shows views, how things are selling, general performance tracking 
+Commissioned work: give them the opportunity to pay an artist to make a certain type of painting
+Curation: AI review for good image quality, artwork tags to help AI, manual override if AI gets it wrong <- initially have the art be self-curated, do it yourself and train the AI with those kind of pieces
+Gallery: People see auction area of accepted artwork, notifications if price is raised, if they win, etc.
+Shipping/Selling: Maybe incorporate third party app, biggest difficulty here
+Artwork submission page: uploading image(s), title/description, category the art would fit in, artist statement, charity selection, preview of the art, submission button and confirmation page
+Admin panel: grid or list of available artwork for the gallery, status (accept/reject/revision etc), implement AI to give each piece a score, notes field for artwork feedback, search features
+Auction gallery/marketplace: filter/sort features, bid amount, time left, card for each artwork  (image/artist/title/bid/time remaining), place bid button (need to log in), add work to watch list, like button, later in process can start curating based on art people like
+
+
+Homepage / Landing Page
+Purpose: Introduce the platform and encourage sign-ups (both artists and bidders).
+
+Key Components:
+
+Hero section: tagline + call-to-action (“Submit Your Art” / “Start Bidding”)
+
+Featured artworks carousel: top submissions or auction highlights
+
+How it works section: 3–4 simple steps for artists and buyers
+
+Testimonials or “Student Spotlight”
+
+Sign-up / login buttons
+
+Footer: About, Contact, Terms & Conditions, Social Media
+Artist Dashboard
+Purpose: Allow student artists to manage submissions and track auctions.
+
+Key Components:
+
+Profile overview: Name, school, bio, portfolio link
+
+Submit Artwork button
+
+Submission List: status (Pending, Accepted, Rejected)
+
+Earnings tracker: total earned + pending
+
+Auction Performance: highest bid, views, likes
+
+Settings: payment info, notification preferences
+Artwork Submission Page 
+Purpose: Let artists upload and describe their art for review.
+
+Key Components:
+
+Upload field for image / video
+
+Title, description, and category
+
+Optional: artist statement, charity selection
+
+Preview of how it will appear in the gallery
+
+Submit button with confirmation
+Curation / Admin Panel
+Purpose: Allow AI + manual curation of submitted works.
+
+Key Components:
+
+Artwork gallery view (grid or list)
+
+Status buttons: Accept / Reject / Request Revision
+
+Quick AI-based scoring: quality, category suggestions
+
+Notes field for feedback
+
+Search & filter by school, category, submission date
+Auction Gallery / Marketplace
+Purpose: Showcase artworks for bidding and encourage engagement.
+
+Key Components:
+
+Grid or card view of all active artworks
+
+Filter / sort: category, school, artist, bid amount, ending soon
+
+Card for each artwork: image, title, artist name, current bid, time remaining
+
+“Place Bid” button (with immediate login prompt if needed)
+
+Option to favorite / watchlist
+Artwork Detail Page
+Purpose: Provide a detailed view to encourage bidding.
+
+Key Components:
+
+Large artwork image / gallery view
+
+Artist bio / statement
+
+Current bid + bid history
+
+Countdown timer to auction close
+
+Place bid button (with bid increment suggestions)
+
+Share buttons (social media, email)
+
+Optional charity info if artist is donating
+Bid Management / Buyer Dashboard
+Purpose: Let buyers track and manage active bids.
+
+Key Components:
+
+Active bids list: current highest bid, ending time
+
+Outbid notifications
+
+Wishlist or favorite artworks
+
+Payment method management for winning bids
+Checkout / Payment Flow
+Purpose: Finalize winning bids safely and distribute revenue.
+
+Key Components:
+
+Payment info form (Stripe integration)
+
+Revenue split breakdown: Artist / Auction house / Charity
+
+Confirmation page & receipt
+
+Shipping / pickup options
+Notifications / Alerts
+Purpose: Keep users engaged and informed.
+
+Key Components:
+
+Email or in-app alerts: outbid, auction ending, artwork accepted
+
+Optional push notifications (later MVP)
+Additional Pages
+About / Mission statement
+
+FAQ / How it Works
+
+Terms & Conditions / Privacy Policy
+
+Contact / Support form
+Optional Future Enhancements
+Leaderboards: top-selling or most-bid artworks
+
+Social features: following artists, liking, commenting
+
+Dynamic AI suggestions: recommended artworks for buyers
+
+Mobile app design: responsive or native
+Will’s suggestions:
+
+
+
