@@ -1,14 +1,16 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "wouter";
-import { Gavel, Clock, TrendingUp, AlertCircle, Heart, Loader2 } from "lucide-react";
+import { Link, useSearch } from "wouter";
+import { Gavel, Clock, TrendingUp, AlertCircle, Heart, Loader2, CreditCard, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import type { Artwork } from "@shared/schema";
 
 interface UserBidSummary {
@@ -41,11 +43,42 @@ function getTimeRemaining(createdAt: Date | string | null): string {
 
 export default function MyBids() {
   const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const searchString = useSearch();
+  const [processingPayment, setProcessingPayment] = useState<number | null>(null);
+
+  const paymentStatus = new URLSearchParams(searchString).get('payment');
+  const paymentArtwork = new URLSearchParams(searchString).get('artwork');
 
   const { data: bids, isLoading } = useQuery<UserBidSummary[]>({
     queryKey: ["/api/my-bids"],
     enabled: isAuthenticated,
   });
+
+  const checkoutMutation = useMutation({
+    mutationFn: async (artworkId: number) => {
+      const res = await apiRequest("POST", `/api/checkout/artwork/${artworkId}`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Payment Error",
+        description: "Failed to start checkout. Please try again.",
+        variant: "destructive",
+      });
+      setProcessingPayment(null);
+    },
+  });
+
+  const handlePayNow = (artworkId: number) => {
+    setProcessingPayment(artworkId);
+    checkoutMutation.mutate(artworkId);
+  };
 
   const { activeBids, wonBids, outbidBids } = useMemo(() => {
     if (!bids) return { activeBids: [], wonBids: [], outbidBids: [] };
@@ -264,6 +297,19 @@ export default function MyBids() {
 
           {/* Won Tab */}
           <TabsContent value="won" className="mt-6">
+            {paymentStatus === 'success' && (
+              <Card className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400 text-base">
+                    <CheckCircle className="w-5 h-5" />
+                    Payment Successful!
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  <p>Your payment has been processed. The artwork will be delivered to you soon.</p>
+                </CardContent>
+              </Card>
+            )}
             {isLoading ? (
               <div className="flex justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -301,6 +347,18 @@ export default function MyBids() {
                         <p className="text-lg font-mono font-bold text-green-600">${bid.userHighestBid.toLocaleString()}</p>
                         <Badge className="mt-1 bg-green-600">Won</Badge>
                       </div>
+                      <Button 
+                        onClick={() => handlePayNow(bid.artworkId)}
+                        disabled={processingPayment === bid.artworkId}
+                        data-testid={`button-pay-${bid.artworkId}`}
+                      >
+                        {processingPayment === bid.artworkId ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <CreditCard className="w-4 h-4 mr-2" />
+                        )}
+                        Pay Now
+                      </Button>
                     </div>
                   </Card>
                 ))}

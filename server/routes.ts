@@ -5,6 +5,7 @@ import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
+import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 
 const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
@@ -121,8 +122,81 @@ export async function registerRoutes(
     if (!req.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-    const bids = await storage.getBidsForUser(req.user.id);
+    const bids = await storage.getBidsForUser((req.user as any).id);
     res.json(bids);
+  });
+
+  // Stripe Payment Routes
+  app.get("/api/stripe/publishable-key", async (req, res) => {
+    try {
+      const publishableKey = await getStripePublishableKey();
+      res.json({ publishableKey });
+    } catch (error) {
+      console.error("Error getting Stripe publishable key:", error);
+      res.status(500).json({ message: "Failed to get Stripe configuration" });
+    }
+  });
+
+  app.post("/api/checkout/artwork/:artworkId", async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    try {
+      const artworkId = Number(req.params.artworkId);
+      const artwork = await storage.getArtwork(artworkId);
+      
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+
+      const bids = await storage.getBidsForArtwork(artworkId);
+      if (bids.length === 0) {
+        return res.status(400).json({ message: "No bids found for this artwork" });
+      }
+
+      const highestBid = bids[0];
+      if (highestBid.bidderId !== (req.user as any).id) {
+        return res.status(403).json({ message: "Only the winning bidder can purchase" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const amount = Number(highestBid.amount);
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: artwork.title,
+              description: `Artwork by ${artwork.artistId} - Winning bid`,
+              images: artwork.imageUrl ? [artwork.imageUrl] : [],
+            },
+            unit_amount: Math.round(amount * 100),
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${req.protocol}://${req.get('host')}/my-bids?payment=success&artwork=${artworkId}`,
+        cancel_url: `${req.protocol}://${req.get('host')}/my-bids?payment=cancelled`,
+        metadata: {
+          artworkId: artworkId.toString(),
+          bidderId: (req.user as any).id,
+          artistId: artwork.artistId,
+          charityId: artwork.charityId?.toString() || '',
+          totalAmount: amount.toString(),
+          artistShare: (amount * 0.70).toFixed(2),
+          platformShare: (amount * 0.15).toFixed(2),
+          charityShare: (amount * 0.15).toFixed(2),
+        },
+      });
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Checkout error:", error);
+      res.status(500).json({ message: "Failed to create checkout session" });
+    }
   });
 
   return httpServer;
