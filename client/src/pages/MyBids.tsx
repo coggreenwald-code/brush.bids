@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ interface UserBidSummary {
   isHighest: boolean;
   auctionEnded: boolean;
   latestBidAt: string | null;
+  isPaid: boolean;
 }
 
 function getTimeRemaining(createdAt: Date | string | null): string {
@@ -48,7 +49,14 @@ export default function MyBids() {
   const [processingPayment, setProcessingPayment] = useState<number | null>(null);
 
   const paymentStatus = new URLSearchParams(searchString).get('payment');
-  const paymentArtwork = new URLSearchParams(searchString).get('artwork');
+  const paymentArtworkId = new URLSearchParams(searchString).get('artwork');
+
+  // Invalidate bids query when returning from payment to get fresh data
+  useEffect(() => {
+    if (paymentStatus === 'success') {
+      queryClient.invalidateQueries({ queryKey: ["/api/my-bids"] });
+    }
+  }, [paymentStatus]);
 
   const { data: bids, isLoading } = useQuery<UserBidSummary[]>({
     queryKey: ["/api/my-bids"],
@@ -297,7 +305,8 @@ export default function MyBids() {
 
           {/* Won Tab */}
           <TabsContent value="won" className="mt-6">
-            {paymentStatus === 'success' && (
+            {paymentStatus === 'success' && paymentArtworkId && 
+             wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
               <Card className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400 text-base">
@@ -307,6 +316,20 @@ export default function MyBids() {
                 </CardHeader>
                 <CardContent className="text-sm text-muted-foreground">
                   <p>Your payment has been processed. The artwork will be delivered to you soon.</p>
+                </CardContent>
+              </Card>
+            )}
+            {paymentStatus === 'success' && paymentArtworkId && 
+             !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
+              <Card className="mb-6 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400 text-base">
+                    <Clock className="w-5 h-5" />
+                    Payment Processing
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  <p>Your payment is being confirmed. This page will update once complete.</p>
                 </CardContent>
               </Card>
             )}
@@ -345,20 +368,22 @@ export default function MyBids() {
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Winning Bid</p>
                         <p className="text-lg font-mono font-bold text-green-600">${bid.userHighestBid.toLocaleString()}</p>
-                        <Badge className="mt-1 bg-green-600">Won</Badge>
+                        <Badge className="mt-1 bg-green-600">{bid.isPaid ? 'Paid' : 'Won'}</Badge>
                       </div>
-                      <Button 
-                        onClick={() => handlePayNow(bid.artworkId)}
-                        disabled={processingPayment === bid.artworkId}
-                        data-testid={`button-pay-${bid.artworkId}`}
-                      >
-                        {processingPayment === bid.artworkId ? (
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        ) : (
-                          <CreditCard className="w-4 h-4 mr-2" />
-                        )}
-                        Pay Now
-                      </Button>
+                      {!bid.isPaid && (
+                        <Button 
+                          onClick={() => handlePayNow(bid.artworkId)}
+                          disabled={processingPayment === bid.artworkId}
+                          data-testid={`button-pay-${bid.artworkId}`}
+                        >
+                          {processingPayment === bid.artworkId ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            <CreditCard className="w-4 h-4 mr-2" />
+                          )}
+                          Pay Now
+                        </Button>
+                      )}
                     </div>
                   </Card>
                 ))}

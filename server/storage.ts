@@ -6,7 +6,7 @@ import {
   type Bid, type InsertBid,
   type Charity, type InsertCharity
 } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Users (Basic ops, Auth handles most)
@@ -18,6 +18,9 @@ export interface IStorage {
   getArtwork(id: number): Promise<Artwork | undefined>;
   createArtwork(artwork: InsertArtwork): Promise<Artwork>;
   updateArtworkStatus(id: number, status: "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork>;
+  setArtworkCheckoutSession(id: number, stripeSessionId: string, expectedPaidBy: string): Promise<Artwork>;
+  markArtworkPaid(id: number): Promise<Artwork | null>;
+  getArtworkBySessionId(sessionId: string): Promise<Artwork | undefined>;
 
   // Bids
   getBidsForArtwork(artworkId: number): Promise<Bid[]>;
@@ -29,6 +32,7 @@ export interface IStorage {
     isHighest: boolean;
     auctionEnded: boolean;
     latestBidAt: Date | null;
+    isPaid: boolean;
   }[]>;
   createBid(bid: InsertBid): Promise<Bid>;
 
@@ -83,6 +87,42 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
+  async setArtworkCheckoutSession(id: number, stripeSessionId: string, expectedPaidBy: string): Promise<Artwork> {
+    // Only set paidBy if not already set (don't overwrite on re-checkout)
+    const existing = await this.getArtwork(id);
+    const updates: { stripeSessionId: string; paidBy?: string } = { stripeSessionId };
+    
+    if (!existing?.paidBy) {
+      updates.paidBy = expectedPaidBy;
+    }
+    
+    const [updated] = await db.update(artworks)
+      .set(updates)
+      .where(eq(artworks.id, id))
+      .returning();
+    return updated;
+  }
+
+  async markArtworkPaid(id: number): Promise<Artwork | null> {
+    // Idempotent at DB level: only update where paidAt IS NULL
+    const [updated] = await db.update(artworks)
+      .set({ paidAt: new Date() })
+      .where(sql`${artworks.id} = ${id} AND ${artworks.paidAt} IS NULL`)
+      .returning();
+    
+    // Return the artwork even if already paid (for idempotency)
+    if (!updated) {
+      return await this.getArtwork(id) || null;
+    }
+    return updated;
+  }
+
+  async getArtworkBySessionId(sessionId: string): Promise<Artwork | undefined> {
+    const [artwork] = await db.select().from(artworks)
+      .where(eq(artworks.stripeSessionId, sessionId));
+    return artwork;
+  }
+
   async getBidsForArtwork(artworkId: number): Promise<Bid[]> {
     return await db.select().from(bids)
       .where(eq(bids.artworkId, artworkId))
@@ -97,6 +137,7 @@ export class DatabaseStorage implements IStorage {
     isHighest: boolean;
     auctionEnded: boolean;
     latestBidAt: Date | null;
+    isPaid: boolean;
   }[]> {
     const userBids = await db.select().from(bids)
       .where(eq(bids.bidderId, userId))
@@ -125,6 +166,7 @@ export class DatabaseStorage implements IStorage {
         const auctionEndDate = new Date(artwork?.createdAt || new Date());
         auctionEndDate.setDate(auctionEndDate.getDate() + 7);
         const auctionEnded = auctionEndDate <= new Date();
+        const isPaid = !!artwork?.paidAt;
         
         return {
           artworkId,
@@ -133,7 +175,8 @@ export class DatabaseStorage implements IStorage {
           artworkHighestBid,
           isHighest,
           auctionEnded,
-          latestBidAt
+          latestBidAt,
+          isPaid
         };
       })
     );

@@ -150,11 +150,28 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Artwork not found" });
       }
 
+      // Check if already paid
+      if (artwork.paidAt) {
+        return res.status(400).json({ message: "This artwork has already been paid for" });
+      }
+
+      // Allow re-checkout if previous session didn't complete (no paidAt means not paid)
+      // This handles abandoned checkouts
+
+      // Check if auction has ended (createdAt + 7 days)
+      const auctionEndDate = new Date(artwork.createdAt || new Date());
+      auctionEndDate.setDate(auctionEndDate.getDate() + 7);
+      if (auctionEndDate > new Date()) {
+        return res.status(400).json({ message: "Auction has not ended yet" });
+      }
+
+      // Get bids ordered by amount descending (highest first)
       const bids = await storage.getBidsForArtwork(artworkId);
       if (bids.length === 0) {
         return res.status(400).json({ message: "No bids found for this artwork" });
       }
 
+      // bids[0] is the highest bid (ordered by amount desc in storage)
       const highestBid = bids[0];
       if (highestBid.bidderId !== (req.user as any).id) {
         return res.status(403).json({ message: "Only the winning bidder can purchase" });
@@ -192,11 +209,30 @@ export async function registerRoutes(
         },
       });
 
+      // Store session ID and expected payer for tracking (payment confirmation comes via webhook)
+      await storage.setArtworkCheckoutSession(artworkId, session.id, (req.user as any).id);
+      
       res.json({ url: session.url });
     } catch (error) {
       console.error("Checkout error:", error);
       res.status(500).json({ message: "Failed to create checkout session" });
     }
+  });
+
+  // Get payment status for an artwork
+  app.get("/api/artwork/:artworkId/payment-status", async (req, res) => {
+    const artworkId = Number(req.params.artworkId);
+    const artwork = await storage.getArtwork(artworkId);
+    
+    if (!artwork) {
+      return res.status(404).json({ message: "Artwork not found" });
+    }
+
+    res.json({
+      isPaid: !!artwork.paidAt,
+      paidAt: artwork.paidAt,
+      paidBy: artwork.paidBy,
+    });
   });
 
   return httpServer;

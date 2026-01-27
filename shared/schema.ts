@@ -20,6 +20,9 @@ export const artworks = pgTable("artworks", {
   aiFeedback: text("ai_feedback"),
   charityId: integer("charity_id"),
   createdAt: timestamp("created_at").defaultNow(),
+  paidAt: timestamp("paid_at"),
+  paidBy: varchar("paid_by").references(() => users.id),
+  stripeSessionId: text("stripe_session_id"),
 });
 
 export const bids = pgTable("bids", {
