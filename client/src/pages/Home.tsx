@@ -83,7 +83,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight tracking-tight text-white">
-                Where Student Art <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400">Meets the World</span>
+                Turning student creativity <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400">into opportunity.</span>
               </h1>
             </motion.div>
             
