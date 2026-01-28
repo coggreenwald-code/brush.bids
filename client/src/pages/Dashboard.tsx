@@ -1,22 +1,26 @@
+import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useArtworks } from "@/hooks/use-artworks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArtworkCard } from "@/components/ArtworkCard";
+import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BoostArtworkModal } from "@/components/BoostArtworkModal";
+import type { Artwork } from "@shared/schema";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [boostArtwork, setBoostArtwork] = useState<Artwork | null>(null);
   
   // In a real app we'd filter by artistId/ownerId. 
   // For this mock, we'll fetch all and pretend to filter or just show list.
   const { data: artworks, isLoading } = useArtworks();
 
-  const myArtworks = artworks?.filter(a => a.artistId === parseInt(user?.id as any || "0")) || [];
+  const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
   const totalEarnings = 1250; // Mock data
   const totalSold = 3;
@@ -123,7 +127,70 @@ export default function Dashboard() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {myArtworks.map(artwork => (
-                      <ArtworkCard key={artwork.id} artwork={artwork} showStatus />
+                      <Card key={artwork.id} className="overflow-hidden" data-testid={`card-dashboard-artwork-${artwork.id}`}>
+                        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                          <Link href={`/artwork/${artwork.id}`}>
+                            <img 
+                              src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800"} 
+                              alt={artwork.title} 
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            />
+                          </Link>
+                          <div className="absolute top-3 right-3 flex gap-2">
+                            <Badge 
+                              variant={
+                                artwork.status === 'approved' ? 'default' : 
+                                artwork.status === 'rejected' ? 'destructive' : 'secondary'
+                              }
+                            >
+                              {artwork.status}
+                            </Badge>
+                            {(artwork.promotionPercentage ?? 0) > 0 && (
+                              <Badge variant="outline" className="bg-amber-500/90 text-white border-amber-400">
+                                <Rocket className="w-3 h-3 mr-1" />
+                                {artwork.promotionPercentage}% Boost
+                              </Badge>
+                            )}
+                          </div>
+                          {artwork.aiScore && (
+                            <div className="absolute top-3 left-3">
+                              <Badge variant="outline" className="bg-black/60 text-white border-white/20">
+                                <Sparkles className="w-3 h-3 mr-1" />
+                                {artwork.aiScore}/100
+                              </Badge>
+                            </div>
+                          )}
+                        </div>
+                        <CardContent className="p-4 space-y-3">
+                          <div>
+                            <h3 className="font-semibold line-clamp-1">{artwork.title}</h3>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                              <Clock className="w-3 h-3" />
+                              <span>Auction active</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between pt-2 border-t">
+                            <div>
+                              <div className="text-xs text-muted-foreground">Current Bid</div>
+                              <div className="font-bold text-primary">${Number(artwork.price).toLocaleString()}</div>
+                            </div>
+                            {artwork.status === 'approved' && !artwork.paidAt && (
+                              <Button 
+                                size="sm" 
+                                variant={(artwork.promotionPercentage ?? 0) > 0 ? "outline" : "default"}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setBoostArtwork(artwork);
+                                }}
+                                data-testid={`button-boost-artwork-${artwork.id}`}
+                              >
+                                <Rocket className="w-4 h-4 mr-1" />
+                                {(artwork.promotionPercentage ?? 0) > 0 ? "Edit Boost" : "Boost"}
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 )}
@@ -164,13 +231,21 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <p className="text-white/90">
-                  Artworks with high-quality descriptions and backstory tend to sell for 25% more. Try adding more detail to your next submission!
+                  Boost your listings to get more visibility! Promoted artworks appear first in the gallery and attract more bidders.
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
+
+      {boostArtwork && (
+        <BoostArtworkModal 
+          artwork={boostArtwork} 
+          open={!!boostArtwork} 
+          onOpenChange={(open) => !open && setBoostArtwork(null)} 
+        />
+      )}
     </Layout>
   );
 }

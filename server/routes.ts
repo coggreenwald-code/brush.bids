@@ -24,6 +24,12 @@ export async function registerRoutes(
   app.get(api.artworks.list.path, async (req, res) => {
     const status = req.query.status as "pending" | "approved" | "rejected" | undefined;
     const artistId = req.query.artistId as string | undefined;
+    
+    if (status === "approved" && !artistId) {
+      const artworks = await storage.getApprovedArtworksSortedByPromotion();
+      return res.json(artworks);
+    }
+    
     const artworks = await storage.getArtworks(status, artistId);
     res.json(artworks);
   });
@@ -53,9 +59,63 @@ export async function registerRoutes(
   });
 
   app.patch(api.artworks.updateStatus.path, async (req, res) => {
-    const { status, feedback } = req.body;
-    const artwork = await storage.updateArtworkStatus(Number(req.params.id), status, feedback);
-    res.json(artwork);
+    try {
+      const { status, feedback } = api.artworks.updateStatus.input.parse(req.body);
+      const artwork = await storage.updateArtworkStatus(Number(req.params.id), status, feedback);
+      res.json(artwork);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
+  app.patch(api.artworks.updatePromotion.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    const id = Number(req.params.id);
+    const artwork = await storage.getArtwork(id);
+    
+    if (!artwork) {
+      return res.status(404).json({ message: "Artwork not found" });
+    }
+
+    if (artwork.artistId !== (req.user as any).id) {
+      return res.status(403).json({ message: "Only the artist can promote their artwork" });
+    }
+
+    if (artwork.status !== "approved") {
+      return res.status(400).json({ message: "Only approved artworks can be promoted" });
+    }
+
+    if (artwork.paidAt) {
+      return res.status(400).json({ message: "Cannot promote artwork that has already been sold" });
+    }
+
+    try {
+      const { promotionPercentage } = api.artworks.updatePromotion.input.parse(req.body);
+      
+      if (promotionPercentage > 70) {
+        return res.status(400).json({ message: "Promotion percentage cannot exceed 70%" });
+      }
+      
+      const updated = await storage.updateArtworkPromotion(id, promotionPercentage);
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
   });
 
   // AI Review Endpoint
@@ -180,6 +240,13 @@ export async function registerRoutes(
       const stripe = await getUncachableStripeClient();
       const amount = Number(highestBid.amount);
 
+      const promotionPercentage = artwork.promotionPercentage || 0;
+      const promotionFee = amount * (promotionPercentage / 100);
+      const baseArtistShare = amount * 0.70;
+      const artistShare = baseArtistShare - promotionFee;
+      const platformShare = amount * 0.15 + promotionFee;
+      const charityShare = amount * 0.15;
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [{
@@ -203,9 +270,11 @@ export async function registerRoutes(
           artistId: artwork.artistId,
           charityId: artwork.charityId?.toString() || '',
           totalAmount: amount.toString(),
-          artistShare: (amount * 0.70).toFixed(2),
-          platformShare: (amount * 0.15).toFixed(2),
-          charityShare: (amount * 0.15).toFixed(2),
+          artistShare: artistShare.toFixed(2),
+          platformShare: platformShare.toFixed(2),
+          charityShare: charityShare.toFixed(2),
+          promotionPercentage: promotionPercentage.toString(),
+          promotionFee: promotionFee.toFixed(2),
         },
       });
 

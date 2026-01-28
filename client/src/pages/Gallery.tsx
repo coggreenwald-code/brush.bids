@@ -90,6 +90,12 @@ export default function Gallery() {
         break;
     }
     
+    filtered.sort((a, b) => {
+      const aBoost = a.promotionPercentage ?? 0;
+      const bBoost = b.promotionPercentage ?? 0;
+      return bBoost - aBoost;
+    });
+    
     return filtered;
   }, [artworks, searchQuery, selectedCategory, sortBy, priceRange]);
 

@@ -64,6 +64,18 @@ export const api = {
         200: z.object({ score: z.number(), feedback: z.string() }),
         404: errorSchemas.notFound,
       },
+    },
+    updatePromotion: {
+      method: 'PATCH' as const,
+      path: '/api/artworks/:id/promotion',
+      input: z.object({
+        promotionPercentage: z.number().min(0).max(70),
+      }),
+      responses: {
+        200: z.custom<typeof artworks.$inferSelect>(),
+        404: errorSchemas.notFound,
+        403: z.object({ message: z.string() }),
+      },
     }
   },
   // Bids

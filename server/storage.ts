@@ -1,7 +1,7 @@
 import { db } from "./db";
 import {
   users, artworks, bids, charities,
-  type User, type InsertUser,
+  type User,
   type Artwork, type InsertArtwork,
   type Bid, type InsertBid,
   type Charity, type InsertCharity
@@ -17,10 +17,12 @@ export interface IStorage {
   getArtworks(status?: "pending" | "approved" | "rejected", artistId?: string): Promise<Artwork[]>;
   getArtwork(id: number): Promise<Artwork | undefined>;
   createArtwork(artwork: InsertArtwork): Promise<Artwork>;
-  updateArtworkStatus(id: number, status: "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork>;
+  updateArtworkStatus(id: number, status: "pending" | "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork>;
   setArtworkCheckoutSession(id: number, stripeSessionId: string, expectedPaidBy: string): Promise<Artwork>;
   markArtworkPaid(id: number): Promise<Artwork | null>;
   getArtworkBySessionId(sessionId: string): Promise<Artwork | undefined>;
+  updateArtworkPromotion(id: number, promotionPercentage: number): Promise<Artwork>;
+  getApprovedArtworksSortedByPromotion(): Promise<Artwork[]>;
 
   // Bids
   getBidsForArtwork(artworkId: number): Promise<Bid[]>;
@@ -75,7 +77,7 @@ export class DatabaseStorage implements IStorage {
     return newArtwork;
   }
 
-  async updateArtworkStatus(id: number, status: "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork> {
+  async updateArtworkStatus(id: number, status: "pending" | "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork> {
     const updates: any = { status };
     if (feedback) updates.aiFeedback = feedback;
     if (score) updates.aiScore = score;
@@ -191,6 +193,20 @@ export class DatabaseStorage implements IStorage {
 
   async getCharities(): Promise<Charity[]> {
     return await db.select().from(charities);
+  }
+
+  async updateArtworkPromotion(id: number, promotionPercentage: number): Promise<Artwork> {
+    const [updated] = await db.update(artworks)
+      .set({ promotionPercentage })
+      .where(eq(artworks.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getApprovedArtworksSortedByPromotion(): Promise<Artwork[]> {
+    return await db.select().from(artworks)
+      .where(eq(artworks.status, "approved"))
+      .orderBy(desc(artworks.promotionPercentage), desc(artworks.createdAt));
   }
 }
 
