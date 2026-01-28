@@ -111,6 +111,28 @@ export const api = {
         403: z.object({ message: z.string() }),
       },
     },
+    updateRole: {
+      method: 'PATCH' as const,
+      path: '/api/users/:id/role',
+      input: z.object({
+        role: z.enum(["artist", "buyer", "both"]),
+      }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        403: z.object({ message: z.string() }),
+      },
+    },
+    completeOnboarding: {
+      method: 'POST' as const,
+      path: '/api/users/:id/complete-onboarding',
+      input: z.object({
+        role: z.enum(["artist", "buyer", "both"]),
+      }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        403: z.object({ message: z.string() }),
+      },
+    },
   },
   // Bids
   bids: {

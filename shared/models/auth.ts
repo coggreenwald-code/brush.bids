@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { index, jsonb, pgTable, timestamp, varchar, text, pgEnum } from "drizzle-orm/pg-core";
 
-export const roleEnum = pgEnum("role", ["artist", "buyer", "admin"]);
+export const roleEnum = pgEnum("role", ["artist", "buyer", "both", "admin"]);
 
 // Session storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
@@ -26,6 +26,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  hasCompletedOnboarding: timestamp("has_completed_onboarding"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

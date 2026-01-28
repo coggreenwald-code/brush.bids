@@ -24,8 +24,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { label: "Home", href: "/", icon: Home, roles: ["all"] },
     { label: "Gallery", href: "/gallery", icon: Palette, roles: ["all"] },
-    { label: "My Bids", href: "/my-bids", icon: Heart, roles: ["buyer", "artist"] },
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["artist"] },
+    { label: "My Bids", href: "/my-bids", icon: Heart, roles: ["buyer", "both"] },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["artist", "both"] },
     { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
   ];
 
@@ -98,7 +98,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <p className="font-semibold truncate text-white">
                     {user?.firstName || user?.username || 'User'}
                   </p>
-                  <p className="text-xs text-white/60 capitalize">{user?.role}</p>
+                  <p className="text-xs text-white/60 capitalize">{user?.role === "both" ? "Artist & Collector" : user?.role}</p>
                 </div>
               </div>
               <Button 

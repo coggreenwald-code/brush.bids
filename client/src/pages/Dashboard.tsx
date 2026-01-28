@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,6 +50,28 @@ export default function Dashboard() {
     },
   });
 
+  const updateRoleMutation = useMutation({
+    mutationFn: async (role: "artist" | "buyer" | "both") => {
+      if (!user?.id) throw new Error("Not authenticated");
+      const res = await apiRequest("PATCH", `/api/users/${user.id}/role`, { role });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Role Updated",
+        description: "Your account type has been changed.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Could not change your role. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
   const totalEarnings = 1250; // Mock data
@@ -83,14 +105,18 @@ export default function Dashboard() {
         <div className="flex justify-between items-center">
           <div>
             <span className="text-sm font-medium text-primary uppercase tracking-wider">Your Studio</span>
-            <h1 className="text-3xl font-display font-bold mt-1">Artist Dashboard</h1>
+            <h1 className="text-3xl font-display font-bold mt-1">
+              {user.role === "buyer" ? "Collector Dashboard" : user.role === "both" ? "Artist & Collector Dashboard" : "Artist Dashboard"}
+            </h1>
             <p className="text-muted-foreground">Welcome back, {user.firstName || user.username}</p>
           </div>
-          <Link href="/submit-artwork">
-            <Button size="lg" className="rounded-full shadow-lg">
-              <Plus className="mr-2 h-5 w-5" /> Submit New Art
-            </Button>
-          </Link>
+          {(user.role === "artist" || user.role === "both") && (
+            <Link href="/submit-artwork">
+              <Button size="lg" className="rounded-full shadow-lg">
+                <Plus className="mr-2 h-5 w-5" /> Submit New Art
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Stats Grid */}
@@ -326,6 +352,53 @@ export default function Dashboard() {
                         View Public Profile
                       </Button>
                     </Link>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" /> Account Type
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Current: <span className="font-medium text-foreground capitalize">{user?.role === "both" ? "Artist & Collector" : user?.role}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant={user?.role === "artist" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => updateRoleMutation.mutate("artist")}
+                    disabled={updateRoleMutation.isPending || user?.role === "artist"}
+                    data-testid="button-role-artist"
+                  >
+                    <Palette className="w-4 h-4 mr-1" /> Artist
+                  </Button>
+                  <Button 
+                    variant={user?.role === "buyer" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => updateRoleMutation.mutate("buyer")}
+                    disabled={updateRoleMutation.isPending || user?.role === "buyer"}
+                    data-testid="button-role-collector"
+                  >
+                    <ShoppingBag className="w-4 h-4 mr-1" /> Collector
+                  </Button>
+                  <Button 
+                    variant={user?.role === "both" ? "default" : "outline"} 
+                    size="sm"
+                    onClick={() => updateRoleMutation.mutate("both")}
+                    disabled={updateRoleMutation.isPending || user?.role === "both"}
+                    data-testid="button-role-both"
+                  >
+                    <Sparkles className="w-4 h-4 mr-1" /> Both
+                  </Button>
+                </div>
+                {updateRoleMutation.isPending && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Updating...
                   </div>
                 )}
               </CardContent>

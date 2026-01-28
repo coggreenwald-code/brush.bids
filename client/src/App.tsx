@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -16,6 +17,8 @@ import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
+import { WelcomeModal } from "@/components/WelcomeModal";
+import { useAuth } from "@/hooks/use-auth";
 
 function Router() {
   return (
@@ -37,12 +40,38 @@ function Router() {
   );
 }
 
+function OnboardingWrapper({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated } = useAuth();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user && !user.hasCompletedOnboarding) {
+      setShowWelcome(true);
+    }
+  }, [isAuthenticated, user]);
+
+  return (
+    <>
+      {children}
+      {user && (
+        <WelcomeModal 
+          isOpen={showWelcome} 
+          userId={user.id}
+          onComplete={() => setShowWelcome(false)}
+        />
+      )}
+    </>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <OnboardingWrapper>
+          <Router />
+        </OnboardingWrapper>
       </TooltipProvider>
     </QueryClientProvider>
   );

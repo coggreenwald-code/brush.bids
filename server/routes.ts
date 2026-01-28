@@ -246,6 +246,58 @@ export async function registerRoutes(
     }
   });
 
+  // Update user role
+  app.patch(api.users.updateRole.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if ((req.user as any).id !== userId) {
+      return res.status(403).json({ message: "You can only update your own role" });
+    }
+
+    try {
+      const { role } = api.users.updateRole.input.parse(req.body);
+      const user = await storage.updateUserRole(userId, role);
+      res.json(user);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
+  // Complete onboarding (first-time role selection)
+  app.post(api.users.completeOnboarding.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if ((req.user as any).id !== userId) {
+      return res.status(403).json({ message: "You can only complete your own onboarding" });
+    }
+
+    try {
+      const { role } = api.users.completeOnboarding.input.parse(req.body);
+      const user = await storage.completeOnboarding(userId, role);
+      res.json(user);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
   // My Bids (user's bids)
   app.get("/api/my-bids", async (req, res) => {
     if (!req.user) {

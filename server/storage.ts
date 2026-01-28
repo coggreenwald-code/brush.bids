@@ -11,8 +11,9 @@ import { eq, desc, sql } from "drizzle-orm";
 export interface IStorage {
   // Users (Basic ops, Auth handles most)
   getUser(id: string): Promise<User | undefined>;
-  updateUserRole(id: string, role: "artist" | "buyer" | "admin"): Promise<User>;
+  updateUserRole(id: string, role: "artist" | "buyer" | "both" | "admin"): Promise<User>;
   updateUserBio(id: string, bio: string): Promise<User>;
+  completeOnboarding(id: string, role: "artist" | "buyer" | "both"): Promise<User>;
 
   // Artworks
   getArtworks(status?: "pending" | "approved" | "rejected", artistId?: string): Promise<Artwork[]>;
@@ -49,9 +50,17 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserRole(id: string, role: "artist" | "buyer" | "admin"): Promise<User> {
+  async updateUserRole(id: string, role: "artist" | "buyer" | "both" | "admin"): Promise<User> {
     const [user] = await db.update(users)
-      .set({ role })
+      .set({ role, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async completeOnboarding(id: string, role: "artist" | "buyer" | "both"): Promise<User> {
+    const [user] = await db.update(users)
+      .set({ role, hasCompletedOnboarding: new Date(), updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
     return user;
