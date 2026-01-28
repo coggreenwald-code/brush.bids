@@ -133,76 +133,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats Bar - Modern Glass Cards */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 -mt-8">
-          {stats.map((stat, i) => (
-            <motion.div 
-              key={stat.label}
-              className="relative group"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i, duration: 0.5 }}
-            >
-              <Card className="text-center p-6 hover-artistic border-2 border-transparent hover:border-primary/20 bg-card/80 backdrop-blur-sm">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <stat.icon className="w-6 h-6 text-primary" />
-                </div>
-                <div className="text-3xl md:text-4xl font-display font-bold text-foreground">{stat.value}</div>
-                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-              </Card>
-            </motion.div>
-          ))}
-        </section>
-
-        {/* Featured Section - Gallery Grid Style */}
-        <section className="space-y-8">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <span className="text-sm font-medium text-primary uppercase tracking-wider">Curated Collection</span>
-              <h2 className="text-3xl md:text-4xl font-display font-bold mt-2">Featured Works</h2>
-              <p className="text-muted-foreground mt-2 max-w-lg">Hand-picked by our AI curation engine for exceptional quality and creativity</p>
-            </div>
-            <Link href="/gallery">
-              <Button data-testid="button-view-gallery" variant="outline" className="hidden md:flex rounded-full">
-                View All <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-[400px] bg-muted animate-pulse rounded-2xl" />
-              ))}
-            </div>
-          ) : featuredArtworks.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed rounded-3xl bg-muted/10 watercolor-bg">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-                <Palette className="w-10 h-10 text-primary" />
-              </div>
-              <h3 className="text-2xl font-display font-bold mb-3">No artworks yet</h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">Be the first to showcase your creativity and start your journey as a selling artist.</p>
-              <Link href="/submit-artwork">
-                <Button data-testid="button-submit-first" size="lg" className="rounded-full">Submit Your Art</Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredArtworks.map((artwork) => (
-                <ArtworkCard key={artwork.id} artwork={artwork} />
-              ))}
-            </div>
-          )}
-          
-          <div className="flex justify-center md:hidden">
-            <Link href="/gallery">
-              <Button data-testid="button-view-gallery-mobile" variant="outline" className="rounded-full">
-                View All Gallery <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-        </section>
-
         {/* How It Works - Modern Cards */}
         <section className="space-y-12">
           <div className="text-center max-w-2xl mx-auto">
@@ -325,6 +255,76 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Featured Section - Gallery Grid Style */}
+        <section className="space-y-8">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">Curated Collection</span>
+              <h2 className="text-3xl md:text-4xl font-display font-bold mt-2">Featured Works</h2>
+              <p className="text-muted-foreground mt-2 max-w-lg">Hand-picked by our AI curation engine for exceptional quality and creativity</p>
+            </div>
+            <Link href="/gallery">
+              <Button data-testid="button-view-gallery" variant="outline" className="hidden md:flex rounded-full">
+                View All <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-[400px] bg-muted animate-pulse rounded-2xl" />
+              ))}
+            </div>
+          ) : featuredArtworks.length === 0 ? (
+            <div className="text-center py-20 border-2 border-dashed rounded-3xl bg-muted/10 watercolor-bg">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+                <Palette className="w-10 h-10 text-primary" />
+              </div>
+              <h3 className="text-2xl font-display font-bold mb-3">No artworks yet</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">Be the first to showcase your creativity and start your journey as a selling artist.</p>
+              <Link href="/submit-artwork">
+                <Button data-testid="button-submit-first" size="lg" className="rounded-full">Submit Your Art</Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredArtworks.map((artwork) => (
+                <ArtworkCard key={artwork.id} artwork={artwork} />
+              ))}
+            </div>
+          )}
+          
+          <div className="flex justify-center md:hidden">
+            <Link href="/gallery">
+              <Button data-testid="button-view-gallery-mobile" variant="outline" className="rounded-full">
+                View All Gallery <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* Stats Bar - Modern Glass Cards */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {stats.map((stat, i) => (
+            <motion.div 
+              key={stat.label}
+              className="relative group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * i, duration: 0.5 }}
+            >
+              <Card className="text-center p-6 hover-artistic border-2 border-transparent hover:border-primary/20 bg-card/80 backdrop-blur-sm">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <stat.icon className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-3xl md:text-4xl font-display font-bold text-foreground">{stat.value}</div>
+                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+              </Card>
+            </motion.div>
+          ))}
         </section>
 
         {/* Student Spotlight / Testimonials */}
