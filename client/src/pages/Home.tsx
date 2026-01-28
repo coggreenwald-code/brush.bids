@@ -90,9 +90,9 @@ export default function Home() {
                 <Brush className="w-4 h-4" />
                 Where creativity meets opportunity
               </span>
-              <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight tracking-tight">
+              <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight tracking-tight text-white">
                 Discover the Next
-                <span className="block mt-2 italic text-white">Generation of Artists</span>
+                <span className="block mt-2 italic">Generation of Artists</span>
               </h1>
             </motion.div>
             
