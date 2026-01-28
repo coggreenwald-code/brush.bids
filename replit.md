@@ -16,6 +16,29 @@ Key features:
 
 Preferred communication style: Simple, everyday language.
 
+## Design System
+
+### Color Palette
+- **Primary**: #1F4959 (deep teal) - Main brand color, used in sidebar, footer, hero sections
+- **Accent**: #5C7C89 (muted teal) - Secondary accent for highlights
+- **Foreground**: #242424 (near black) - Primary text color
+- **Background**: Cool off-white (#F7F9FA) with slight blue undertone
+
+### Typography
+- **Display Font**: Playfair Display (serif) - Used for headings, elegant artistic feel
+- **Body Font**: Inter (sans-serif) - Clean, modern readability
+
+### Design Elements
+- **Artistic Utilities**: blob-shape animations, watercolor-bg gradients, hover-artistic effects
+- **Cards**: Clean with subtle shadows, hover elevation effects
+- **Buttons**: Rounded (rounded-full) for CTAs, standard rounded for secondary
+- **Sidebar**: Dark teal background with white text, matches footer
+
+### Component Patterns
+- Page headers include small uppercase label above title (e.g., "Curated Collection")
+- Empty states use watercolor backgrounds with centered icons
+- Hero sections use blob shape backgrounds with SVG brush stroke decorations
+
 ## System Architecture
 
 ### Frontend Architecture

@@ -48,11 +48,12 @@ export default function Dashboard() {
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-display font-bold">Artist Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {user.username}</p>
+            <span className="text-sm font-medium text-primary uppercase tracking-wider">Your Studio</span>
+            <h1 className="text-3xl font-display font-bold mt-1">Artist Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back, {user.firstName || user.username}</p>
           </div>
           <Link href="/submit-artwork">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
+            <Button size="lg" className="rounded-full shadow-lg">
               <Plus className="mr-2 h-5 w-5" /> Submit New Art
             </Button>
           </Link>
@@ -109,8 +110,10 @@ export default function Dashboard() {
                 {isLoading ? (
                   <div>Loading...</div>
                 ) : myArtworks.length === 0 ? (
-                  <div className="text-center py-12 border-2 border-dashed rounded-xl">
-                    <Palette className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <div className="text-center py-16 border-2 border-dashed rounded-2xl bg-muted/10 watercolor-bg">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Palette className="w-8 h-8 text-primary" />
+                    </div>
                     <h3 className="text-lg font-semibold">No artworks yet</h3>
                     <p className="text-muted-foreground mb-4">Start your journey by submitting your first piece.</p>
                     <Link href="/submit-artwork">

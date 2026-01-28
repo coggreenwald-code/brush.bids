@@ -78,7 +78,8 @@ export default function SubmitArtwork() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-display font-bold">Submit Artwork</h1>
+          <span className="text-sm font-medium text-primary uppercase tracking-wider">Create Listing</span>
+          <h1 className="text-3xl font-display font-bold mt-1">Submit Artwork</h1>
           <p className="text-muted-foreground">Upload your masterpiece for AI curation and global auction.</p>
         </div>
 
@@ -178,7 +179,7 @@ export default function SubmitArtwork() {
                 )}
               />
 
-              <Button type="submit" size="lg" className="w-full" disabled={createArtwork.isPending}>
+              <Button type="submit" size="lg" className="w-full rounded-full" disabled={createArtwork.isPending}>
                 {createArtwork.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...

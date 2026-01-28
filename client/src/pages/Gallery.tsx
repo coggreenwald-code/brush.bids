@@ -108,11 +108,12 @@ export default function Gallery() {
 
   return (
     <Layout>
-      <div className="space-y-6 pb-16">
+      <div className="space-y-8 pb-16">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-display font-bold">Gallery</h1>
+            <span className="text-sm font-medium text-primary uppercase tracking-wider">Curated Collection</span>
+            <h1 className="text-4xl font-display font-bold mt-1">Gallery</h1>
             <p className="text-muted-foreground mt-2">Browse unique artworks from emerging student talent</p>
           </div>
           
@@ -251,8 +252,10 @@ export default function Gallery() {
             ))}
           </div>
         ) : filteredArtworks.length === 0 ? (
-          <div className="py-20 text-center border rounded-2xl bg-muted/20">
-            <Palette className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+          <div className="py-20 text-center border-2 border-dashed rounded-3xl bg-muted/10 watercolor-bg">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+              <Palette className="w-10 h-10 text-primary" />
+            </div>
             <h3 className="text-xl font-bold mb-2">No Artworks Found</h3>
             <p className="text-muted-foreground mb-4">
               {searchQuery || activeFilters.length > 0 
