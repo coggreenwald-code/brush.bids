@@ -58,7 +58,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <span className="text-2xl font-display font-bold">BrushBids</span>
-              <p className="text-xs text-white/60 font-medium tracking-wider uppercase">Art Auction</p>
+              <p className="text-xs text-white/60 font-medium tracking-wider uppercase">ART AUCTIONS</p>
             </div>
           </Link>
         </div>
