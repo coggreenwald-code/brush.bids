@@ -9,8 +9,20 @@ Key features:
 - AI curation system that scores and provides feedback on artwork submissions
 - Real-time auction gallery with bidding functionality
 - Charity selection for artists (15% of sales go to chosen charity)
+- Artist promotion tool (0-20% boost to increase listing visibility)
 - Admin panel for manual curation override
 - Replit Auth integration for user authentication
+
+### Revenue Split
+- Base: 70% artist, 15% platform, 15% charity
+- With boost: Boost percentage deducted from artist's share, added to platform's share
+- Example: 10% boost = 60% artist, 25% platform, 15% charity
+
+### Promotion Feature
+- Artists can boost approved artworks by paying 0-20% of final sale price
+- Boosted listings appear first in gallery regardless of sort option
+- Boost fee only charged when artwork sells (no upfront cost)
+- Visual "Boosted" badge on promoted listings
 
 ## User Preferences
 
