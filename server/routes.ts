@@ -227,7 +227,8 @@ export async function registerRoutes(
     }
     
     const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    if ((req.user as any).id !== userId) {
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (currentUserId !== userId) {
       return res.status(403).json({ message: "You can only update your own profile" });
     }
 
@@ -253,7 +254,8 @@ export async function registerRoutes(
     }
     
     const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    if ((req.user as any).id !== userId) {
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (currentUserId !== userId) {
       return res.status(403).json({ message: "You can only update your own role" });
     }
 
@@ -279,7 +281,8 @@ export async function registerRoutes(
     }
     
     const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    if ((req.user as any).id !== userId) {
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (currentUserId !== userId) {
       return res.status(403).json({ message: "You can only complete your own onboarding" });
     }
 

@@ -12,6 +12,9 @@ Key features:
 - Artist promotion tool (0-20% boost to increase listing visibility)
 - Admin panel for manual curation override
 - Replit Auth integration for user authentication
+- Role-based accounts: Artist, Collector, or Both
+- Welcome onboarding modal for new users to select their role
+- Role switching available anytime from Dashboard settings
 
 ### Revenue Split
 - Base: 70% artist, 15% platform, 15% charity
