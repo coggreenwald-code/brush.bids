@@ -92,12 +92,12 @@ export default function Home() {
               </span>
               <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight tracking-tight">
                 Discover the Next
-                <span className="block mt-2 italic text-[#5C7C89]">Generation of Artists</span>
+                <span className="block mt-2 italic text-white">Generation of Artists</span>
               </h1>
             </motion.div>
             
             <motion.p 
-              className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed"
+              className="text-lg md:text-xl text-white max-w-2xl mx-auto leading-relaxed font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
@@ -297,7 +297,7 @@ export default function Home() {
               </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold">
                 Curated by 
-                <span className="italic text-primary"> Intelligence</span>
+                <span className="italic text-[#1F4959]"> Intelligence</span>
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed">
                 Every submission is analyzed by our advanced AI curators. They evaluate technique, composition, and originality to ensure only the highest quality student work reaches the marketplace.
@@ -394,7 +394,7 @@ export default function Home() {
           
           <div className="relative z-10">
             <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
-              Ready to <span className="italic text-[#5C7C89]">Create Your Legacy?</span>
+              Ready to <span className="italic text-white">Create Your Legacy?</span>
             </h2>
             <p className="text-white/80 text-lg max-w-xl mx-auto mb-10">
               Whether you're looking to sell your art or discover the next big talent, BrushBids is your platform.
