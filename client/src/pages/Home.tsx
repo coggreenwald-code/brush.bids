@@ -135,96 +135,156 @@ export default function Home() {
 
         {/* How It Works - Modern Cards */}
         <section className="space-y-12">
-          <div className="text-center max-w-2xl mx-auto">
+          <motion.div 
+            className="text-center max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          >
             <span className="text-sm font-medium text-primary uppercase tracking-wider">Simple Process</span>
             <h2 className="text-3xl md:text-4xl font-display font-bold mt-2 mb-4">How It Works</h2>
             <p className="text-muted-foreground text-lg">Whether you're a student artist or an art enthusiast, getting started is simple.</p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* For Artists */}
-            <Card className="relative overflow-hidden p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blob-shape -translate-y-1/2 translate-x-1/2" />
-              
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-                    <GraduationCap className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-display font-bold">For Artists</h3>
-                    <p className="text-sm text-muted-foreground">Start selling your work</p>
-                  </div>
-                </div>
-                <div className="space-y-5">
-                  {howItWorksArtist.map((step, i) => (
-                    <div key={step.title} className="flex gap-4 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-primary/30">
-                        {i + 1}
-                      </div>
-                      <div className="pt-0.5">
-                        <h4 className="font-semibold flex items-center gap-2">
-                          <step.icon className="w-4 h-4 text-primary" />
-                          {step.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
-                      </div>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <Card className="relative overflow-hidden p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 h-full">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blob-shape -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-8">
+                    <motion.div 
+                      className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <GraduationCap className="w-6 h-6 text-white" />
+                    </motion.div>
+                    <div>
+                      <h3 className="text-2xl font-display font-bold">For Artists</h3>
+                      <p className="text-sm text-muted-foreground">Start selling your work</p>
                     </div>
-                  ))}
+                  </div>
+                  <div className="space-y-5">
+                    {howItWorksArtist.map((step, i) => (
+                      <motion.div 
+                        key={step.title} 
+                        className="flex gap-4 items-start"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-primary/30">
+                          {i + 1}
+                        </div>
+                        <div className="pt-0.5">
+                          <h4 className="font-semibold flex items-center gap-2">
+                            <step.icon className="w-4 h-4 text-primary" />
+                            {step.title}
+                          </h4>
+                          <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <Link href="/submit-artwork">
+                    <Button data-testid="button-start-selling" className="mt-8 w-full rounded-full" size="lg">Start Selling Your Art</Button>
+                  </Link>
                 </div>
-                <Link href="/submit-artwork">
-                  <Button data-testid="button-start-selling" className="mt-8 w-full rounded-full" size="lg">Start Selling Your Art</Button>
-                </Link>
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
 
             {/* For Buyers */}
-            <Card className="relative overflow-hidden p-8 bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-accent/5 blob-shape -translate-y-1/2 translate-x-1/2" style={{ animationDelay: '-3s' }} />
-              
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-display font-bold">For Collectors</h3>
-                    <p className="text-sm text-muted-foreground">Discover emerging talent</p>
-                  </div>
-                </div>
-                <div className="space-y-5">
-                  {howItWorksBuyer.map((step, i) => (
-                    <div key={step.title} className="flex gap-4 items-start">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-accent/30">
-                        {i + 1}
-                      </div>
-                      <div className="pt-0.5">
-                        <h4 className="font-semibold flex items-center gap-2">
-                          <step.icon className="w-4 h-4 text-accent" />
-                          {step.title}
-                        </h4>
-                        <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
-                      </div>
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="relative overflow-hidden p-8 bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20 h-full">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-accent/5 blob-shape -translate-y-1/2 translate-x-1/2" style={{ animationDelay: '-3s' }} />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-8">
+                    <motion.div 
+                      className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center"
+                      whileHover={{ scale: 1.1, rotate: -5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      <Users className="w-6 h-6 text-white" />
+                    </motion.div>
+                    <div>
+                      <h3 className="text-2xl font-display font-bold">For Collectors</h3>
+                      <p className="text-sm text-muted-foreground">Discover emerging talent</p>
                     </div>
-                  ))}
+                  </div>
+                  <div className="space-y-5">
+                    {howItWorksBuyer.map((step, i) => (
+                      <motion.div 
+                        key={step.title} 
+                        className="flex gap-4 items-start"
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-accent/30">
+                          {i + 1}
+                        </div>
+                        <div className="pt-0.5">
+                          <h4 className="font-semibold flex items-center gap-2">
+                            <step.icon className="w-4 h-4 text-accent" />
+                            {step.title}
+                          </h4>
+                          <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <Link href="/gallery">
+                    <Button data-testid="button-browse-gallery" variant="outline" className="mt-8 w-full rounded-full" size="lg">Browse the Gallery</Button>
+                  </Link>
                 </div>
-                <Link href="/gallery">
-                  <Button data-testid="button-browse-gallery" variant="outline" className="mt-8 w-full rounded-full" size="lg">Browse the Gallery</Button>
-                </Link>
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
           </div>
         </section>
 
         {/* AI Curation Explainer - Artistic Layout */}
-        <section className="relative overflow-hidden">
+        <motion.section 
+          className="relative overflow-hidden"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+        >
           <div className="absolute inset-0 watercolor-bg rounded-3xl" />
           <div className="relative grid md:grid-cols-2 gap-12 items-center bg-card/50 backdrop-blur-sm p-8 md:p-12 rounded-3xl border">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full bg-primary/10 text-primary">
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <motion.div 
+                className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full bg-primary/10 text-primary"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+              >
                 <Sparkles className="w-4 h-4" />
                 AI-Powered
-              </div>
+              </motion.div>
               <h2 className="text-3xl md:text-4xl font-display font-bold">
                 Curated by 
                 <span className="italic text-[#1F4959]"> Intelligence</span>
@@ -233,33 +293,60 @@ export default function Home() {
                 Every submission is analyzed by our advanced AI curators. They evaluate technique, composition, and originality to ensure only the highest quality student work reaches the marketplace.
               </p>
               <ul className="space-y-4">
-                {['Instant Feedback for Artists', 'Quality Assurance for Buyers', 'Fair & Unbiased Selection'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 font-medium">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                {['Instant Feedback for Artists', 'Quality Assurance for Buyers', 'Fair & Unbiased Selection'].map((item, i) => (
+                  <motion.li 
+                    key={item} 
+                    className="flex items-center gap-3 font-medium"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
+                  >
+                    <motion.div 
+                      className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center"
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
                       <Award className="w-4 h-4" />
-                    </div>
+                    </motion.div>
                     {item}
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
-            <div className="relative">
+            </motion.div>
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+              whileInView={{ opacity: 1, scale: 1, rotate: 2 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.3, type: "spring" }}
+            >
               <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-2xl" />
-              <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500 border-4 border-white dark:border-gray-800">
+              <motion.div 
+                className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800"
+                whileHover={{ rotate: 0, scale: 1.02 }}
+                transition={{ duration: 0.5 }}
+              >
                 <img 
                   src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop" 
                   alt="AI Art Analysis" 
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent mix-blend-overlay" />
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Featured Section - Gallery Grid Style */}
         <section className="space-y-8">
-          <div className="flex items-end justify-between gap-4">
+          <motion.div 
+            className="flex items-end justify-between gap-4"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          >
             <div>
               <span className="text-sm font-medium text-primary uppercase tracking-wider">Curated Collection</span>
               <h2 className="text-3xl md:text-4xl font-display font-bold mt-2">Featured Works</h2>
@@ -270,7 +357,7 @@ export default function Home() {
                 View All <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
-          </div>
+          </motion.div>
 
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -279,31 +366,57 @@ export default function Home() {
               ))}
             </div>
           ) : featuredArtworks.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed rounded-3xl bg-muted/10 watercolor-bg">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
+            <motion.div 
+              className="text-center py-20 border-2 border-dashed rounded-3xl bg-muted/10 watercolor-bg"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div 
+                className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2, type: "spring" }}
+              >
                 <Palette className="w-10 h-10 text-primary" />
-              </div>
+              </motion.div>
               <h3 className="text-2xl font-display font-bold mb-3">No artworks yet</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">Be the first to showcase your creativity and start your journey as a selling artist.</p>
               <Link href="/submit-artwork">
                 <Button data-testid="button-submit-first" size="lg" className="rounded-full">Submit Your Art</Button>
               </Link>
-            </div>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredArtworks.map((artwork) => (
-                <ArtworkCard key={artwork.id} artwork={artwork} />
+              {featuredArtworks.map((artwork, i) => (
+                <motion.div
+                  key={artwork.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: i * 0.15 }}
+                >
+                  <ArtworkCard artwork={artwork} />
+                </motion.div>
               ))}
             </div>
           )}
           
-          <div className="flex justify-center md:hidden">
+          <motion.div 
+            className="flex justify-center md:hidden"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
             <Link href="/gallery">
               <Button data-testid="button-view-gallery-mobile" variant="outline" className="rounded-full">
                 View All Gallery <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
-          </div>
+          </motion.div>
         </section>
 
         {/* Stats Bar - Modern Glass Cards */}
@@ -312,15 +425,28 @@ export default function Home() {
             <motion.div 
               key={stat.label}
               className="relative group"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i, duration: 0.5 }}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: 0.1 * i, duration: 0.5, type: "spring" }}
             >
               <Card className="text-center p-6 hover-artistic border-2 border-transparent hover:border-primary/20 bg-card/80 backdrop-blur-sm">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center">
+                <motion.div 
+                  className="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center"
+                  whileHover={{ scale: 1.15, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
                   <stat.icon className="w-6 h-6 text-primary" />
-                </div>
-                <div className="text-3xl md:text-4xl font-display font-bold text-foreground">{stat.value}</div>
+                </motion.div>
+                <motion.div 
+                  className="text-3xl md:text-4xl font-display font-bold text-foreground"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 + i * 0.1, duration: 0.4 }}
+                >
+                  {stat.value}
+                </motion.div>
                 <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
               </Card>
             </motion.div>
@@ -329,27 +455,39 @@ export default function Home() {
 
         {/* Student Spotlight / Testimonials */}
         <section className="space-y-10">
-          <div className="text-center max-w-2xl mx-auto">
+          <motion.div 
+            className="text-center max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          >
             <span className="text-sm font-medium text-primary uppercase tracking-wider">Community Stories</span>
             <h2 className="text-3xl md:text-4xl font-display font-bold mt-2 mb-4">Student Spotlight</h2>
             <p className="text-muted-foreground text-lg">Hear from artists and collectors who are part of the BrushBids community.</p>
-          </div>
+          </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((testimonial, i) => (
               <motion.div
                 key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i, duration: 0.5 }}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: 0.15 * i, duration: 0.6, type: "spring" }}
               >
                 <Card className="p-6 h-full flex flex-col hover-artistic group">
                   <CardContent className="p-0 flex-1 flex flex-col">
                     <div className="flex items-center gap-4 mb-4">
-                      <Avatar className="w-14 h-14 border-2 border-primary/20 group-hover:border-primary/40 transition-colors">
-                        <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${testimonial.avatar}`} />
-                        <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 400 }}
+                      >
+                        <Avatar className="w-14 h-14 border-2 border-primary/20 group-hover:border-primary/40 transition-colors">
+                          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${testimonial.avatar}`} />
+                          <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                      </motion.div>
                       <div>
                         <p className="font-semibold">{testimonial.name}</p>
                         <p className="text-xs text-muted-foreground">{testimonial.school}</p>
@@ -381,11 +519,25 @@ export default function Home() {
         </section>
 
         {/* CTA Section - Artistic Final Touch */}
-        <section className="relative overflow-hidden text-center py-20 px-8 rounded-3xl bg-[#1F4959] text-white">
+        <motion.section 
+          className="relative overflow-hidden text-center py-20 px-8 rounded-3xl bg-[#1F4959] text-white"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
           {/* Artistic background */}
           <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-32 h-32 bg-white/5 blob-shape" />
-            <div className="absolute bottom-10 right-10 w-48 h-48 bg-[#5C7C89]/20 blob-shape" style={{ animationDelay: '-3s' }} />
+            <motion.div 
+              className="absolute top-10 left-10 w-32 h-32 bg-white/5 blob-shape"
+              animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div 
+              className="absolute bottom-10 right-10 w-48 h-48 bg-[#5C7C89]/20 blob-shape"
+              animate={{ scale: [1, 1.15, 1], rotate: [0, -5, 0] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            />
           </div>
           
           <svg className="absolute inset-0 w-full h-full opacity-10 pointer-events-none" viewBox="0 0 1200 400">
@@ -393,13 +545,31 @@ export default function Home() {
           </svg>
           
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
+            <motion.h2 
+              className="text-3xl md:text-5xl font-display font-bold mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               Ready to <span className="italic text-white">Create Your Legacy?</span>
-            </h2>
-            <p className="text-white/80 text-lg max-w-xl mx-auto mb-10">
+            </motion.h2>
+            <motion.p 
+              className="text-white/80 text-lg max-w-xl mx-auto mb-10"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               Whether you're looking to sell your art or discover the next big talent, BrushBids is your platform.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            </motion.p>
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
               <Link href="/submit-artwork">
                 <Button data-testid="button-submit-artwork-cta" size="lg" className="min-w-[220px] h-14 text-lg rounded-full bg-white text-[#1F4959] hover:bg-white/90 font-semibold">
                   Submit Your Artwork
@@ -410,9 +580,9 @@ export default function Home() {
                   Explore Gallery
                 </Button>
               </Link>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
       </div>
 
       <Footer />
