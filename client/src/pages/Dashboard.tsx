@@ -7,18 +7,48 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
+import { Textarea } from "@/components/ui/textarea";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { Artwork } from "@shared/schema";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [boostArtwork, setBoostArtwork] = useState<Artwork | null>(null);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioText, setBioText] = useState(user?.bio || "");
+  const { toast } = useToast();
   
   // In a real app we'd filter by artistId/ownerId. 
   // For this mock, we'll fetch all and pretend to filter or just show list.
   const { data: artworks, isLoading } = useArtworks();
+
+  const updateBioMutation = useMutation({
+    mutationFn: async (bio: string) => {
+      if (!user?.id) throw new Error("Not authenticated");
+      const res = await apiRequest("PATCH", `/api/users/${user.id}/bio`, { bio });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profile Updated",
+        description: "Your bio has been saved successfully.",
+      });
+      setEditingBio(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Could not save your bio. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
@@ -222,6 +252,82 @@ export default function Dashboard() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5" /> Your Profile
+                </CardTitle>
+                {!editingBio && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => {
+                      setBioText(user?.bio || "");
+                      setEditingBio(true);
+                    }}
+                    data-testid="button-edit-bio"
+                  >
+                    Edit
+                  </Button>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {editingBio ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      placeholder="Tell buyers about yourself, your artistic style, and what inspires you..."
+                      value={bioText}
+                      onChange={(e) => setBioText(e.target.value)}
+                      className="min-h-[100px]"
+                      maxLength={500}
+                      data-testid="textarea-bio"
+                    />
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-muted-foreground">{bioText.length}/500</span>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setEditingBio(false)}
+                          data-testid="button-cancel-bio"
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          onClick={() => updateBioMutation.mutate(bioText)}
+                          disabled={updateBioMutation.isPending}
+                          data-testid="button-save-bio"
+                        >
+                          {updateBioMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Check className="w-4 h-4 mr-1" />
+                          )}
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {user?.bio ? (
+                      <p className="text-sm text-muted-foreground">{user.bio}</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">
+                        Add a bio to tell buyers about yourself and your art.
+                      </p>
+                    )}
+                    <Link href={`/artist/${user?.id}`}>
+                      <Button variant="outline" size="sm" className="mt-3 w-full" data-testid="link-view-my-profile">
+                        View Public Profile
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

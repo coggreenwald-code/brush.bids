@@ -12,6 +12,7 @@ export interface IStorage {
   // Users (Basic ops, Auth handles most)
   getUser(id: string): Promise<User | undefined>;
   updateUserRole(id: string, role: "artist" | "buyer" | "admin"): Promise<User>;
+  updateUserBio(id: string, bio: string): Promise<User>;
 
   // Artworks
   getArtworks(status?: "pending" | "approved" | "rejected", artistId?: string): Promise<Artwork[]>;
@@ -51,6 +52,14 @@ export class DatabaseStorage implements IStorage {
   async updateUserRole(id: string, role: "artist" | "buyer" | "admin"): Promise<User> {
     const [user] = await db.update(users)
       .set({ role })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserBio(id: string, bio: string): Promise<User> {
+    const [user] = await db.update(users)
+      .set({ bio, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
     return user;

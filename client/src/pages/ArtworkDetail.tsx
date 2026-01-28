@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtwork } from "@/hooks/use-artworks";
 import { useBids, usePlaceBid } from "@/hooks/use-bids";
-import { useRoute } from "wouter";
+import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +15,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Loader2, DollarSign, Clock, Heart, Share2, Sparkles, Twitter, Facebook, Link as LinkIcon, Copy, Check } from "lucide-react";
+import { Loader2, DollarSign, Clock, Heart, Share2, Sparkles, Twitter, Facebook, Link as LinkIcon, Copy, Check, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useQuery } from "@tanstack/react-query";
+import type { User as UserType } from "@shared/schema";
 
 const bidSchema = z.object({
   amount: z.coerce.number().min(1, "Bid must be at least $1"),
@@ -75,6 +77,11 @@ export default function ArtworkDetail() {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const { data: artist } = useQuery<UserType>({
+    queryKey: ['/api/users', artwork?.artistId],
+    enabled: !!artwork?.artistId,
+  });
 
   const form = useForm({
     resolver: zodResolver(bidSchema),
@@ -198,23 +205,63 @@ export default function ArtworkDetail() {
               {artwork.status === 'approved' && <Badge variant="outline" className="text-green-600 border-green-600">Live Auction</Badge>}
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4" data-testid="text-artwork-title">{artwork.title}</h1>
-            <div className="flex items-center gap-4">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${artwork.artistId}`} />
-                <AvatarFallback>A</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm text-muted-foreground">Created by</p>
-                <p className="font-semibold">Artist #{artwork.artistId}</p>
+            <Link href={`/artist/${artwork.artistId}`}>
+              <div className="flex items-center gap-4 hover-elevate rounded-lg p-2 -m-2 cursor-pointer" data-testid="link-artist-profile">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src={artist?.profileImageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${artwork.artistId}`} />
+                  <AvatarFallback>{artist?.firstName?.charAt(0) || 'A'}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm text-muted-foreground">Created by</p>
+                  <p className="font-semibold text-primary hover:underline">
+                    {artist?.firstName && artist?.lastName 
+                      ? `${artist.firstName} ${artist.lastName}` 
+                      : artist?.username || `Artist #${artwork.artistId}`}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
 
           <Separator />
 
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            {artwork.description}
-          </p>
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">About This Artwork</h3>
+            <p className="text-lg leading-relaxed text-muted-foreground">
+              {artwork.description}
+            </p>
+          </div>
+
+          {artist && (
+            <Card className="p-6">
+              <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                <User className="w-5 h-5" /> About the Artist
+              </h3>
+              <Link href={`/artist/${artwork.artistId}`}>
+                <div className="flex items-start gap-4 hover-elevate rounded-lg p-2 -m-2 cursor-pointer">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={artist.profileImageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${artwork.artistId}`} />
+                    <AvatarFallback>{artist.firstName?.charAt(0) || 'A'}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-semibold text-primary">
+                      {artist.firstName && artist.lastName 
+                        ? `${artist.firstName} ${artist.lastName}` 
+                        : artist.username || `Artist #${artwork.artistId}`}
+                    </p>
+                    {artist.bio ? (
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{artist.bio}</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground mt-1 italic">This artist hasn't added a bio yet.</p>
+                    )}
+                    <span className="text-sm text-primary underline mt-2 inline-block" data-testid="link-view-artist-profile">
+                      View Full Profile
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </Card>
+          )}
 
           <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

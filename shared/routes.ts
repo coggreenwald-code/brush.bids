@@ -76,7 +76,41 @@ export const api = {
         404: errorSchemas.notFound,
         403: z.object({ message: z.string() }),
       },
+    },
+    generateDescription: {
+      method: 'POST' as const,
+      path: '/api/artworks/generate-description',
+      input: z.object({
+        title: z.string(),
+        medium: z.string().optional(),
+      }),
+      responses: {
+        200: z.object({ description: z.string() }),
+        400: errorSchemas.validation,
+      },
     }
+  },
+  // Users/Artists
+  users: {
+    get: {
+      method: 'GET' as const,
+      path: '/api/users/:id',
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        404: errorSchemas.notFound,
+      },
+    },
+    updateBio: {
+      method: 'PATCH' as const,
+      path: '/api/users/:id/bio',
+      input: z.object({
+        bio: z.string().max(500),
+      }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        403: z.object({ message: z.string() }),
+      },
+    },
   },
   // Bids
   bids: {

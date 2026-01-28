@@ -15,6 +15,7 @@ import FAQ from "@/pages/FAQ";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import MyBids from "@/pages/MyBids";
+import ArtistProfile from "@/pages/ArtistProfile";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/gallery" component={Gallery} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/artwork/:id" component={ArtworkDetail} />
+      <Route path="/artist/:id" component={ArtistProfile} />
       <Route path="/submit-artwork" component={SubmitArtwork} />
       <Route path="/admin" component={Admin} />
       <Route path="/about" component={About} />

@@ -177,6 +177,75 @@ export async function registerRoutes(
     res.json(charities);
   });
 
+  // AI Description Generator
+  app.post(api.artworks.generateDescription.path, async (req, res) => {
+    try {
+      const { title, medium } = api.artworks.generateDescription.input.parse(req.body);
+      
+      const response = await openai.chat.completions.create({
+        model: "gpt-5.1",
+        messages: [
+          { 
+            role: "system", 
+            content: "You are a creative writing assistant helping student artists write compelling descriptions for their artwork. Write engaging, personal descriptions that tell a story and connect emotionally with potential buyers. Keep descriptions between 2-4 sentences. Be authentic and avoid overly formal language." 
+          },
+          { 
+            role: "user", 
+            content: `Write a compelling description for an artwork titled "${title}"${medium ? ` created using ${medium}` : ''}. Focus on the emotional impact and creative process.` 
+          }
+        ],
+        max_completion_tokens: 200
+      });
+
+      const description = response.choices[0].message.content || "Unable to generate description";
+      res.json({ description });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      console.error("AI description generation failed:", err);
+      res.status(500).json({ message: "Failed to generate description" });
+    }
+  });
+
+  // Users
+  app.get(api.users.get.path, async (req, res) => {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const user = await storage.getUser(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  });
+
+  app.patch(api.users.updateBio.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    if ((req.user as any).id !== userId) {
+      return res.status(403).json({ message: "You can only update your own profile" });
+    }
+
+    try {
+      const { bio } = api.users.updateBio.input.parse(req.body);
+      const user = await storage.updateUserBio(userId, bio);
+      res.json(user);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
   // My Bids (user's bids)
   app.get("/api/my-bids", async (req, res) => {
     if (!req.user) {

@@ -12,8 +12,10 @@ import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { Loader2, UploadCloud } from "lucide-react";
+import { Loader2, UploadCloud, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 // Extending schema from shared but coercing numbers for form handling
 const formSchema = z.object({
@@ -30,6 +32,40 @@ export default function SubmitArtwork() {
   const { toast } = useToast();
   const createArtwork = useCreateArtwork();
   const { data: charities } = useCharities();
+
+  const generateDescription = useMutation({
+    mutationFn: async (data: { title: string; medium?: string }) => {
+      const res = await apiRequest("POST", "/api/artworks/generate-description", data);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      form.setValue("description", data.description);
+      toast({
+        title: "Description Generated",
+        description: "AI has created a description. Feel free to edit it!",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Generation Failed",
+        description: "Could not generate description. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleGenerateDescription = () => {
+    const title = form.getValues("title");
+    if (!title || title.length < 3) {
+      toast({
+        title: "Title Required",
+        description: "Please enter a title first so the AI can generate a relevant description.",
+        variant: "destructive",
+      });
+      return;
+    }
+    generateDescription.mutate({ title });
+  };
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -105,15 +141,32 @@ export default function SubmitArtwork() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description & Backstory</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Description & Backstory</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGenerateDescription}
+                        disabled={generateDescription.isPending}
+                        data-testid="button-ai-generate-description"
+                      >
+                        {generateDescription.isPending ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-4 h-4 mr-2" />
+                        )}
+                        AI Write
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea 
-                        placeholder="Tell us about your creative process..." 
+                        placeholder="Tell us about your creative process, or click 'AI Write' to generate a description..." 
                         className="min-h-[120px]"
                         {...field} 
                       />
                     </FormControl>
-                    <FormDescription>Good stories increase sales by 25%.</FormDescription>
+                    <FormDescription>Good stories increase sales by 25%. Let AI help you craft the perfect description!</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
