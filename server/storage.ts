@@ -13,7 +13,8 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   updateUserRole(id: string, role: "artist" | "buyer" | "both" | "admin"): Promise<User>;
   updateUserBio(id: string, bio: string): Promise<User>;
-  completeOnboarding(id: string, role: "artist" | "buyer" | "both"): Promise<User>;
+  updateUserName(id: string, firstName: string, lastName: string): Promise<User>;
+  completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string): Promise<User>;
 
   // Artworks
   getArtworks(status?: "pending" | "approved" | "rejected", artistId?: string): Promise<Artwork[]>;
@@ -58,9 +59,21 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async completeOnboarding(id: string, role: "artist" | "buyer" | "both"): Promise<User> {
+  async completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string): Promise<User> {
+    const updateData: any = { role, hasCompletedOnboarding: new Date(), updatedAt: new Date() };
+    if (firstName) updateData.firstName = firstName;
+    if (lastName) updateData.lastName = lastName;
+    
     const [user] = await db.update(users)
-      .set({ role, hasCompletedOnboarding: new Date(), updatedAt: new Date() })
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserName(id: string, firstName: string, lastName: string): Promise<User> {
+    const [user] = await db.update(users)
+      .set({ firstName, lastName, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
     return user;

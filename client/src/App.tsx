@@ -57,6 +57,8 @@ function OnboardingWrapper({ children }: { children: React.ReactNode }) {
         <WelcomeModal 
           isOpen={showWelcome} 
           userId={user.id}
+          existingFirstName={user.firstName}
+          existingLastName={user.lastName}
           onComplete={() => setShowWelcome(false)}
         />
       )}

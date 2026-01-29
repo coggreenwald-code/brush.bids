@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +23,9 @@ export default function Dashboard() {
   const [boostArtwork, setBoostArtwork] = useState<Artwork | null>(null);
   const [editingBio, setEditingBio] = useState(false);
   const [bioText, setBioText] = useState(user?.bio || "");
+  const [editingName, setEditingName] = useState(false);
+  const [firstName, setFirstName] = useState(user?.firstName || "");
+  const [lastName, setLastName] = useState(user?.lastName || "");
   const { toast } = useToast();
   
   // In a real app we'd filter by artistId/ownerId. 
@@ -72,18 +77,50 @@ export default function Dashboard() {
     },
   });
 
+  const updateNameMutation = useMutation({
+    mutationFn: async (data: { firstName: string; lastName: string }) => {
+      if (!user?.id) throw new Error("Not authenticated");
+      const res = await apiRequest("PATCH", `/api/users/${user.id}/name`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Name Updated",
+        description: "Your name has been saved successfully.",
+      });
+      setEditingName(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Could not save your name. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
-  const totalEarnings = 1250; // Mock data
-  const totalSold = 3;
-  const activeListings = myArtworks.length;
+  // Calculate real stats based on user's actual activity
+  const soldArtworks = myArtworks.filter(a => a.paidAt);
+  const totalEarnings = soldArtworks.reduce((sum, a) => {
+    const price = Number(a.price) || 0;
+    const boost = a.promotionPercentage || 0;
+    // Artist gets 70% minus boost percentage
+    return sum + (price * (0.70 - boost / 100));
+  }, 0);
+  const totalSold = soldArtworks.length;
+  const activeListings = myArtworks.filter(a => a.status === "approved" && !a.paidAt).length;
+  const pendingReview = myArtworks.filter(a => a.status === "pending").length;
 
-  const chartData = [
-    { name: 'Jan', earnings: 400 },
-    { name: 'Feb', earnings: 300 },
-    { name: 'Mar', earnings: 550 },
-    { name: 'Apr', earnings: 200 },
-  ];
+  // Only show chart data if there are actual earnings
+  const chartData = totalSold > 0 ? [
+    { name: 'Jan', earnings: 0 },
+    { name: 'Feb', earnings: 0 },
+    { name: 'Mar', earnings: 0 },
+    { name: 'Apr', earnings: Math.round(totalEarnings) },
+  ] : [];
 
   if (!user) {
     return (
@@ -127,8 +164,8 @@ export default function Dashboard() {
               <DollarSign className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalEarnings}</div>
-              <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+              <div className="text-2xl font-bold">${Math.round(totalEarnings).toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">{totalSold > 0 ? `From ${totalSold} sale${totalSold > 1 ? 's' : ''}` : 'No sales yet'}</p>
             </CardContent>
           </Card>
           
@@ -139,7 +176,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeListings}</div>
-              <p className="text-xs text-muted-foreground">3 pending review</p>
+              <p className="text-xs text-muted-foreground">{pendingReview > 0 ? `${pendingReview} pending review` : 'None pending review'}</p>
             </CardContent>
           </Card>
           
@@ -267,17 +304,27 @@ export default function Dashboard() {
                 <CardTitle>Earnings Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} />
-                      <YAxis axisLine={false} tickLine={false} fontSize={12} tickFormatter={(value) => `$${value}`} />
-                      <Tooltip />
-                      <Bar dataKey="earnings" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                {chartData.length > 0 ? (
+                  <div className="h-[200px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} />
+                        <YAxis axisLine={false} tickLine={false} fontSize={12} tickFormatter={(value) => `$${value}`} />
+                        <Tooltip />
+                        <Bar dataKey="earnings" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-[200px] flex items-center justify-center text-center">
+                    <div className="text-muted-foreground">
+                      <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No earnings yet</p>
+                      <p className="text-xs">Your earnings will appear here once you make a sale</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -286,21 +333,96 @@ export default function Dashboard() {
                 <CardTitle className="flex items-center gap-2">
                   <User className="w-5 h-5" /> Your Profile
                 </CardTitle>
-                {!editingBio && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => {
-                      setBioText(user?.bio || "");
-                      setEditingBio(true);
-                    }}
-                    data-testid="button-edit-bio"
-                  >
-                    Edit
-                  </Button>
-                )}
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Name Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm text-muted-foreground">Name</Label>
+                    {!editingName && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => {
+                          setFirstName(user?.firstName || "");
+                          setLastName(user?.lastName || "");
+                          setEditingName(true);
+                        }}
+                        data-testid="button-edit-name"
+                      >
+                        <Pencil className="w-3 h-3 mr-1" /> Edit
+                      </Button>
+                    )}
+                  </div>
+                  {editingName ? (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          placeholder="First name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          data-testid="input-edit-first-name"
+                        />
+                        <Input
+                          placeholder="Last name"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          data-testid="input-edit-last-name"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setEditingName(false)}
+                          data-testid="button-cancel-name"
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          onClick={() => updateNameMutation.mutate({ firstName: firstName.trim(), lastName: lastName.trim() })}
+                          disabled={updateNameMutation.isPending || !firstName.trim() || !lastName.trim()}
+                          data-testid="button-save-name"
+                        >
+                          {updateNameMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Check className="w-4 h-4 mr-1" />
+                          )}
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium">
+                      {user?.firstName && user?.lastName 
+                        ? `${user.firstName} ${user.lastName}` 
+                        : <span className="text-muted-foreground italic">Add your name</span>}
+                    </p>
+                  )}
+                </div>
+
+                {/* Bio Section */}
+                <div className="space-y-2 pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm text-muted-foreground">Bio</Label>
+                    {!editingBio && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => {
+                          setBioText(user?.bio || "");
+                          setEditingBio(true);
+                        }}
+                        data-testid="button-edit-bio"
+                      >
+                        <Pencil className="w-3 h-3 mr-1" /> Edit
+                      </Button>
+                    )}
+                  </div>
                 {editingBio ? (
                   <div className="space-y-3">
                     <Textarea
@@ -354,6 +476,7 @@ export default function Dashboard() {
                     </Link>
                   </div>
                 )}
+                </div>
               </CardContent>
             </Card>
 

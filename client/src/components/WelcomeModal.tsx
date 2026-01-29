@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Palette, ShoppingBag, Sparkles, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -10,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 interface WelcomeModalProps {
   isOpen: boolean;
   userId: string;
+  existingFirstName?: string | null;
+  existingLastName?: string | null;
   onComplete: () => void;
 }
 
@@ -36,13 +40,17 @@ const roleOptions: { id: RoleOption; title: string; description: string; icon: t
   },
 ];
 
-export function WelcomeModal({ isOpen, userId, onComplete }: WelcomeModalProps) {
+export function WelcomeModal({ isOpen, userId, existingFirstName, existingLastName, onComplete }: WelcomeModalProps) {
   const [selectedRole, setSelectedRole] = useState<RoleOption | null>(null);
+  const [firstName, setFirstName] = useState(existingFirstName || "");
+  const [lastName, setLastName] = useState(existingLastName || "");
   const { toast } = useToast();
 
+  const needsName = !existingFirstName || !existingLastName;
+
   const completeOnboardingMutation = useMutation({
-    mutationFn: async (role: RoleOption) => {
-      const res = await apiRequest("POST", `/api/users/${userId}/complete-onboarding`, { role });
+    mutationFn: async (data: { role: RoleOption; firstName?: string; lastName?: string }) => {
+      const res = await apiRequest("POST", `/api/users/${userId}/complete-onboarding`, data);
       return res.json();
     },
     onSuccess: () => {
@@ -64,9 +72,14 @@ export function WelcomeModal({ isOpen, userId, onComplete }: WelcomeModalProps) 
 
   const handleContinue = () => {
     if (selectedRole) {
-      completeOnboardingMutation.mutate(selectedRole);
+      const data: { role: RoleOption; firstName?: string; lastName?: string } = { role: selectedRole };
+      if (needsName && firstName.trim()) data.firstName = firstName.trim();
+      if (needsName && lastName.trim()) data.lastName = lastName.trim();
+      completeOnboardingMutation.mutate(data);
     }
   };
+
+  const canContinue = selectedRole && (!needsName || (firstName.trim() && lastName.trim()));
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -74,11 +87,36 @@ export function WelcomeModal({ isOpen, userId, onComplete }: WelcomeModalProps) 
         <DialogHeader>
           <DialogTitle className="text-2xl font-display text-center">Welcome to BrushBids!</DialogTitle>
           <DialogDescription className="text-center">
-            Tell us how you'd like to use the platform. You can change this anytime.
+            {needsName ? "Let's set up your profile. " : ""}Tell us how you'd like to use the platform.
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-3 mt-4">
+        {needsName && (
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                placeholder="Enter your first name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                data-testid="input-first-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                placeholder="Enter your last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                data-testid="input-last-name"
+              />
+            </div>
+          </div>
+        )}
+        
+        <div className={`space-y-3 ${needsName ? 'mt-4' : 'mt-4'}`}>
           {roleOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = selectedRole === option.id;
@@ -118,7 +156,7 @@ export function WelcomeModal({ isOpen, userId, onComplete }: WelcomeModalProps) 
         <Button 
           className="w-full mt-4" 
           size="lg"
-          disabled={!selectedRole || completeOnboardingMutation.isPending}
+          disabled={!canContinue || completeOnboardingMutation.isPending}
           onClick={handleContinue}
           data-testid="button-complete-onboarding"
         >

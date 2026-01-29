@@ -2,15 +2,17 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useArtworks } from "@/hooks/use-artworks";
 import { ArtworkCard } from "@/components/ArtworkCard";
-import { ArrowRight, Sparkles, Upload, Palette, Eye, DollarSign, Heart, GraduationCap, Award, Users, Brush, Frame } from "lucide-react";
+import { ArrowRight, Sparkles, Upload, Palette, Eye, DollarSign, Heart, GraduationCap, Award, Users, Brush, Frame, LogIn } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Footer } from "@/components/Footer";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Home() {
   const { data: artworks, isLoading } = useArtworks({ status: "approved" });
+  const { isAuthenticated } = useAuth();
 
   const featuredArtworks = artworks?.slice(0, 3) || [];
 
@@ -64,6 +66,20 @@ export default function Home() {
 
   return (
     <Layout>
+      {/* Fixed Sign In Button - Top Right */}
+      {!isAuthenticated && (
+        <div className="fixed top-4 right-4 z-50 md:top-6 md:right-6">
+          <Button 
+            onClick={() => window.location.href = "/api/login"}
+            className="bg-[#1F4959] text-white hover:bg-[#1F4959]/90 shadow-lg gap-2 rounded-full px-6"
+            data-testid="button-fixed-sign-in"
+          >
+            <LogIn className="w-4 h-4" />
+            Sign In
+          </Button>
+        </div>
+      )}
+
       <div className="space-y-24 pb-16">
         {/* Hero Section - Modern & Artistic */}
         <section className="relative rounded-3xl overflow-hidden bg-[#1F4959] text-white py-28 px-6 md:px-12">

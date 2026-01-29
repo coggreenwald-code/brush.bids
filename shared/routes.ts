@@ -127,6 +127,20 @@ export const api = {
       path: '/api/users/:id/complete-onboarding',
       input: z.object({
         role: z.enum(["artist", "buyer", "both"]),
+        firstName: z.string().min(1).optional(),
+        lastName: z.string().min(1).optional(),
+      }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        403: z.object({ message: z.string() }),
+      },
+    },
+    updateName: {
+      method: 'PATCH' as const,
+      path: '/api/users/:id/name',
+      input: z.object({
+        firstName: z.string().min(1),
+        lastName: z.string().min(1),
       }),
       responses: {
         200: z.custom<typeof users.$inferSelect>(),

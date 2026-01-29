@@ -247,6 +247,33 @@ export async function registerRoutes(
     }
   });
 
+  // Update user name
+  app.patch(api.users.updateName.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (currentUserId !== userId) {
+      return res.status(403).json({ message: "You can only update your own profile" });
+    }
+
+    try {
+      const { firstName, lastName } = api.users.updateName.input.parse(req.body);
+      const user = await storage.updateUserName(userId, firstName, lastName);
+      res.json(user);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
   // Update user role
   app.patch(api.users.updateRole.path, async (req, res) => {
     if (!req.user) {
@@ -287,8 +314,8 @@ export async function registerRoutes(
     }
 
     try {
-      const { role } = api.users.completeOnboarding.input.parse(req.body);
-      const user = await storage.completeOnboarding(userId, role);
+      const { role, firstName, lastName } = api.users.completeOnboarding.input.parse(req.body);
+      const user = await storage.completeOnboarding(userId, role, firstName, lastName);
       res.json(user);
     } catch (err) {
       if (err instanceof z.ZodError) {
