@@ -9,9 +9,9 @@ import {
   X,
   Gavel,
   Home,
-  Heart,
-  Brush
+  Heart
 } from "lucide-react";
+import logoImage from "@/assets/logo.png";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 border-b bg-[#1F4959] text-white">
         <Link href="/" className="text-2xl font-display font-bold flex items-center gap-2">
-          <Brush className="w-6 h-6" /> BrushBids
+          <img src={logoImage} alt="BrushBids" className="w-7 h-7 invert" /> BrushBids
         </Link>
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} data-testid="button-mobile-menu">
           {mobileMenuOpen ? <X /> : <Menu />}
@@ -53,8 +53,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {/* Logo Section */}
         <div className="p-6 hidden md:block border-b border-white/10">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-              <Brush className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center p-1.5">
+              <img src={logoImage} alt="BrushBids" className="w-full h-full invert" />
             </div>
             <div>
               <span className="text-2xl font-display font-bold">BrushBids</span>
