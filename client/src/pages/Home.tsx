@@ -5,55 +5,27 @@ import { ArrowRight, Sparkles, Upload, Palette, Eye, DollarSign, Heart, Graduati
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
+import artSunset from "@assets/art-sunset-mountains.png";
+import artPortrait from "@assets/art-abstract-portrait.png";
+import artOcean from "@assets/art-ocean-watercolor.png";
+import artGeometric from "@assets/art-geometric-abstract.png";
+import artFloral from "@assets/art-floral-still-life.png";
+import artCityscape from "@assets/art-urban-cityscape.png";
+import artFlow from "@assets/art-abstract-flow.png";
+
 const placeholderArtworks = [
-  {
-    id: 0,
-    title: "Ethereal Horizons",
-    artistName: "Maya Rodriguez",
-    imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop",
-  },
-  {
-    id: 0,
-    title: "Urban Fragments",
-    artistName: "Liam Chen",
-    imageUrl: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?q=80&w=800&auto=format&fit=crop",
-  },
-  {
-    id: 0,
-    title: "Silent Currents",
-    artistName: "Sofia Patel",
-    imageUrl: "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800&auto=format&fit=crop",
-  },
-  {
-    id: 0,
-    title: "Chromatic Dreams",
-    artistName: "Kai Williams",
-    imageUrl: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=800&auto=format&fit=crop",
-  },
-  {
-    id: 0,
-    title: "Whispered Light",
-    artistName: "Elena Torres",
-    imageUrl: "https://images.unsplash.com/photo-1549887534-1541e9326642?q=80&w=800&auto=format&fit=crop",
-  },
-  {
-    id: 0,
-    title: "Golden Reverie",
-    artistName: "Aiden Brooks",
-    imageUrl: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=800&auto=format&fit=crop",
-  },
-  {
-    id: 0,
-    title: "Tidal Memory",
-    artistName: "Nora Kim",
-    imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop",
-  },
+  { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
+  { id: 0, title: "Urban Fragments", artistName: "Liam Chen", imageUrl: artPortrait },
+  { id: 0, title: "Silent Currents", artistName: "Sofia Patel", imageUrl: artOcean },
+  { id: 0, title: "Chromatic Dreams", artistName: "Kai Williams", imageUrl: artGeometric },
+  { id: 0, title: "Whispered Light", artistName: "Elena Torres", imageUrl: artFloral },
+  { id: 0, title: "Golden Reverie", artistName: "Aiden Brooks", imageUrl: artCityscape },
+  { id: 0, title: "Tidal Memory", artistName: "Nora Kim", imageUrl: artFlow },
 ];
 
 export default function Home() {
@@ -66,7 +38,7 @@ export default function Home() {
         id: a.id,
         title: a.title,
         artistName: `Artist #${a.artistId}`,
-        imageUrl: a.imageUrl || placeholderArtworks[0].imageUrl,
+        imageUrl: a.imageUrl || artSunset,
       }));
     }
     return placeholderArtworks;
@@ -110,22 +82,24 @@ export default function Home() {
 
   const currentArt = coverFlowArtworks[currentIndex];
 
-  const getCoverFlowItems = () => {
+  const getCoverFlowItems = useCallback(() => {
     const total = coverFlowArtworks.length;
-    const items: { artwork: typeof coverFlowArtworks[0]; offset: number }[] = [];
+    const items: { artwork: typeof coverFlowArtworks[0]; offset: number; arrayIdx: number }[] = [];
     for (let i = -3; i <= 3; i++) {
       const idx = ((currentIndex + i) % total + total) % total;
-      items.push({ artwork: coverFlowArtworks[idx], offset: i });
+      items.push({ artwork: coverFlowArtworks[idx], offset: i, arrayIdx: idx });
     }
     return items;
-  };
+  }, [coverFlowArtworks, currentIndex]);
+
+  const flowItems = getCoverFlowItems();
 
   return (
     <Layout>
       <div className="space-y-24 pb-16">
         {/* Hero Section */}
-        <section className="relative py-12 md:py-20 overflow-hidden" data-testid="section-hero">
-          <div className="absolute inset-0 -z-10">
+        <section className="relative py-12 md:py-20" data-testid="section-hero">
+          <div className="absolute inset-0 -z-10 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#F9F0EA] via-[#f0e6dc] to-[#e8ddd3] dark:from-[#2a2420] dark:via-[#1e1a17] dark:to-[#2a2420]" />
             <div className="absolute top-10 right-10 w-[400px] h-[400px] rounded-full bg-[#B8965A]/8 blur-[100px]" />
             <div className="absolute bottom-10 left-10 w-[300px] h-[300px] rounded-full bg-[#9E8472]/10 blur-[80px]" />
@@ -148,7 +122,7 @@ export default function Home() {
             >
               <span className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full bg-[#B8965A]/10 text-[#B8965A] dark:text-[#C9A84C] mb-6">
                 <Brush className="w-3.5 h-3.5" />
-                Where Student Art Finds Its Audience
+                Turning Student Creativity Into Opportunity
               </span>
             </motion.div>
 
@@ -194,7 +168,7 @@ export default function Home() {
         </section>
 
         {/* Cover Flow Featured Works */}
-        <section className="space-y-8" data-testid="section-featured-works">
+        <section className="space-y-6" data-testid="section-featured-works">
           <motion.div
             className="text-center"
             initial={{ opacity: 0, y: 30 }}
@@ -206,105 +180,124 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-display font-bold mt-2">Featured Works</h2>
           </motion.div>
 
-          <div className="relative">
-            {/* Cover Flow Container */}
+          <div className="relative select-none">
             <div
-              className="relative mx-auto overflow-hidden"
-              style={{ height: "380px", perspective: "1200px" }}
+              className="relative mx-auto"
+              style={{
+                height: "420px",
+                perspective: "800px",
+                perspectiveOrigin: "50% 40%",
+                overflow: "hidden",
+              }}
               data-testid="cover-flow-container"
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                {getCoverFlowItems().map(({ artwork, offset }) => {
+              {/* Dark gradient floor for reflection effect */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-[45%] pointer-events-none"
+                style={{
+                  background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 30%, rgba(0,0,0,0.06) 100%)",
+                }}
+              />
+
+              <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "20px" }}>
+                {flowItems.map(({ artwork, offset, arrayIdx }) => {
                   const isCenter = offset === 0;
                   const absOffset = Math.abs(offset);
+                  const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
 
-                  const translateX = offset * 180;
-                  const translateZ = isCenter ? 0 : -150 - absOffset * 40;
-                  const rotateY = isCenter ? 0 : offset < 0 ? 45 : -45;
-                  const scale = isCenter ? 1 : Math.max(0.5, 0.85 - absOffset * 0.1);
-                  const zIndex = 10 - absOffset;
-                  const opacity = absOffset > 2 ? 0.3 : 1;
+                  const coverSize = isCenter ? 220 : 180;
+                  const gap = isCenter ? 0 : 110 + (absOffset - 1) * 95;
+                  const translateX = isCenter ? 0 : side * (coverSize / 2 + gap);
+                  const rotateY = isCenter ? 0 : side * -55;
+                  const translateZ = isCenter ? 80 : -20 * absOffset;
+                  const zIndex = 20 - absOffset;
+                  const itemOpacity = absOffset >= 3 ? 0.4 : absOffset === 2 ? 0.7 : 1;
 
                   return (
-                    <motion.div
-                      key={`${artwork.title}-${offset}`}
+                    <div
+                      key={`flow-${arrayIdx}`}
                       className="absolute cursor-pointer"
                       style={{
                         zIndex,
+                        transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
+                        transition: "transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease",
                         transformStyle: "preserve-3d",
+                        opacity: itemOpacity,
+                        willChange: "transform, opacity",
                       }}
-                      animate={{
-                        x: translateX,
-                        z: translateZ,
-                        rotateY,
-                        scale,
-                        opacity,
-                      }}
-                      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
                       onClick={() => {
                         if (offset < 0) goPrev();
                         else if (offset > 0) goNext();
                       }}
                     >
-                      <div className="relative" style={{ transformStyle: "preserve-3d" }}>
-                        {/* Artwork Cover */}
-                        <div
-                          className={cn(
-                            "relative overflow-hidden rounded-md shadow-2xl",
-                            isCenter ? "w-[240px] h-[240px] md:w-[280px] md:h-[280px]" : "w-[200px] h-[200px] md:w-[220px] md:h-[220px]"
-                          )}
-                          style={{
-                            boxShadow: isCenter
-                              ? "0 20px 60px rgba(76, 57, 45, 0.3), 0 8px 20px rgba(0,0,0,0.15)"
-                              : "0 10px 30px rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          <img
-                            src={artwork.imageUrl}
-                            alt={artwork.title}
-                            className="w-full h-full object-cover"
-                            draggable={false}
+                      {/* Artwork Cover */}
+                      <div
+                        className="relative overflow-hidden"
+                        style={{
+                          width: `${coverSize}px`,
+                          height: `${coverSize}px`,
+                          borderRadius: "4px",
+                          boxShadow: isCenter
+                            ? "0 4px 20px rgba(0,0,0,0.25), 0 15px 40px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.1)"
+                            : "0 2px 12px rgba(0,0,0,0.2), 0 8px 25px rgba(0,0,0,0.1)",
+                        }}
+                      >
+                        <img
+                          src={artwork.imageUrl}
+                          alt={artwork.title}
+                          className="w-full h-full object-cover"
+                          draggable={false}
+                          loading="lazy"
+                        />
+                        {isCenter && (
+                          <div
+                            className="absolute inset-0 pointer-events-none"
+                            style={{
+                              boxShadow: "inset 0 0 0 1px rgba(184,150,90,0.3)",
+                              borderRadius: "4px",
+                            }}
                           />
-                          {isCenter && (
-                            <div className="absolute inset-0 ring-2 ring-[#B8965A]/30 rounded-md pointer-events-none" />
-                          )}
-                        </div>
-
-                        {/* Reflection */}
-                        <div
-                          className={cn(
-                            "relative overflow-hidden rounded-md mt-1",
-                            isCenter ? "w-[240px] h-[80px] md:w-[280px] md:h-[90px]" : "w-[200px] h-[60px] md:w-[220px] md:h-[70px]"
-                          )}
-                          style={{
-                            transform: "scaleY(-1)",
-                            WebkitMaskImage: "linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 100%)",
-                            maskImage: "linear-gradient(to top, transparent 0%, rgba(0,0,0,0.3) 100%)",
-                          }}
-                        >
-                          <img
-                            src={artwork.imageUrl}
-                            alt=""
-                            className="w-full h-full object-cover object-bottom opacity-40"
-                            draggable={false}
-                          />
-                        </div>
+                        )}
                       </div>
-                    </motion.div>
+
+                      {/* Reflection */}
+                      <div
+                        className="overflow-hidden"
+                        style={{
+                          width: `${coverSize}px`,
+                          height: `${coverSize * 0.35}px`,
+                          marginTop: "2px",
+                          borderRadius: "0 0 4px 4px",
+                          transform: "scaleY(-1)",
+                          WebkitMaskImage: "linear-gradient(to top, transparent 10%, rgba(0,0,0,0.25) 100%)",
+                          maskImage: "linear-gradient(to top, transparent 10%, rgba(0,0,0,0.25) 100%)",
+                          opacity: 0.35,
+                        }}
+                      >
+                        <img
+                          src={artwork.imageUrl}
+                          alt=""
+                          className="w-full object-cover object-bottom"
+                          style={{ height: `${coverSize}px` }}
+                          draggable={false}
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
             {/* Current Artwork Title */}
-            <div className="text-center mt-4">
+            <div className="text-center mt-2">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentIndex}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.4 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.3 }}
                   className="space-y-1"
                 >
                   <h3 className="text-xl md:text-2xl font-display font-bold" data-testid="text-coverflow-title">
@@ -318,7 +311,7 @@ export default function Home() {
             </div>
 
             {/* Navigation Controls */}
-            <div className="flex items-center justify-center gap-6 mt-6">
+            <div className="flex items-center justify-center gap-6 mt-5">
               <Button
                 size="icon"
                 variant="outline"
@@ -335,7 +328,7 @@ export default function Home() {
                     key={i}
                     onClick={() => setCurrentIndex(i)}
                     className={cn(
-                      "rounded-full transition-all duration-400",
+                      "rounded-full transition-all duration-300",
                       i === currentIndex
                         ? "w-6 h-2 bg-[#B8965A]"
                         : "w-2 h-2 bg-[#DDDAD3] dark:bg-[#3a3530] hover:bg-[#A89D92]"
@@ -358,7 +351,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works - Modern Cards */}
+        {/* How It Works */}
         <section className="space-y-12" data-testid="section-how-it-works">
           <motion.div
             className="text-center max-w-2xl mx-auto"
@@ -392,14 +385,7 @@ export default function Home() {
                   </div>
                   <div className="space-y-5">
                     {howItWorksArtist.map((step, i) => (
-                      <motion.div
-                        key={step.title}
-                        className="flex gap-4 items-start"
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                      >
+                      <div key={step.title} className="flex gap-4 items-start">
                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#B8965A] text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-[#B8965A]/30">
                           {i + 1}
                         </div>
@@ -410,7 +396,7 @@ export default function Home() {
                           </h4>
                           <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                   <Link href="/submit-artwork">
@@ -439,14 +425,7 @@ export default function Home() {
                   </div>
                   <div className="space-y-5">
                     {howItWorksBuyer.map((step, i) => (
-                      <motion.div
-                        key={step.title}
-                        className="flex gap-4 items-start"
-                        initial={{ opacity: 0, x: 20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                      >
+                      <div key={step.title} className="flex gap-4 items-start">
                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#96A0AB] text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-[#96A0AB]/30">
                           {i + 1}
                         </div>
@@ -457,7 +436,7 @@ export default function Home() {
                           </h4>
                           <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                   <Link href="/gallery">
@@ -492,7 +471,7 @@ export default function Home() {
           ))}
         </section>
 
-        {/* CTA Section */}
+        {/* CTA */}
         <section className="text-center space-y-6 py-12" data-testid="section-cta">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
