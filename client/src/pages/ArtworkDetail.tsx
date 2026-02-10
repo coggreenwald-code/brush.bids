@@ -98,8 +98,9 @@ export default function ArtworkDetail() {
   const auctionEndDate = new Date(artwork.createdAt || new Date());
   auctionEndDate.setDate(auctionEndDate.getDate() + 7);
 
-  const onSubmit = (data: { amount: number }) => {
-    if (data.amount <= currentPrice) {
+  const onSubmit = (data: { amount: string }) => {
+    const amount = Number(data.amount);
+    if (amount <= currentPrice) {
       form.setError("amount", { message: `Bid must be higher than current price ($${currentPrice})` });
       return;
     }
@@ -112,10 +113,10 @@ export default function ArtworkDetail() {
     placeBid.mutate({
       artworkId: artwork.id,
       bidderId: user.id as unknown as string,
-      amount: data.amount.toString(),
+      amount: amount.toString(),
     }, {
       onSuccess: () => {
-        toast({ title: "Bid Placed!", description: `You successfully bid $${data.amount}` });
+        toast({ title: "Bid Placed!", description: `You successfully bid $${amount}` });
         form.reset();
       }
     });

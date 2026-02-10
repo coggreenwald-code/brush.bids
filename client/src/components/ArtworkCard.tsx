@@ -3,7 +3,7 @@ import { type Artwork, type User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Clock, Sparkles, Rocket } from "lucide-react";
+import { Sparkles, Rocket } from "lucide-react";
 
 interface ArtworkCardProps {
   artwork: Artwork & { artist?: User };
@@ -15,15 +15,14 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <Link href={`/artwork/${artwork.id}`}>
         <Card 
-          className="overflow-hidden cursor-pointer group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-card h-full flex flex-col"
+          className="overflow-hidden cursor-pointer group border shadow-sm hover:shadow-lg transition-all duration-300 bg-card h-full flex flex-col"
           data-testid={`card-artwork-${artwork.id}`}
         >
-          {/* Image Container with Artistic Frame Effect */}
           <div className="relative aspect-[4/5] overflow-hidden bg-muted">
             <img 
               src={displayImage} 
@@ -31,11 +30,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
-            {/* Inner Frame Effect */}
-            <div className="absolute inset-2 border border-white/0 group-hover:border-white/30 rounded-sm transition-all duration-500 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {showStatus && (
               <div className="absolute top-3 right-3 z-10">
@@ -66,38 +61,18 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
               )}
             </div>
             
-            {/* Hover Action Hint */}
             <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-              <p className="text-white text-sm font-medium">View artwork details</p>
+              <p className="text-white text-sm font-medium">View artwork</p>
             </div>
           </div>
           
-          {/* Content Section */}
           <div className="p-5 flex flex-col flex-1 bg-card">
-            <h3 className="font-display text-xl font-semibold mb-1 line-clamp-1 group-hover:text-primary transition-colors duration-300">
+            <h3 className="font-display text-lg font-semibold line-clamp-1 group-hover:text-[#B8965A] transition-colors duration-300">
               {artwork.title}
             </h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-muted-foreground mt-1">
               by <span className="font-medium text-foreground/80">{artwork.artistId}</span>
             </p>
-            
-            <div className="mt-auto">
-              {/* Auction Timer Placeholder */}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Auction ends in 6d 23h</span>
-              </div>
-              
-              {/* Price Section */}
-              <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                  Current Bid
-                </div>
-                <div className="font-display font-bold text-xl text-primary">
-                  ${Number(artwork.price).toLocaleString()}
-                </div>
-              </div>
-            </div>
           </div>
         </Card>
       </Link>

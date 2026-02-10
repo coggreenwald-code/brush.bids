@@ -106,7 +106,7 @@ export function Footer() {
             <div className="mt-6 p-3 rounded-lg bg-white/5 border border-white/10">
               <div className="flex items-center gap-2 text-sm">
                 <Heart className="w-4 h-4 text-[#C9A84C]" />
-                <span className="text-white/70">15% of every sale goes to charity</span>
+                <span className="text-white/70">A portion of every sale goes to charity</span>
               </div>
             </div>
           </div>

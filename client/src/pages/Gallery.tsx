@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, SlidersHorizontal, X, Palette } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 
 const categories = [
   "All Categories",
@@ -26,8 +25,6 @@ const categories = [
 const sortOptions = [
   { value: "newest", label: "Newest First" },
   { value: "oldest", label: "Oldest First" },
-  { value: "price-low", label: "Price: Low to High" },
-  { value: "price-high", label: "Price: High to Low" },
   { value: "ending-soon", label: "Ending Soon" },
 ];
 
@@ -37,7 +34,6 @@ export default function Gallery() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [sortBy, setSortBy] = useState("newest");
-  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredArtworks = useMemo(() => {
@@ -61,23 +57,12 @@ export default function Gallery() {
       );
     }
     
-    filtered = filtered.filter((a) => {
-      const price = Number(a.price);
-      return price >= priceRange[0] && price <= priceRange[1];
-    });
-    
     switch (sortBy) {
       case "newest":
         filtered.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
         break;
       case "oldest":
         filtered.sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
-        break;
-      case "price-low":
-        filtered.sort((a, b) => Number(a.price) - Number(b.price));
-        break;
-      case "price-high":
-        filtered.sort((a, b) => Number(b.price) - Number(a.price));
         break;
       case "ending-soon":
         filtered.sort((a, b) => {
@@ -97,28 +82,24 @@ export default function Gallery() {
     });
     
     return filtered;
-  }, [artworks, searchQuery, selectedCategory, sortBy, priceRange]);
+  }, [artworks, searchQuery, selectedCategory, sortBy]);
 
   const activeFilters = [
     selectedCategory !== "All Categories" && selectedCategory,
-    priceRange[0] > 0 && `Min $${priceRange[0]}`,
-    priceRange[1] < 10000 && `Max $${priceRange[1]}`,
   ].filter(Boolean);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCategory("All Categories");
     setSortBy("newest");
-    setPriceRange([0, 10000]);
   };
 
   return (
     <Layout>
       <div className="space-y-8 pb-16">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <span className="text-sm font-medium text-primary uppercase tracking-wider">Curated Collection</span>
+            <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Curated Collection</span>
             <h1 className="text-4xl font-display font-bold mt-1">Gallery</h1>
             <p className="text-muted-foreground mt-2">Browse unique artworks from emerging student talent</p>
           </div>
@@ -135,7 +116,6 @@ export default function Gallery() {
               />
             </div>
             
-            {/* Mobile Filter Button */}
             <Sheet open={showFilters} onOpenChange={setShowFilters}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="md:hidden" data-testid="button-mobile-filters">
@@ -175,18 +155,6 @@ export default function Gallery() {
                     </Select>
                   </div>
                   
-                  <div className="space-y-4">
-                    <Label>Price Range: ${priceRange[0]} - ${priceRange[1]}</Label>
-                    <Slider
-                      value={priceRange}
-                      onValueChange={setPriceRange}
-                      min={0}
-                      max={10000}
-                      step={100}
-                      data-testid="slider-price-mobile"
-                    />
-                  </div>
-                  
                   <Button variant="outline" className="w-full" onClick={clearFilters} data-testid="button-clear-filters-mobile">
                     Clear All Filters
                   </Button>
@@ -196,7 +164,6 @@ export default function Gallery() {
           </div>
         </div>
 
-        {/* Desktop Filters */}
         <div className="hidden md:flex items-center gap-4 flex-wrap">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-48" data-testid="select-category">
@@ -227,7 +194,6 @@ export default function Gallery() {
           </div>
         </div>
 
-        {/* Active Filters */}
         {(activeFilters.length > 0 || searchQuery) && (
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-muted-foreground">Active filters:</span>
@@ -250,17 +216,16 @@ export default function Gallery() {
           </div>
         )}
 
-        {/* Gallery Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="h-[350px] bg-muted animate-pulse rounded-xl" />
+              <div key={i} className="h-[350px] bg-muted animate-pulse rounded-md" />
             ))}
           </div>
         ) : filteredArtworks.length === 0 ? (
-          <div className="py-20 text-center border-2 border-dashed rounded-3xl bg-muted/10 watercolor-bg">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-              <Palette className="w-10 h-10 text-primary" />
+          <div className="py-20 text-center border-2 border-dashed rounded-md bg-muted/10">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#B8965A]/10 flex items-center justify-center">
+              <Palette className="w-10 h-10 text-[#B8965A]" />
             </div>
             <h3 className="text-xl font-bold mb-2">No Artworks Found</h3>
             <p className="text-muted-foreground mb-4">
