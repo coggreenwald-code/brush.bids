@@ -201,7 +201,7 @@ export default function ArtworkDetail() {
           <div>
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               <Badge variant="secondary" className="uppercase tracking-wider">Original Art</Badge>
-              {artwork.status === 'pending' && <Badge variant="outline" className="text-yellow-600 border-yellow-600">Pending Review</Badge>}
+              {artwork.status === 'pending' && <Badge variant="outline" className="text-[#B8965A] border-[#B8965A]">Pending Review</Badge>}
               {artwork.status === 'approved' && <Badge variant="outline" className="text-green-600 border-green-600">Live Auction</Badge>}
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4" data-testid="text-artwork-title">{artwork.title}</h1>

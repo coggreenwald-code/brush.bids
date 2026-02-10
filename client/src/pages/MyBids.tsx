@@ -137,7 +137,7 @@ export default function MyBids() {
   const stats = [
     { label: "Active Bids", value: activeBids.length, icon: Gavel, color: "text-primary" },
     { label: "Auctions Won", value: wonBids.length, icon: TrendingUp, color: "text-green-600" },
-    { label: "Outbid", value: outbidBids.length, icon: AlertCircle, color: "text-orange-500" },
+    { label: "Outbid", value: outbidBids.length, icon: AlertCircle, color: "text-[#9E8472]" },
   ];
 
   return (
@@ -166,9 +166,9 @@ export default function MyBids() {
 
         {/* Outbid Alert */}
         {outbidBids.filter(b => !b.auctionEnded).length > 0 && (
-          <Card className="border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20">
+          <Card className="border-[#9E8472]/20 dark:border-[#9E8472]/30 bg-[#9E8472]/5 dark:bg-[#9E8472]/10">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-400 text-base">
+              <CardTitle className="flex items-center gap-2 text-[#9E8472] dark:text-[#C9A84C] text-base">
                 <AlertCircle className="w-5 h-5" />
                 You've Been Outbid on {outbidBids.filter(b => !b.auctionEnded).length} Active Auction{outbidBids.filter(b => !b.auctionEnded).length > 1 ? 's' : ''}
               </CardTitle>
@@ -265,7 +265,7 @@ export default function MyBids() {
             ) : (
               <div className="space-y-4">
                 {outbidBids.map((bid) => (
-                  <Card key={bid.artworkId} className="p-4 border-orange-200 dark:border-orange-800" data-testid={`card-outbid-${bid.artworkId}`}>
+                  <Card key={bid.artworkId} className="p-4 border-[#9E8472]/20 dark:border-[#9E8472]/30" data-testid={`card-outbid-${bid.artworkId}`}>
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
                         <img 
@@ -287,9 +287,9 @@ export default function MyBids() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Your Bid</p>
-                        <p className="text-lg font-mono font-bold text-orange-600">${bid.userHighestBid.toLocaleString()}</p>
+                        <p className="text-lg font-mono font-bold text-[#9E8472]">${bid.userHighestBid.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground">Current: ${bid.artworkHighestBid.toLocaleString()}</p>
-                        <Badge variant="outline" className="mt-1 border-orange-500 text-orange-600">Outbid</Badge>
+                        <Badge variant="outline" className="mt-1 border-[#9E8472] text-[#9E8472]">Outbid</Badge>
                       </div>
                       {!bid.auctionEnded && (
                         <Link href={`/artwork/${bid.artworkId}`}>
@@ -321,9 +321,9 @@ export default function MyBids() {
             )}
             {paymentStatus === 'success' && paymentArtworkId && 
              !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
-              <Card className="mb-6 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+              <Card className="mb-6 border-[#B8965A]/20 dark:border-[#B8965A]/30 bg-[#B8965A]/5 dark:bg-[#B8965A]/10">
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400 text-base">
+                  <CardTitle className="flex items-center gap-2 text-[#9E8472] dark:text-[#C9A84C] text-base">
                     <Clock className="w-5 h-5" />
                     Payment Processing
                   </CardTitle>

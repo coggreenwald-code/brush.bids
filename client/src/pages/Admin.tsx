@@ -91,7 +91,7 @@ export default function Admin() {
           </div>
           
           {pendingCount > 0 && (
-            <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400">
+            <Badge variant="outline" className="bg-[#B8965A]/10 text-[#4C392D] border-[#B8965A]/20 dark:bg-[#B8965A]/20 dark:text-[#C9A84C]">
               <AlertCircle className="w-3 h-3 mr-1" />
               {pendingCount} pending review
             </Badge>
@@ -101,7 +101,7 @@ export default function Admin() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4">
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">{pendingCount}</div>
+            <div className="text-2xl font-bold text-[#B8965A]">{pendingCount}</div>
             <div className="text-sm text-muted-foreground">Pending</div>
           </Card>
           <Card className="p-4 text-center">
@@ -191,7 +191,7 @@ export default function Admin() {
                             variant="outline" 
                             className={
                               artwork.status === 'pending' 
-                                ? "bg-yellow-100 text-yellow-800 border-yellow-200" 
+                                ? "bg-[#B8965A]/10 text-[#4C392D] border-[#B8965A]/20" 
                                 : artwork.status === 'approved'
                                 ? "bg-green-100 text-green-800 border-green-200"
                                 : "bg-red-100 text-red-800 border-red-200"

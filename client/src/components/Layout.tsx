@@ -36,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
       {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b bg-[#1F4959] text-white">
+      <div className="md:hidden flex items-center justify-between p-4 border-b bg-[#4C392D] text-white">
         <Link href="/" className="text-2xl font-display font-bold flex items-center gap-2">
           <img src={logoImage} alt="BrushBids" className="w-8 h-8 invert" /> BrushBids
         </Link>
@@ -47,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Sidebar / Mobile Menu */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-[#1F4959] text-white transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 flex flex-col",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-[#4C392D] text-white transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 flex flex-col",
         mobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
       )}>
         {/* Logo Section */}
@@ -91,7 +91,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {isAuthenticated ? (
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 px-2">
-                <div className="w-10 h-10 rounded-full bg-[#5C7C89] flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-10 h-10 rounded-full bg-[#9E8472] flex items-center justify-center text-white font-bold text-sm">
                   {user?.firstName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <div className="overflow-hidden">
@@ -112,7 +112,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           ) : (
             <Button 
-              className="w-full bg-white text-[#1F4959] hover:bg-white/90 font-semibold shadow-lg" 
+              className="w-full bg-white text-[#4C392D] hover:bg-white/90 font-semibold shadow-lg" 
               onClick={() => window.location.href = "/api/login"}
               data-testid="button-sign-in"
             >

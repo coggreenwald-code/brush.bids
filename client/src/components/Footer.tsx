@@ -7,7 +7,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-[#1F4959] text-white mt-auto">
+    <footer className="border-t bg-[#4C392D] text-white mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -105,7 +105,7 @@ export function Footer() {
             {/* Charity Note */}
             <div className="mt-6 p-3 rounded-lg bg-white/5 border border-white/10">
               <div className="flex items-center gap-2 text-sm">
-                <Heart className="w-4 h-4 text-[#5C7C89]" />
+                <Heart className="w-4 h-4 text-[#C9A84C]" />
                 <span className="text-white/70">15% of every sale goes to charity</span>
               </div>
             </div>

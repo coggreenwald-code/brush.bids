@@ -172,7 +172,7 @@ export default function Dashboard() {
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Listings</CardTitle>
-              <Palette className="h-4 w-4 text-blue-500" />
+              <Palette className="h-4 w-4 text-[#9E8472]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeListings}</div>
@@ -239,7 +239,7 @@ export default function Dashboard() {
                               {artwork.status}
                             </Badge>
                             {(artwork.promotionPercentage ?? 0) > 0 && (
-                              <Badge variant="outline" className="bg-amber-500/90 text-white border-amber-400">
+                              <Badge variant="outline" className="bg-[#B8965A]/90 text-white border-[#C9A84C]">
                                 <Rocket className="w-3 h-3 mr-1" />
                                 {artwork.promotionPercentage}% Boost
                               </Badge>

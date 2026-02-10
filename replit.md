@@ -16,7 +16,7 @@ Key features:
 - Role-based accounts: Artist, Collector, or Both
 - Welcome onboarding modal for new users to select their role and collect name
 - Role switching available anytime from Dashboard settings
-- Warm, colorful design with gold, coral, and violet accents appealing to artists
+- Warm earth tone design with gold and silver accents on a cream background
 
 ### Revenue Split
 - Base: 70% artist, 15% platform, 15% charity
@@ -36,10 +36,14 @@ Preferred communication style: Simple, everyday language.
 ## Design System
 
 ### Color Palette
-- **Primary**: #1F4959 (deep teal) - Main brand color, used in sidebar, footer, hero sections
-- **Accent**: #5C7C89 (muted teal) - Secondary accent for highlights
-- **Foreground**: #242424 (near black) - Primary text color
-- **Background**: Cool off-white (#F7F9FA) with slight blue undertone
+- **Primary**: #4C392D (dark chocolate brown) - Main brand color, used in sidebar, footer, hero sections
+- **Accent**: #9E8472 (warm taupe) - Secondary accent for highlights
+- **Warm Gray**: #A89D92 - Subtle UI elements
+- **Light Gray**: #DDDAD3 - Borders, secondary backgrounds
+- **Background**: #F9F0EA (warm cream) - Page background
+- **Gold Accent**: #B8965A / #C9A84C - Used for artist-related elements, highlights, badges
+- **Silver Accent**: #96A0AB / #A8AEB5 - Used for collector elements, secondary highlights
+- **Foreground**: Dark brown tones for text hierarchy
 
 ### Typography
 - **Display Font**: Playfair Display (serif) - Used for headings, elegant artistic feel
@@ -49,7 +53,7 @@ Preferred communication style: Simple, everyday language.
 - **Artistic Utilities**: blob-shape animations, watercolor-bg gradients, hover-artistic effects
 - **Cards**: Clean with subtle shadows, hover elevation effects
 - **Buttons**: Rounded (rounded-full) for CTAs, standard rounded for secondary
-- **Sidebar**: Dark teal background with white text, matches footer
+- **Sidebar**: Dark brown background with white text, matches footer
 
 ### Component Patterns
 - Page headers include small uppercase label above title (e.g., "Curated Collection")

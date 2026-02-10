@@ -59,7 +59,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
                 </Badge>
               )}
               {(artwork.promotionPercentage ?? 0) > 0 && (
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg flex items-center gap-1">
+                <Badge className="bg-gradient-to-r from-[#B8965A] to-[#C9A84C] text-white border-0 shadow-lg flex items-center gap-1">
                   <Rocket className="w-3 h-3" />
                   Boosted
                 </Badge>

@@ -58,10 +58,10 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: "500+", label: "Student Artists", icon: GraduationCap, color: "text-amber-500", bg: "bg-amber-500/10" },
+    { value: "500+", label: "Student Artists", icon: GraduationCap, color: "text-[#B8965A]", bg: "bg-[#B8965A]/10" },
     { value: "$125K", label: "Earned by Artists", icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { value: "$18K", label: "Donated to Charity", icon: Heart, color: "text-rose-400", bg: "bg-rose-400/10" },
-    { value: "2,000+", label: "Artworks Sold", icon: Frame, color: "text-violet-400", bg: "bg-violet-400/10" },
+    { value: "$18K", label: "Donated to Charity", icon: Heart, color: "text-[#C9A84C]", bg: "bg-[#C9A84C]/10" },
+    { value: "2,000+", label: "Artworks Sold", icon: Frame, color: "text-[#96A0AB]", bg: "bg-[#96A0AB]/10" },
   ];
 
   return (
@@ -71,7 +71,7 @@ export default function Home() {
         <div className="fixed top-4 right-4 z-50 md:top-6 md:right-6">
           <Button 
             onClick={() => window.location.href = "/api/login"}
-            className="bg-[#1F4959] text-white shadow-lg gap-2 rounded-full px-6"
+            className="bg-[#4C392D] text-white shadow-lg gap-2 rounded-full px-6"
             data-testid="button-fixed-sign-in"
           >
             <LogIn className="w-4 h-4" />
@@ -84,14 +84,14 @@ export default function Home() {
         {/* Hero Section - Rich Gradient */}
         <section 
           className="relative rounded-3xl overflow-hidden text-white py-28 px-6 md:px-12"
-          style={{ background: "linear-gradient(135deg, #1F4959 0%, #2D3A5C 35%, #5C3D6E 65%, #8B7EC8 85%, #D4A853 100%)" }}
+          style={{ background: "linear-gradient(135deg, #4C392D 0%, #6B5244 30%, #9E8472 60%, #B8965A 85%, #C9A84C 100%)" }}
         >
           {/* Artistic background elements */}
           <div className="absolute inset-0 z-0">
-            <div className="absolute top-10 right-10 w-64 h-64 bg-amber-400/10 blob-shape" />
-            <div className="absolute bottom-20 left-20 w-48 h-48 bg-violet-400/15 blob-shape" style={{ animationDelay: '-4s' }} />
-            <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-rose-400/10 blob-shape" style={{ animationDelay: '-2s' }} />
-            <div className="absolute top-20 left-1/2 w-40 h-40 bg-amber-300/8 blob-shape" style={{ animationDelay: '-6s' }} />
+            <div className="absolute top-10 right-10 w-64 h-64 bg-[#C9A84C]/10 blob-shape" />
+            <div className="absolute bottom-20 left-20 w-48 h-48 bg-[#A8AEB5]/12 blob-shape" style={{ animationDelay: '-4s' }} />
+            <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-[#9E8472]/10 blob-shape" style={{ animationDelay: '-2s' }} />
+            <div className="absolute top-20 left-1/2 w-40 h-40 bg-[#B8965A]/8 blob-shape" style={{ animationDelay: '-6s' }} />
           </div>
           
           {/* Brush stroke decorations */}
@@ -133,7 +133,7 @@ export default function Home() {
               transition={{ delay: 0.5, duration: 0.6 }}
             >
               <Link href="/gallery">
-                <Button data-testid="button-start-bidding" size="lg" className="h-14 px-10 text-lg rounded-full bg-white text-[#1F4959] font-semibold shadow-lg shadow-black/20">
+                <Button data-testid="button-start-bidding" size="lg" className="h-14 px-10 text-lg rounded-full bg-white text-[#4C392D] font-semibold shadow-lg shadow-black/20">
                   Explore Gallery <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
@@ -162,7 +162,7 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-sm font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">Simple Process</span>
+            <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Simple Process</span>
             <h2 className="text-3xl md:text-4xl font-display font-bold mt-2 mb-4">How It Works</h2>
             <p className="text-muted-foreground text-lg">Whether you're a student artist or an art enthusiast, getting started is simple.</p>
           </motion.div>
@@ -175,13 +175,13 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <Card className="relative overflow-hidden p-8 h-full" style={{ background: "linear-gradient(to bottom right, rgba(212,168,83,0.08), rgba(212,168,83,0.15))", borderColor: "rgba(212,168,83,0.25)" }}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-amber-400/10 blob-shape -translate-y-1/2 translate-x-1/2" />
+              <Card className="relative overflow-hidden p-8 h-full" style={{ background: "linear-gradient(to bottom right, rgba(185,150,90,0.08), rgba(185,150,90,0.15))", borderColor: "rgba(185,150,90,0.25)" }}>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-[#C9A84C]/10 blob-shape -translate-y-1/2 translate-x-1/2" />
                 
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-8">
                     <motion.div 
-                      className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center"
+                      className="w-12 h-12 rounded-xl bg-[#B8965A] flex items-center justify-center"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 400 }}
                     >
@@ -202,12 +202,12 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
                       >
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-amber-500/30">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#B8965A] text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-[#B8965A]/30">
                           {i + 1}
                         </div>
                         <div className="pt-0.5">
                           <h4 className="font-semibold flex items-center gap-2">
-                            <step.icon className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                            <step.icon className="w-4 h-4 text-[#B8965A] dark:text-[#C9A84C]" />
                             {step.title}
                           </h4>
                           <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
@@ -216,7 +216,7 @@ export default function Home() {
                     ))}
                   </div>
                   <Link href="/submit-artwork">
-                    <Button data-testid="button-start-selling" className="mt-8 w-full rounded-full bg-amber-500 text-white" size="lg">Start Selling Your Art</Button>
+                    <Button data-testid="button-start-selling" className="mt-8 w-full rounded-full bg-[#B8965A] text-white" size="lg">Start Selling Your Art</Button>
                   </Link>
                 </div>
               </Card>
@@ -229,13 +229,13 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Card className="relative overflow-hidden p-8 h-full" style={{ background: "linear-gradient(to bottom right, rgba(232,115,108,0.08), rgba(232,115,108,0.15))", borderColor: "rgba(232,115,108,0.25)" }}>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-rose-400/10 blob-shape -translate-y-1/2 translate-x-1/2" style={{ animationDelay: '-3s' }} />
+              <Card className="relative overflow-hidden p-8 h-full" style={{ background: "linear-gradient(to bottom right, rgba(168,174,181,0.08), rgba(168,174,181,0.15))", borderColor: "rgba(168,174,181,0.25)" }}>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-[#A8AEB5]/10 blob-shape -translate-y-1/2 translate-x-1/2" style={{ animationDelay: '-3s' }} />
                 
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-8">
                     <motion.div 
-                      className="w-12 h-12 rounded-xl bg-rose-400 flex items-center justify-center"
+                      className="w-12 h-12 rounded-xl bg-[#96A0AB] flex items-center justify-center"
                       whileHover={{ scale: 1.1, rotate: -5 }}
                       transition={{ type: "spring", stiffness: 400 }}
                     >
@@ -256,12 +256,12 @@ export default function Home() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
                       >
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-rose-400 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-rose-400/30">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#96A0AB] text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-[#96A0AB]/30">
                           {i + 1}
                         </div>
                         <div className="pt-0.5">
                           <h4 className="font-semibold flex items-center gap-2">
-                            <step.icon className="w-4 h-4 text-rose-500 dark:text-rose-400" />
+                            <step.icon className="w-4 h-4 text-[#96A0AB] dark:text-[#A8AEB5]" />
                             {step.title}
                           </h4>
                           <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
@@ -270,7 +270,7 @@ export default function Home() {
                     ))}
                   </div>
                   <Link href="/gallery">
-                    <Button data-testid="button-browse-gallery" variant="outline" className="mt-8 w-full rounded-full border-rose-400/30 text-rose-600 dark:text-rose-400" size="lg">Browse the Gallery</Button>
+                    <Button data-testid="button-browse-gallery" variant="outline" className="mt-8 w-full rounded-full border-[#96A0AB]/30 text-[#96A0AB] dark:text-[#A8AEB5]" size="lg">Browse the Gallery</Button>
                   </Link>
                 </div>
               </Card>
@@ -287,7 +287,7 @@ export default function Home() {
           transition={{ duration: 0.8 }}
         >
           <div className="absolute inset-0 watercolor-bg rounded-3xl" />
-          <div className="absolute inset-0 rounded-3xl" style={{ background: "radial-gradient(ellipse at 30% 40%, rgba(212,168,83,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(139,126,200,0.06) 0%, transparent 50%)" }} />
+          <div className="absolute inset-0 rounded-3xl" style={{ background: "radial-gradient(ellipse at 30% 40%, rgba(185,150,90,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(185,150,90,0.06) 0%, transparent 50%)" }} />
           <div className="relative grid md:grid-cols-2 gap-12 items-center bg-card/50 backdrop-blur-sm p-8 md:p-12 rounded-3xl border">
             <motion.div 
               className="space-y-6"
@@ -297,7 +297,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <motion.div 
-                className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400"
+                className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full bg-[#C9A84C]/10 text-[#B8965A] dark:text-[#C9A84C]"
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -308,7 +308,7 @@ export default function Home() {
               </motion.div>
               <h2 className="text-3xl md:text-4xl font-display font-bold">
                 Curated by 
-                <span className="italic text-violet-600 dark:text-violet-400"> Experts</span>
+                <span className="italic text-[#B8965A] dark:text-[#C9A84C]"> Experts</span>
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed">
                 Every submission is carefully reviewed by our team of experienced curators. They use advanced tools trained by art professionals to evaluate technique, composition, and originality — ensuring only the highest quality student work reaches the marketplace.
@@ -328,7 +328,7 @@ export default function Home() {
                     transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
                   >
                     <motion.div 
-                      className="w-8 h-8 rounded-full bg-violet-500/10 text-violet-500 dark:text-violet-400 flex items-center justify-center flex-shrink-0 mt-0.5"
+                      className="w-8 h-8 rounded-full bg-[#C9A84C]/10 text-[#B8965A] dark:text-[#C9A84C] flex items-center justify-center flex-shrink-0 mt-0.5"
                       whileHover={{ scale: 1.2, rotate: 10 }}
                       transition={{ type: "spring", stiffness: 400 }}
                     >
@@ -349,7 +349,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.3, type: "spring" }}
             >
-              <div className="absolute -inset-4 rounded-3xl blur-2xl" style={{ background: "linear-gradient(to bottom right, rgba(139,126,200,0.2), rgba(212,168,83,0.2))" }} />
+              <div className="absolute -inset-4 rounded-3xl blur-2xl" style={{ background: "linear-gradient(to bottom right, rgba(185,150,90,0.2), rgba(185,150,90,0.2))" }} />
               <motion.div 
                 className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800"
                 whileHover={{ rotate: 0, scale: 1.02 }}
@@ -360,7 +360,7 @@ export default function Home() {
                   alt="Expert Art Curation" 
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 mix-blend-overlay" style={{ background: "linear-gradient(to top right, rgba(139,126,200,0.3), transparent)" }} />
+                <div className="absolute inset-0 mix-blend-overlay" style={{ background: "linear-gradient(to top right, rgba(185,150,90,0.3), transparent)" }} />
               </motion.div>
             </motion.div>
           </div>
@@ -376,7 +376,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
           >
             <div>
-              <span className="text-sm font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">Curated Collection</span>
+              <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Curated Collection</span>
               <h2 className="text-3xl md:text-4xl font-display font-bold mt-2">Featured Works</h2>
               <p className="text-muted-foreground mt-2 max-w-lg">Hand-picked by our expert curators for exceptional quality and creativity</p>
             </div>
@@ -402,13 +402,13 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <motion.div 
-                className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-500/10 flex items-center justify-center"
+                className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#C9A84C]/10 flex items-center justify-center"
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2, type: "spring" }}
               >
-                <Palette className="w-10 h-10 text-amber-500" />
+                <Palette className="w-10 h-10 text-[#B8965A]" />
               </motion.div>
               <h3 className="text-2xl font-display font-bold mb-3">No artworks yet</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">Be the first to showcase your creativity and start your journey as a selling artist.</p>
@@ -490,7 +490,7 @@ export default function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-sm font-medium text-rose-500 dark:text-rose-400 uppercase tracking-wider">Community Stories</span>
+            <span className="text-sm font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-wider">Community Stories</span>
             <h2 className="text-3xl md:text-4xl font-display font-bold mt-2 mb-4">Student Spotlight</h2>
             <p className="text-muted-foreground text-lg">Hear from artists and collectors who are part of the BrushBids community.</p>
           </motion.div>
@@ -504,14 +504,14 @@ export default function Home() {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: 0.15 * i, duration: 0.6, type: "spring" }}
               >
-                <Card className="p-6 h-full flex flex-col hover-artistic group" style={{ background: i === 0 ? "linear-gradient(to bottom right, rgba(212,168,83,0.04), rgba(212,168,83,0.08))" : i === 1 ? "linear-gradient(to bottom right, rgba(139,126,200,0.04), rgba(139,126,200,0.08))" : "linear-gradient(to bottom right, rgba(232,115,108,0.04), rgba(232,115,108,0.08))" }}>
+                <Card className="p-6 h-full flex flex-col hover-artistic group" style={{ background: i === 0 ? "linear-gradient(to bottom right, rgba(185,150,90,0.04), rgba(185,150,90,0.08))" : i === 1 ? "linear-gradient(to bottom right, rgba(168,174,181,0.04), rgba(168,174,181,0.08))" : "linear-gradient(to bottom right, rgba(201,168,76,0.04), rgba(201,168,76,0.08))" }}>
                   <CardContent className="p-0 flex-1 flex flex-col">
                     <div className="flex items-center gap-4 mb-4">
                       <motion.div
                         whileHover={{ scale: 1.1 }}
                         transition={{ type: "spring", stiffness: 400 }}
                       >
-                        <Avatar className={`w-14 h-14 border-2 ${i === 0 ? 'border-amber-500/30 group-hover:border-amber-500/50' : i === 1 ? 'border-violet-400/30 group-hover:border-violet-400/50' : 'border-rose-400/30 group-hover:border-rose-400/50'} transition-colors`}>
+                        <Avatar className={`w-14 h-14 border-2 ${i === 0 ? 'border-[#B8965A]/30 group-hover:border-[#B8965A]/50' : i === 1 ? 'border-[#96A0AB]/30 group-hover:border-[#96A0AB]/50' : 'border-[#C9A84C]/30 group-hover:border-[#C9A84C]/50'} transition-colors`}>
                           <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${testimonial.avatar}`} />
                           <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                         </Avatar>
@@ -519,7 +519,7 @@ export default function Home() {
                       <div>
                         <p className="font-semibold">{testimonial.name}</p>
                         <p className="text-xs text-muted-foreground">{testimonial.school}</p>
-                        <span className={`inline-block mt-1 text-xs font-medium px-2 py-0.5 rounded-full ${i === 0 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : i === 1 ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400' : 'bg-rose-400/10 text-rose-500 dark:text-rose-400'}`}>
+                        <span className={`inline-block mt-1 text-xs font-medium px-2 py-0.5 rounded-full ${i === 0 ? 'bg-[#B8965A]/10 text-[#B8965A] dark:text-[#C9A84C]' : i === 1 ? 'bg-[#96A0AB]/10 text-[#96A0AB] dark:text-[#A8AEB5]' : 'bg-[#C9A84C]/10 text-[#C9A84C] dark:text-[#C9A84C]'}`}>
                           {testimonial.role}
                         </span>
                       </div>
@@ -528,13 +528,13 @@ export default function Home() {
                     <div className="mt-4 pt-4 border-t text-sm text-muted-foreground flex items-center gap-2">
                       {testimonial.sold && (
                         <>
-                          <Palette className={`w-4 h-4 ${i === 0 ? 'text-amber-500' : 'text-violet-400'}`} />
+                          <Palette className={`w-4 h-4 ${i === 0 ? 'text-[#B8965A]' : 'text-[#96A0AB]'}`} />
                           <span>{testimonial.sold} artworks sold</span>
                         </>
                       )}
                       {testimonial.purchased && (
                         <>
-                          <Frame className="w-4 h-4 text-rose-400" />
+                          <Frame className="w-4 h-4 text-[#C9A84C]" />
                           <span>{testimonial.purchased} artworks purchased</span>
                         </>
                       )}
@@ -549,7 +549,7 @@ export default function Home() {
         {/* CTA Section - Warm Gradient */}
         <motion.section 
           className="relative overflow-hidden text-center py-20 px-8 rounded-3xl text-white"
-          style={{ background: "linear-gradient(135deg, #1F4959 0%, #3D3A6E 50%, #8B7EC8 100%)" }}
+          style={{ background: "linear-gradient(135deg, #4C392D 0%, #6B5244 50%, #9E8472 100%)" }}
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -558,17 +558,17 @@ export default function Home() {
           {/* Artistic background */}
           <div className="absolute inset-0">
             <motion.div 
-              className="absolute top-10 left-10 w-32 h-32 bg-amber-400/10 blob-shape"
+              className="absolute top-10 left-10 w-32 h-32 bg-[#C9A84C]/10 blob-shape"
               animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div 
-              className="absolute bottom-10 right-10 w-48 h-48 bg-violet-400/15 blob-shape"
+              className="absolute bottom-10 right-10 w-48 h-48 bg-[#A8AEB5]/12 blob-shape"
               animate={{ scale: [1, 1.15, 1], rotate: [0, -5, 0] }}
               transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             />
             <motion.div 
-              className="absolute top-1/2 left-1/2 w-36 h-36 bg-rose-400/8 blob-shape"
+              className="absolute top-1/2 left-1/2 w-36 h-36 bg-[#9E8472]/8 blob-shape"
               animate={{ scale: [1, 1.08, 1], rotate: [0, 3, 0] }}
               transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
             />
@@ -605,7 +605,7 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.5 }}
             >
               <Link href="/submit-artwork">
-                <Button data-testid="button-submit-artwork-cta" size="lg" className="min-w-[220px] h-14 text-lg rounded-full bg-white text-[#1F4959] font-semibold">
+                <Button data-testid="button-submit-artwork-cta" size="lg" className="min-w-[220px] h-14 text-lg rounded-full bg-white text-[#4C392D] font-semibold">
                   Submit Your Artwork
                 </Button>
               </Link>

@@ -115,7 +115,7 @@ export default function ArtistProfile() {
                         className="w-full h-full object-cover"
                       />
                       {artwork.promotionPercentage && artwork.promotionPercentage > 0 && (
-                        <Badge className="absolute top-2 right-2 bg-amber-500">Boosted</Badge>
+                        <Badge className="absolute top-2 right-2 bg-[#B8965A]">Boosted</Badge>
                       )}
                     </div>
                     <div className="p-4">

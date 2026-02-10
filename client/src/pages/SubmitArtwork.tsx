@@ -202,7 +202,7 @@ export default function SubmitArtwork() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <span className="text-sm font-medium text-amber-600 uppercase tracking-wider">Create Listing</span>
+          <span className="text-sm font-medium text-[#B8965A] uppercase tracking-wider">Create Listing</span>
           <h1 className="text-3xl font-display font-bold mt-1">Submit Artwork</h1>
           <p className="text-muted-foreground">Upload your masterpiece for expert review and global auction.</p>
         </div>
@@ -423,12 +423,12 @@ export default function SubmitArtwork() {
                     <FormControl>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Card 
-                          className={`cursor-pointer transition-all hover-elevate ${field.value === "ai_instant" ? "ring-2 ring-amber-500 border-amber-500" : ""}`}
+                          className={`cursor-pointer transition-all hover-elevate ${field.value === "ai_instant" ? "ring-2 ring-[#B8965A] border-[#B8965A]" : ""}`}
                           onClick={() => field.onChange("ai_instant")}
                           data-testid="card-review-ai"
                         >
                           <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-amber-500 text-white" : "bg-muted"}`}>
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-[#B8965A] text-white" : "bg-muted"}`}>
                               <Zap className="w-6 h-6" />
                             </div>
                             <div>
@@ -436,18 +436,18 @@ export default function SubmitArtwork() {
                               <p className="text-xs text-muted-foreground mt-1">
                                 Get immediate feedback from our review tool, trained by experienced curators for accurate, expert-level analysis.
                               </p>
-                              <span className="inline-block mt-2 text-xs font-medium text-amber-600">Results in seconds</span>
+                              <span className="inline-block mt-2 text-xs font-medium text-[#B8965A]">Results in seconds</span>
                             </div>
                           </CardContent>
                         </Card>
 
                         <Card 
-                          className={`cursor-pointer transition-all hover-elevate ${field.value === "human_curator" ? "ring-2 ring-violet-500 border-violet-500" : ""}`}
+                          className={`cursor-pointer transition-all hover-elevate ${field.value === "human_curator" ? "ring-2 ring-[#96A0AB] border-[#96A0AB]" : ""}`}
                           onClick={() => field.onChange("human_curator")}
                           data-testid="card-review-human"
                         >
                           <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "human_curator" ? "bg-violet-500 text-white" : "bg-muted"}`}>
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "human_curator" ? "bg-[#96A0AB] text-white" : "bg-muted"}`}>
                               <Clock className="w-6 h-6" />
                             </div>
                             <div>
@@ -455,7 +455,7 @@ export default function SubmitArtwork() {
                               <p className="text-xs text-muted-foreground mt-1">
                                 Receive detailed, personalized feedback from our team of professional art curators.
                               </p>
-                              <span className="inline-block mt-2 text-xs font-medium text-violet-600">1-3 business days</span>
+                              <span className="inline-block mt-2 text-xs font-medium text-[#96A0AB]">1-3 business days</span>
                             </div>
                           </CardContent>
                         </Card>
