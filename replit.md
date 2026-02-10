@@ -2,19 +2,21 @@
 
 ## Overview
 
-BrushBids is a student art auction platform that connects emerging student artists with collectors. The platform features AI-powered curation for artwork submissions, real-time bidding, and charitable giving integration. Artists submit their work for AI review, approved pieces enter the auction gallery, and a portion of sales goes to selected charities.
+BrushBids is a student art auction platform that connects emerging student artists with collectors. The platform features expert curation (supported by AI tools) for artwork submissions, real-time bidding, and charitable giving integration. Artists submit their work for curator review, approved pieces enter the auction gallery, and a portion of sales goes to selected charities.
 
 Key features:
 - Artist dashboard with submission management and earnings tracking
-- AI curation system that scores and provides feedback on artwork submissions
+- Expert curation system with two review options: instant AI-assisted feedback or human curator review
+- Image upload from camera roll or direct artwork scanning via device camera
 - Real-time auction gallery with bidding functionality
 - Charity selection for artists (15% of sales go to chosen charity)
 - Artist promotion tool (0-20% boost to increase listing visibility)
 - Admin panel for manual curation override
 - Replit Auth integration for user authentication
 - Role-based accounts: Artist, Collector, or Both
-- Welcome onboarding modal for new users to select their role
+- Welcome onboarding modal for new users to select their role and collect name
 - Role switching available anytime from Dashboard settings
+- Warm, colorful design with gold, coral, and violet accents appealing to artists
 
 ### Revenue Split
 - Base: 70% artist, 15% platform, 15% charity

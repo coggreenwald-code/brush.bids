@@ -6,6 +6,39 @@ import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const allowedMimeTypes = new Set([
+  "image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp", "image/tiff",
+]);
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadDir),
+    filename: (_req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const extAllowed = /\.(jpg|jpeg|png|gif|webp|bmp|tiff)$/i;
+    if (!extAllowed.test(path.extname(file.originalname))) {
+      return cb(new Error("Only image files are allowed"));
+    }
+    if (!allowedMimeTypes.has(file.mimetype)) {
+      return cb(new Error("Invalid image file type"));
+    }
+    cb(null, true);
+  },
+});
 
 const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
@@ -210,6 +243,21 @@ export async function registerRoutes(
       res.status(500).json({ message: "Failed to generate description" });
     }
   });
+
+  app.post(api.artworks.upload.path, (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    next();
+  }, upload.single("image"), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.json({ imageUrl });
+  });
+
+  app.use("/uploads", (await import("express")).default.static(uploadDir));
 
   // Users
   app.get(api.users.get.path, async (req, res) => {

@@ -14,8 +14,8 @@ export default function FAQ() {
       answer: "We accept various forms of visual art including paintings, drawings, digital art, photography, mixed media, and sculptures (photos of 3D work). All submissions must be original works created by you.",
     },
     {
-      question: "How does the AI curation process work?",
-      answer: "Our AI evaluates submissions based on technical execution, composition, creativity, and presentation. It provides a score from 1-100 along with detailed feedback. Works scoring above our threshold are approved for auction; others receive constructive feedback for improvement.",
+      question: "How does the curation process work?",
+      answer: "Our expert curators, supported by advanced review tools, evaluate submissions based on technical execution, composition, creativity, and presentation. You can choose instant feedback or wait for a detailed human curator review. Works meeting our standards are approved for auction; others receive constructive feedback for improvement.",
     },
     {
       question: "How much do I earn from a sale?",
@@ -27,7 +27,7 @@ export default function FAQ() {
     },
     {
       question: "What happens if my artwork is rejected?",
-      answer: "You'll receive detailed AI feedback explaining why. Common reasons include image quality issues, incomplete descriptions, or technique areas needing improvement. You can always resubmit after making adjustments.",
+      answer: "You'll receive detailed feedback from our curators explaining why. Common reasons include image quality issues, incomplete descriptions, or technique areas needing improvement. You can always resubmit after making adjustments.",
     },
   ];
 
@@ -57,7 +57,7 @@ export default function FAQ() {
   const generalFaqs = [
     {
       question: "What makes BrushBids different from other art marketplaces?",
-      answer: "We focus exclusively on student artists, use AI for fair and unbiased curation, and ensure 15% of every sale goes to charity. We're building a community, not just a marketplace.",
+      answer: "We focus exclusively on student artists, use expert curation for fair and unbiased reviews, and ensure 15% of every sale goes to charity. We're building a community, not just a marketplace.",
     },
     {
       question: "How do charities receive donations?",

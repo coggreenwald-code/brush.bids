@@ -39,9 +39,9 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-bold">4. AI Curation</h2>
+            <h2 className="text-xl font-display font-bold">4. Curation Process</h2>
             <p className="text-muted-foreground">
-              All artwork submissions are evaluated by our AI curation system. BrushBids reserves the right to accept or reject any submission based on our quality standards. Decisions made by the AI curation system are final, though artists may resubmit improved works.
+              All artwork submissions are evaluated by our expert curation team, supported by advanced review tools. BrushBids reserves the right to accept or reject any submission based on our quality standards. Artists may resubmit improved works.
             </p>
           </section>
 

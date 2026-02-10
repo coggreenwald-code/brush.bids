@@ -88,6 +88,14 @@ export const api = {
         200: z.object({ description: z.string() }),
         400: errorSchemas.validation,
       },
+    },
+    upload: {
+      method: 'POST' as const,
+      path: '/api/artworks/upload-image',
+      responses: {
+        200: z.object({ imageUrl: z.string() }),
+        400: errorSchemas.validation,
+      },
     }
   },
   // Users/Artists

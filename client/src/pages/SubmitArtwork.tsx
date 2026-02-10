@@ -12,18 +12,19 @@ import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { Loader2, UploadCloud, Sparkles } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useState, useRef, useCallback } from "react";
 
-// Extending schema from shared but coercing numbers for form handling
 const formSchema = z.object({
   title: z.string().min(3, "Title too short"),
   description: z.string().min(10, "Description too short"),
-  imageUrl: z.string().url("Must be a valid URL"),
+  imageUrl: z.string().min(1, "Please upload an image of your artwork"),
   price: z.coerce.number().min(1, "Price must be positive"),
   charityId: z.coerce.number().optional(),
+  reviewType: z.enum(["ai_instant", "human_curator"]),
 });
 
 export default function SubmitArtwork() {
@@ -32,6 +33,13 @@ export default function SubmitArtwork() {
   const { toast } = useToast();
   const createArtwork = useCreateArtwork();
   const { data: charities } = useCharities();
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const generateDescription = useMutation({
     mutationFn: async (data: { title: string; medium?: string }) => {
@@ -42,7 +50,7 @@ export default function SubmitArtwork() {
       form.setValue("description", data.description);
       toast({
         title: "Description Generated",
-        description: "AI has created a description. Feel free to edit it!",
+        description: "A description has been created. Feel free to edit it!",
       });
     },
     onError: () => {
@@ -59,7 +67,7 @@ export default function SubmitArtwork() {
     if (!title || title.length < 3) {
       toast({
         title: "Title Required",
-        description: "Please enter a title first so the AI can generate a relevant description.",
+        description: "Please enter a title first so we can generate a relevant description.",
         variant: "destructive",
       });
       return;
@@ -67,15 +75,91 @@ export default function SubmitArtwork() {
     generateDescription.mutate({ title });
   };
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
       imageUrl: "",
       price: 0,
+      reviewType: "ai_instant",
     },
   });
+
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/api/artworks/upload-image", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      form.setValue("imageUrl", data.imageUrl);
+      setImagePreview(URL.createObjectURL(file));
+      toast({ title: "Image Uploaded", description: "Your artwork image is ready." });
+    } catch {
+      toast({ title: "Upload Failed", description: "Could not upload image. Please try again.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadImage(file);
+  };
+
+  const startCamera = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setShowCamera(true);
+    } catch {
+      toast({ title: "Camera Unavailable", description: "Could not access your camera. Please check permissions.", variant: "destructive" });
+    }
+  }, [toast]);
+
+  const capturePhoto = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], `scan-${Date.now()}.jpg`, { type: "image/jpeg" });
+        uploadImage(file);
+      }
+    }, "image/jpeg", 0.92);
+    stopCamera();
+  }, []);
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  }, []);
+
+  const removeImage = () => {
+    form.setValue("imageUrl", "");
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   if (!user) {
     return (
@@ -90,13 +174,15 @@ export default function SubmitArtwork() {
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     createArtwork.mutate({
       ...data,
-      artistId: parseInt(user.id as any),
-      price: data.price.toString(), // DB expects decimal as string sometimes or number depending on driver, but schema says decimal
+      artistId: user.id,
+      price: data.price.toString(),
     } as any, {
       onSuccess: () => {
         toast({
           title: "Submission Successful",
-          description: "Your artwork has been sent to AI curators for review.",
+          description: data.reviewType === "ai_instant"
+            ? "Your artwork has been submitted for instant expert review."
+            : "Your artwork has been submitted and will be reviewed by our curators soon.",
         });
         setLocation("/dashboard");
       },
@@ -110,13 +196,15 @@ export default function SubmitArtwork() {
     });
   };
 
+  const selectedReviewType = form.watch("reviewType");
+
   return (
     <Layout>
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <span className="text-sm font-medium text-primary uppercase tracking-wider">Create Listing</span>
+          <span className="text-sm font-medium text-amber-600 uppercase tracking-wider">Create Listing</span>
           <h1 className="text-3xl font-display font-bold mt-1">Submit Artwork</h1>
-          <p className="text-muted-foreground">Upload your masterpiece for AI curation and global auction.</p>
+          <p className="text-muted-foreground">Upload your masterpiece for expert review and global auction.</p>
         </div>
 
         <Card className="p-8">
@@ -129,7 +217,7 @@ export default function SubmitArtwork() {
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Sunset over the Dorms" {...field} />
+                      <Input placeholder="e.g. Sunset over the Dorms" {...field} data-testid="input-title" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -141,7 +229,7 @@ export default function SubmitArtwork() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-1">
                       <FormLabel>Description & Backstory</FormLabel>
                       <Button
                         type="button"
@@ -156,17 +244,18 @@ export default function SubmitArtwork() {
                         ) : (
                           <Sparkles className="w-4 h-4 mr-2" />
                         )}
-                        AI Write
+                        Auto Write
                       </Button>
                     </div>
                     <FormControl>
                       <Textarea 
-                        placeholder="Tell us about your creative process, or click 'AI Write' to generate a description..." 
+                        placeholder="Tell us about your creative process, or click 'Auto Write' to generate a description..." 
                         className="min-h-[120px]"
                         {...field} 
+                        data-testid="textarea-description"
                       />
                     </FormControl>
-                    <FormDescription>Good stories increase sales by 25%. Let AI help you craft the perfect description!</FormDescription>
+                    <FormDescription>Good stories increase sales by 25%. Let us help you craft the perfect description!</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -180,7 +269,7 @@ export default function SubmitArtwork() {
                     <FormItem>
                       <FormLabel>Reserve Price ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="50.00" {...field} />
+                        <Input type="number" placeholder="50.00" {...field} data-testid="input-price" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -195,7 +284,7 @@ export default function SubmitArtwork() {
                       <FormLabel>Select Charity (Optional)</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger data-testid="select-charity">
                             <SelectValue placeholder="Choose a cause" />
                           </SelectTrigger>
                         </FormControl>
@@ -215,30 +304,175 @@ export default function SubmitArtwork() {
               <FormField
                 control={form.control}
                 name="imageUrl"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
-                    <FormLabel>Image URL</FormLabel>
+                    <FormLabel>Artwork Image</FormLabel>
                     <FormControl>
-                      <div className="flex gap-2">
-                        <Input placeholder="https://..." {...field} />
-                        <Button type="button" variant="outline" size="icon">
-                          <UploadCloud className="w-4 h-4" />
-                        </Button>
+                      <div className="space-y-4">
+                        {imagePreview || form.getValues("imageUrl") ? (
+                          <div className="relative rounded-md overflow-hidden border bg-muted">
+                            <img 
+                              src={imagePreview || form.getValues("imageUrl")} 
+                              alt="Artwork preview" 
+                              className="w-full max-h-64 object-contain"
+                              data-testid="img-artwork-preview"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2"
+                              onClick={removeImage}
+                              data-testid="button-remove-image"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div 
+                            className="border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors hover:border-primary/50 hover:bg-muted/50"
+                            onClick={() => fileInputRef.current?.click()}
+                            data-testid="dropzone-image"
+                          >
+                            <ImagePlus className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                            <p className="font-medium text-sm">Click to upload your artwork</p>
+                            <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, WebP up to 10MB</p>
+                          </div>
+                        )}
+
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileSelect}
+                          data-testid="input-file-upload"
+                        />
+
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            data-testid="button-upload-file"
+                          >
+                            {uploading ? (
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                              <UploadCloud className="w-4 h-4 mr-2" />
+                            )}
+                            From Camera Roll
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={startCamera}
+                            disabled={uploading || showCamera}
+                            data-testid="button-scan-artwork"
+                          >
+                            <Camera className="w-4 h-4 mr-2" />
+                            Scan Artwork
+                          </Button>
+                        </div>
+
+                        {showCamera && (
+                          <div className="relative rounded-md overflow-hidden border bg-black">
+                            <video ref={videoRef} autoPlay playsInline className="w-full" data-testid="video-camera" />
+                            <canvas ref={canvasRef} className="hidden" />
+                            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+                              <Button
+                                type="button"
+                                size="lg"
+                                className="rounded-full bg-white text-black"
+                                onClick={capturePhoto}
+                                data-testid="button-capture"
+                              >
+                                <Camera className="w-5 h-5 mr-2" /> Capture
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="lg"
+                                className="rounded-full border-white text-white"
+                                onClick={stopCamera}
+                                data-testid="button-cancel-camera"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </FormControl>
-                    <FormDescription>Link to your high-res image file.</FormDescription>
+                    <FormDescription>Upload from your camera roll or scan your artwork directly.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" size="lg" className="w-full rounded-full" disabled={createArtwork.isPending}>
+              <FormField
+                control={form.control}
+                name="reviewType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Review Type</FormLabel>
+                    <FormDescription className="mb-3">Choose how you'd like your artwork reviewed.</FormDescription>
+                    <FormControl>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Card 
+                          className={`cursor-pointer transition-all hover-elevate ${field.value === "ai_instant" ? "ring-2 ring-amber-500 border-amber-500" : ""}`}
+                          onClick={() => field.onChange("ai_instant")}
+                          data-testid="card-review-ai"
+                        >
+                          <CardContent className="p-4 flex flex-col items-center text-center gap-3">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-amber-500 text-white" : "bg-muted"}`}>
+                              <Zap className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-sm">Instant Feedback</h4>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Get immediate feedback from our review tool, trained by experienced curators for accurate, expert-level analysis.
+                              </p>
+                              <span className="inline-block mt-2 text-xs font-medium text-amber-600">Results in seconds</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card 
+                          className={`cursor-pointer transition-all hover-elevate ${field.value === "human_curator" ? "ring-2 ring-violet-500 border-violet-500" : ""}`}
+                          onClick={() => field.onChange("human_curator")}
+                          data-testid="card-review-human"
+                        >
+                          <CardContent className="p-4 flex flex-col items-center text-center gap-3">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "human_curator" ? "bg-violet-500 text-white" : "bg-muted"}`}>
+                              <Clock className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-sm">Human Curator Review</h4>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Receive detailed, personalized feedback from our team of professional art curators.
+                              </p>
+                              <span className="inline-block mt-2 text-xs font-medium text-violet-600">1-3 business days</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" size="lg" className="w-full rounded-full" disabled={createArtwork.isPending} data-testid="button-submit-artwork">
                 {createArtwork.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
                   </>
                 ) : (
-                  "Submit to Curators"
+                  `Submit for ${selectedReviewType === "ai_instant" ? "Instant" : "Curator"} Review`
                 )}
               </Button>
             </form>

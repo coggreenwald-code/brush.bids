@@ -13,7 +13,7 @@ export default function About() {
     {
       icon: Award,
       title: "Quality First",
-      description: "Our AI curation ensures only the highest quality work reaches collectors, maintaining trust on both sides.",
+      description: "Our expert curation ensures only the highest quality work reaches collectors, maintaining trust on both sides.",
     },
     {
       icon: Users,
@@ -56,7 +56,7 @@ export default function About() {
               BrushBids was founded in 2024 with a simple belief: student artists deserve better opportunities to share and sell their work. Too often, talented young creators struggle to find platforms that take them seriously and offer fair compensation.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              We built BrushBids as the bridge between passionate student artists and discerning collectors. Using AI-powered curation, we ensure quality while eliminating bias. Every artwork that reaches our marketplace has been evaluated for technique, composition, and originality.
+              We built BrushBids as the bridge between passionate student artists and discerning collectors. Our expert curation process ensures quality while eliminating bias. Every artwork that reaches our marketplace has been evaluated for technique, composition, and originality.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               But we didn't stop there. We believe art should give back. That's why 15% of every sale goes to a charity chosen by the artist. To date, our community has donated over $18,000 to causes ranging from environmental conservation to arts education.
@@ -104,18 +104,18 @@ export default function About() {
           </div>
         </section>
 
-        {/* AI Curation */}
+        {/* Expert Curation */}
         <section className="space-y-6">
           <div className="flex items-center gap-3">
             <Sparkles className="w-6 h-6 text-primary" />
-            <h2 className="text-2xl font-display font-bold">AI-Powered Curation</h2>
+            <h2 className="text-2xl font-display font-bold">Expert Curation</h2>
           </div>
           <Card className="p-8 bg-gradient-to-br from-primary/5 to-accent/5">
             <p className="text-muted-foreground leading-relaxed">
-              Our proprietary AI system evaluates every submission based on multiple criteria: technical execution, composition, creativity, and market appeal. This ensures fair, unbiased reviews while maintaining the high quality standards our collectors expect.
+              Our curation team, supported by advanced review tools trained by experienced art professionals, evaluates every submission based on multiple criteria: technical execution, composition, creativity, and market appeal. This ensures fair, unbiased reviews while maintaining the high quality standards our collectors expect.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Artists receive instant feedback on their submissions, helping them understand how to improve and succeed. Even rejected works come with constructive guidance, making BrushBids a learning platform as much as a marketplace.
+              Artists can choose between instant feedback or a detailed human curator review. Even rejected works come with constructive guidance, making BrushBids a learning platform as much as a marketplace.
             </p>
           </Card>
         </section>

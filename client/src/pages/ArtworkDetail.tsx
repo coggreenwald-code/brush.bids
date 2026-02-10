@@ -156,7 +156,7 @@ export default function ArtworkDetail() {
           {artwork.aiFeedback && (
             <Card className="p-6 bg-primary/5 border-primary/20">
               <h3 className="font-semibold flex items-center gap-2 mb-2 text-primary">
-                <Sparkles className="w-4 h-4" /> AI Curator Feedback
+                <Sparkles className="w-4 h-4" /> Curator Feedback
               </h3>
               <p className="text-sm text-muted-foreground italic">"{artwork.aiFeedback}"</p>
               <div className="mt-4 flex items-center gap-2">

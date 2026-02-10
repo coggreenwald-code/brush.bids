@@ -7,6 +7,7 @@ export * from "./models/auth";
 export * from "./models/chat";
 
 export const statusEnum = pgEnum("status", ["pending", "approved", "rejected"]);
+export const reviewTypeEnum = pgEnum("review_type", ["ai_instant", "human_curator"]);
 
 export const artworks = pgTable("artworks", {
   id: serial("id").primaryKey(),
@@ -24,6 +25,7 @@ export const artworks = pgTable("artworks", {
   paidBy: varchar("paid_by").references(() => users.id),
   stripeSessionId: text("stripe_session_id"),
   promotionPercentage: integer("promotion_percentage").default(0),
+  reviewType: reviewTypeEnum("review_type").default("ai_instant").notNull(),
 });
 
 export const bids = pgTable("bids", {

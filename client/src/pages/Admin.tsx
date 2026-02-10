@@ -62,7 +62,7 @@ export default function Admin() {
     aiReview.mutate(id, {
       onSuccess: (data) => {
         toast({
-          title: "AI Review Complete",
+          title: "Review Complete",
           description: `Score: ${data.score}/100. Feedback generated.`,
         });
       }
@@ -87,7 +87,7 @@ export default function Admin() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-display font-bold">Curation Queue</h1>
-            <p className="text-muted-foreground">Review pending submissions with AI assistance</p>
+            <p className="text-muted-foreground">Review pending submissions with expert curation tools</p>
           </div>
           
           {pendingCount > 0 && (
@@ -224,7 +224,7 @@ export default function Admin() {
                           data-testid={`button-ai-review-${artwork.id}`}
                         >
                           {aiReview.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                          Generate AI Review
+                          Generate Review
                         </Button>
                       ) : null}
                       
