@@ -184,34 +184,34 @@ export default function Home() {
             <div
               className="relative mx-auto"
               style={{
-                height: "420px",
-                perspective: "800px",
-                perspectiveOrigin: "50% 40%",
+                height: "440px",
+                perspective: "1200px",
+                perspectiveOrigin: "50% 35%",
                 overflow: "hidden",
               }}
               data-testid="cover-flow-container"
             >
-              {/* Dark gradient floor for reflection effect */}
               <div
-                className="absolute bottom-0 left-0 right-0 h-[45%] pointer-events-none"
+                className="absolute bottom-0 left-0 right-0 h-[40%] pointer-events-none"
                 style={{
-                  background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 30%, rgba(0,0,0,0.06) 100%)",
+                  background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.015) 40%, rgba(0,0,0,0.04) 100%)",
                 }}
               />
 
-              <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "20px" }}>
+              <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "15px" }}>
                 {flowItems.map(({ artwork, offset, arrayIdx }) => {
                   const isCenter = offset === 0;
                   const absOffset = Math.abs(offset);
                   const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
 
-                  const coverSize = isCenter ? 220 : 180;
-                  const gap = isCenter ? 0 : 110 + (absOffset - 1) * 95;
-                  const translateX = isCenter ? 0 : side * (coverSize / 2 + gap);
-                  const rotateY = isCenter ? 0 : side * -55;
-                  const translateZ = isCenter ? 80 : -20 * absOffset;
+                  const coverSize = isCenter ? 240 : 190;
+                  const centerGap = 160;
+                  const stackSpacing = 70;
+                  const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
+                  const rotateY = isCenter ? 0 : side * -60;
+                  const translateZ = isCenter ? 120 : -(absOffset * 30);
                   const zIndex = 20 - absOffset;
-                  const itemOpacity = absOffset >= 3 ? 0.4 : absOffset === 2 ? 0.7 : 1;
+                  const itemOpacity = absOffset >= 3 ? 0.3 : absOffset === 2 ? 0.65 : 1;
 
                   return (
                     <div
@@ -220,7 +220,7 @@ export default function Home() {
                       style={{
                         zIndex,
                         transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
-                        transition: "transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease",
+                        transition: "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease",
                         transformStyle: "preserve-3d",
                         opacity: itemOpacity,
                         willChange: "transform, opacity",
@@ -230,16 +230,15 @@ export default function Home() {
                         else if (offset > 0) goNext();
                       }}
                     >
-                      {/* Artwork Cover */}
                       <div
                         className="relative overflow-hidden"
                         style={{
                           width: `${coverSize}px`,
                           height: `${coverSize}px`,
-                          borderRadius: "4px",
+                          borderRadius: "3px",
                           boxShadow: isCenter
-                            ? "0 4px 20px rgba(0,0,0,0.25), 0 15px 40px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.1)"
-                            : "0 2px 12px rgba(0,0,0,0.2), 0 8px 25px rgba(0,0,0,0.1)",
+                            ? "0 8px 30px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)"
+                            : `${side * -3}px 2px 10px rgba(0,0,0,0.2)`,
                         }}
                       >
                         <img
@@ -253,25 +252,23 @@ export default function Home() {
                           <div
                             className="absolute inset-0 pointer-events-none"
                             style={{
-                              boxShadow: "inset 0 0 0 1px rgba(184,150,90,0.3)",
-                              borderRadius: "4px",
+                              background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)",
+                              borderRadius: "3px",
                             }}
                           />
                         )}
                       </div>
 
-                      {/* Reflection */}
                       <div
-                        className="overflow-hidden"
+                        className="overflow-hidden pointer-events-none"
                         style={{
                           width: `${coverSize}px`,
-                          height: `${coverSize * 0.35}px`,
-                          marginTop: "2px",
-                          borderRadius: "0 0 4px 4px",
+                          height: `${coverSize * 0.3}px`,
+                          marginTop: "1px",
                           transform: "scaleY(-1)",
-                          WebkitMaskImage: "linear-gradient(to top, transparent 10%, rgba(0,0,0,0.25) 100%)",
-                          maskImage: "linear-gradient(to top, transparent 10%, rgba(0,0,0,0.25) 100%)",
-                          opacity: 0.35,
+                          WebkitMaskImage: "linear-gradient(to top, transparent 15%, rgba(0,0,0,0.2) 100%)",
+                          maskImage: "linear-gradient(to top, transparent 15%, rgba(0,0,0,0.2) 100%)",
+                          opacity: isCenter ? 0.3 : 0.15,
                         }}
                       >
                         <img
