@@ -97,7 +97,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="space-y-24 pb-16">
+      <div className="pb-16">
         {/* Hero Section */}
         <section className="relative -mt-4 md:-mt-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
           <div className="relative w-full min-h-[520px] md:min-h-[600px] lg:min-h-[680px] overflow-hidden">
@@ -134,7 +134,7 @@ export default function Home() {
                 </motion.div>
 
                 <motion.h1
-                  className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white leading-[1.1] tracking-tight drop-shadow-lg"
+                  className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-white leading-[1.05] tracking-tight drop-shadow-lg"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.1 }}
@@ -177,23 +177,23 @@ export default function Home() {
         </section>
 
         {/* Cover Flow Featured Works — Full Width */}
-        <section className="relative -mx-4 md:-mx-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
-          <div className="py-16 md:py-24">
+        <section className="relative mt-20 md:mt-28 -mx-4 md:-mx-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
+          <div className="pb-8 md:pb-12">
             <motion.div
-              className="text-center mb-10"
+              className="text-left px-6 md:px-12 lg:px-16 mb-8"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight">Featured Works</h2>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold tracking-tight leading-[1.05]">Featured<br />Works</h2>
             </motion.div>
 
             <div className="relative select-none">
               <div
                 className="relative mx-auto"
                 style={{
-                  height: "580px",
+                  height: "500px",
                   perspective: "1400px",
                   perspectiveOrigin: "50% 38%",
                   overflow: "hidden",
@@ -272,7 +272,7 @@ export default function Home() {
                           className="overflow-hidden pointer-events-none"
                           style={{
                             width: `${coverSize}px`,
-                            height: `${coverSize * 0.28}px`,
+                            height: `${coverSize * 0.22}px`,
                             marginTop: "1px",
                             transform: "scaleY(-1)",
                             WebkitMaskImage: "linear-gradient(to top, transparent 20%, rgba(0,0,0,0.18) 100%)",
@@ -295,7 +295,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center mt-4">
+              <div className="text-center -mt-2">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
@@ -303,9 +303,9 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.3 }}
-                    className="space-y-1"
+                    className="space-y-0.5"
                   >
-                    <h3 className="text-2xl md:text-3xl font-display font-bold" data-testid="text-coverflow-title">
+                    <h3 className="text-xl md:text-2xl font-display font-semibold tracking-tight" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
                     <p className="text-sm text-muted-foreground tracking-wide" data-testid="text-coverflow-artist">
@@ -315,7 +315,7 @@ export default function Home() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center justify-center gap-6 mt-6">
+              <div className="flex items-center justify-center gap-6 mt-4">
                 <Button
                   size="icon"
                   variant="outline"
@@ -356,45 +356,45 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works — FLV Editorial Style */}
-        <section className="py-8" data-testid="section-how-it-works">
+        {/* How It Works — FLV asymmetric editorial */}
+        <section className="mt-20 md:mt-32" data-testid="section-how-it-works">
           <motion.div
-            className="text-center max-w-2xl mx-auto mb-16"
+            className="text-right mb-12 md:mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight">How It Works</h2>
-            <p className="text-muted-foreground text-lg mt-4">Whether you're a student artist or an art enthusiast, getting started is simple.</p>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
+            <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight mt-2">How It Works</h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <div className="mb-8">
+              <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
                 <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
-                <h3 className="text-2xl md:text-3xl font-display font-bold mt-2">Start selling your work</h3>
+                <h3 className="text-xl md:text-2xl font-display font-semibold mt-2">Start selling your work</h3>
               </div>
-              <div className="space-y-8">
+              <div className="space-y-7">
                 {howItWorksArtist.map((step, i) => (
                   <div key={step.title} className="flex gap-5 items-start">
-                    <span className="flex-shrink-0 text-3xl font-display font-bold text-[#B8965A]/30 dark:text-[#C9A84C]/30 leading-none pt-0.5">
+                    <span className="flex-shrink-0 text-2xl font-display font-light text-[#B8965A]/40 dark:text-[#C9A84C]/40 leading-none pt-0.5 tabular-nums">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <h4 className="font-semibold text-base">{step.title}</h4>
+                      <h4 className="font-medium text-sm uppercase tracking-wide">{step.title}</h4>
                       <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <Link href="/submit-artwork">
-                <Button data-testid="button-start-selling" className="mt-10 rounded-md bg-[#4C392D] text-white px-8" size="lg">Start Selling Your Art</Button>
+                <Button data-testid="button-start-selling" className="mt-10 rounded-md bg-[#4C392D] text-white px-8 uppercase tracking-wider text-xs" size="lg">Start Selling</Button>
               </Link>
             </motion.div>
 
@@ -404,34 +404,43 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <div className="mb-8">
+              <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
                 <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
-                <h3 className="text-2xl md:text-3xl font-display font-bold mt-2">Discover emerging talent</h3>
+                <h3 className="text-xl md:text-2xl font-display font-semibold mt-2">Discover emerging talent</h3>
               </div>
-              <div className="space-y-8">
+              <div className="space-y-7">
                 {howItWorksBuyer.map((step, i) => (
                   <div key={step.title} className="flex gap-5 items-start">
-                    <span className="flex-shrink-0 text-3xl font-display font-bold text-[#96A0AB]/30 dark:text-[#A8AEB5]/30 leading-none pt-0.5">
+                    <span className="flex-shrink-0 text-2xl font-display font-light text-[#96A0AB]/40 dark:text-[#A8AEB5]/40 leading-none pt-0.5 tabular-nums">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div>
-                      <h4 className="font-semibold text-base">{step.title}</h4>
+                      <h4 className="font-medium text-sm uppercase tracking-wide">{step.title}</h4>
                       <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <Link href="/gallery">
-                <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-md px-8" size="lg">Browse the Gallery</Button>
+                <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-md px-8 uppercase tracking-wider text-xs" size="lg">Browse Gallery</Button>
               </Link>
             </motion.div>
           </div>
         </section>
 
-        {/* Stats — Minimal Editorial */}
-        <section className="py-8" data-testid="section-stats">
-          <div className="border-t border-b border-[#e0d6cd] dark:border-border py-12 md:py-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 max-w-4xl mx-auto text-center">
+        {/* Stats — FLV style with left-aligned large heading */}
+        <section className="mt-24 md:mt-36" data-testid="section-stats">
+          <motion.div
+            className="mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-semibold tracking-tight leading-[0.95]">Our<br />Impact</h2>
+          </motion.div>
+          <div className="border-t border-[#e0d6cd] dark:border-border pt-10 md:pt-14">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {stats.map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -440,37 +449,37 @@ export default function Home() {
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ delay: 0.08 * i, duration: 0.4 }}
                 >
-                  <p className={`text-3xl md:text-4xl font-display font-bold ${stat.color}`} data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                  <p className="text-3xl md:text-4xl font-display font-semibold" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
                     {stat.value}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-2 tracking-wide">{stat.label}</p>
+                  <p className="text-sm text-muted-foreground mt-2 tracking-wide uppercase">{stat.label}</p>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA — Clean FLV Banner */}
-        <section className="py-16 md:py-24 text-center" data-testid="section-cta">
+        {/* CTA — FLV style, right-aligned */}
+        <section className="mt-24 md:mt-36 mb-8" data-testid="section-cta">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5 }}
-            className="max-w-2xl mx-auto space-y-6"
+            className="text-right max-w-3xl ml-auto"
           >
-            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight">Ready to Start Your Journey?</h2>
-            <p className="text-muted-foreground text-lg leading-relaxed">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold tracking-tight leading-[1.05]">Ready to Start<br />Your Journey?</h2>
+            <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4 max-w-lg ml-auto">
               Join a community of student artists and collectors making art accessible and impactful.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex flex-wrap gap-4 justify-end mt-8">
               <Link href="/submit-artwork">
-                <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8" data-testid="button-cta-submit">
+                <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
                   Submit Your Art <Upload className="w-4 h-4" />
                 </Button>
               </Link>
               <Link href="/gallery">
-                <Button size="lg" variant="outline" className="rounded-md gap-2 px-8" data-testid="button-cta-browse">
+                <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-browse">
                   Browse Gallery <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>

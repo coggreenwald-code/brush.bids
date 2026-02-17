@@ -9,7 +9,8 @@ import {
   X,
   Home,
   Heart,
-  ChevronDown
+  ChevronDown,
+  Users
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 import { useState } from "react";
@@ -32,6 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { label: "Home", href: "/", icon: Home, roles: ["all"] },
     { label: "Gallery", href: "/gallery", icon: Palette, roles: ["all"] },
+    { label: "About", href: "/about", icon: Users, roles: ["all"] },
     { label: "My Bids", href: "/my-bids", icon: Heart, roles: ["buyer", "both"] },
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["artist", "both"] },
     { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
@@ -49,7 +51,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <div className="w-7 h-7 flex items-center justify-center">
               <img src={logoImage} alt="BrushBids" className="w-full h-full dark:invert" />
             </div>
-            <span className="text-lg font-display font-bold text-[#4C392D] dark:text-foreground tracking-tight">BrushBids</span>
+            <span className="text-lg font-display font-semibold text-[#4C392D] dark:text-foreground tracking-tight">BrushBids</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8" data-testid="nav-desktop">

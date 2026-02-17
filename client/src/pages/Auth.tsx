@@ -30,7 +30,7 @@ export default function Auth() {
             <div className="w-12 h-12 mx-auto mb-4">
               <img src={logoImage} alt="BrushBids" className="w-full h-full dark:invert" />
             </div>
-            <h1 className="text-3xl font-display font-bold tracking-tight" data-testid="text-auth-title">
+            <h1 className="text-3xl font-display font-semibold tracking-tight" data-testid="text-auth-title">
               Welcome to BrushBids
             </h1>
             <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
