@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
+import heroImage from "@assets/Z-A18XdAxsiBvxgt_DavidHockney,PortraitofanArtist-PoolwithTwoF_1771370870284.avif";
 import artSunset from "@assets/art-sunset-mountains.png";
 import artPortrait from "@assets/art-abstract-portrait.png";
 import artOcean from "@assets/art-ocean-watercolor.png";
@@ -98,72 +99,80 @@ export default function Home() {
     <Layout>
       <div className="space-y-24 pb-16">
         {/* Hero Section */}
-        <section className="relative py-12 md:py-20" data-testid="section-hero">
-          <div className="absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F9F0EA] via-[#f0e6dc] to-[#e8ddd3] dark:from-[#2a2420] dark:via-[#1e1a17] dark:to-[#2a2420]" />
-            <div className="absolute top-10 right-10 w-[400px] h-[400px] rounded-full bg-[#B8965A]/8 blur-[100px]" />
-            <div className="absolute bottom-10 left-10 w-[300px] h-[300px] rounded-full bg-[#9E8472]/10 blur-[80px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#C9A84C]/5 blur-[120px]" />
-            <svg className="absolute bottom-0 left-0 w-full opacity-[0.04] dark:opacity-[0.02]" viewBox="0 0 1200 200" preserveAspectRatio="none">
-              <path d="M0,100 Q200,20 400,80 T800,60 T1200,100 L1200,200 L0,200 Z" fill="#4C392D" />
-            </svg>
-            <svg className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] dark:opacity-[0.02]" viewBox="0 0 200 200">
-              <circle cx="100" cy="100" r="80" stroke="#B8965A" strokeWidth="0.5" fill="none" />
-              <circle cx="100" cy="100" r="60" stroke="#B8965A" strokeWidth="0.3" fill="none" />
-              <circle cx="100" cy="100" r="40" stroke="#B8965A" strokeWidth="0.2" fill="none" />
-            </svg>
-          </div>
+        <section className="relative -mt-4 md:-mt-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
+          <div className="relative w-full min-h-[520px] md:min-h-[600px] lg:min-h-[680px] overflow-hidden">
+            <img
+              src={heroImage}
+              alt="David Hockney - Portrait of an Artist (Pool with Two Figures)"
+              className="absolute inset-0 w-full h-full object-cover"
+              data-testid="img-hero-background"
+            />
+            <div
+              className="absolute inset-0 dark:opacity-90"
+              style={{
+                background: "linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 dark:opacity-90"
+              style={{
+                background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%)",
+              }}
+            />
 
-          <div className="relative z-10 max-w-3xl mx-auto text-center space-y-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-            >
-              <span className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full bg-[#B8965A]/10 text-[#B8965A] dark:text-[#C9A84C] mb-6">
-                <Brush className="w-3.5 h-3.5" />
-                Turning Student Creativity Into Opportunity
-              </span>
-            </motion.div>
+            <div className="relative z-10 h-full min-h-[520px] md:min-h-[600px] lg:min-h-[680px] flex items-end">
+              <div className="max-w-2xl px-6 md:px-12 lg:px-16 pb-12 md:pb-16 space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7 }}
+                >
+                  <span className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full bg-white/15 text-white/90 backdrop-blur-sm">
+                    <Brush className="w-3.5 h-3.5" />
+                    Turning Student Creativity Into Opportunity
+                  </span>
+                </motion.div>
 
-            <motion.h1
-              className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-[#4C392D] dark:text-foreground leading-[1.1] tracking-tight"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              data-testid="text-hero-title"
-            >
-              Your Art.{" "}
-              <span className="text-[#B8965A] dark:text-[#C9A84C]">Your Future.</span>
-            </motion.h1>
+                <motion.h1
+                  className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white leading-[1.1] tracking-tight drop-shadow-lg"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  data-testid="text-hero-title"
+                >
+                  Your Art.{" "}
+                  <span className="text-[#E8C874]">Your Future.</span>
+                </motion.h1>
 
-            <motion.p
-              className="text-base md:text-lg text-[#6b5c50] dark:text-muted-foreground leading-relaxed max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              data-testid="text-mission-statement"
-            >
-              BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience, allowing them to make their artistic dreams a reality.
-            </motion.p>
+                <motion.p
+                  className="text-base md:text-lg text-white/80 leading-relaxed max-w-xl drop-shadow-md"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.2 }}
+                  data-testid="text-mission-statement"
+                >
+                  BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience, allowing them to make their artistic dreams a reality.
+                </motion.p>
 
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-            >
-              <Link href="/gallery">
-                <Button data-testid="button-explore-gallery" size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8">
-                  Explore Gallery <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link href="/submit-artwork">
-                <Button data-testid="button-submit-art-hero" size="lg" variant="outline" className="rounded-md gap-2 border-[#9E8472]/40 text-[#4C392D] dark:text-foreground px-8">
-                  Submit Artwork <Upload className="w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
+                <motion.div
+                  className="flex flex-col sm:flex-row gap-3 pt-2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.3 }}
+                >
+                  <Link href="/gallery">
+                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-md bg-white text-[#4C392D] gap-2 px-8 border-white">
+                      Explore Gallery <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/submit-artwork">
+                    <Button data-testid="button-submit-art-hero" size="lg" variant="outline" className="rounded-md gap-2 border-white/40 text-white px-8 backdrop-blur-sm bg-white/10">
+                      Submit Artwork <Upload className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
           </div>
         </section>
 
