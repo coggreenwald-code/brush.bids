@@ -17,6 +17,7 @@ import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
+import Auth from "@/pages/Auth";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/contact" component={Contact} />
       <Route path="/my-bids" component={MyBids} />
+      <Route path="/auth" component={Auth} />
       <Route component={NotFound} />
     </Switch>
   );

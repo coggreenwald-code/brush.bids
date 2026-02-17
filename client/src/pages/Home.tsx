@@ -176,338 +176,305 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Cover Flow Featured Works */}
-        <section className="space-y-6" data-testid="section-featured-works">
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Curated Collection</span>
-            <h2 className="text-3xl md:text-4xl font-display font-bold mt-2">Featured Works</h2>
-          </motion.div>
-
-          <div className="relative select-none">
-            <div
-              className="relative mx-auto"
-              style={{
-                height: "440px",
-                perspective: "1200px",
-                perspectiveOrigin: "50% 35%",
-                overflow: "hidden",
-              }}
-              data-testid="cover-flow-container"
+        {/* Cover Flow Featured Works — Full Width */}
+        <section className="relative -mx-4 md:-mx-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
+          <div className="py-16 md:py-24">
+            <motion.div
+              className="text-center mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
             >
+              <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight">Featured Works</h2>
+            </motion.div>
+
+            <div className="relative select-none">
               <div
-                className="absolute bottom-0 left-0 right-0 h-[40%] pointer-events-none"
+                className="relative mx-auto"
                 style={{
-                  background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.015) 40%, rgba(0,0,0,0.04) 100%)",
+                  height: "580px",
+                  perspective: "1400px",
+                  perspectiveOrigin: "50% 38%",
+                  overflow: "hidden",
                 }}
-              />
+                data-testid="cover-flow-container"
+              >
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-[35%] pointer-events-none"
+                  style={{
+                    background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.01) 50%, rgba(0,0,0,0.035) 100%)",
+                  }}
+                />
 
-              <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "15px" }}>
-                {flowItems.map(({ artwork, offset, arrayIdx }) => {
-                  const isCenter = offset === 0;
-                  const absOffset = Math.abs(offset);
-                  const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
+                <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "10px" }}>
+                  {flowItems.map(({ artwork, offset, arrayIdx }) => {
+                    const isCenter = offset === 0;
+                    const absOffset = Math.abs(offset);
+                    const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
 
-                  const coverSize = isCenter ? 240 : 190;
-                  const centerGap = 160;
-                  const stackSpacing = 70;
-                  const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
-                  const rotateY = isCenter ? 0 : side * -60;
-                  const translateZ = isCenter ? 120 : -(absOffset * 30);
-                  const zIndex = 20 - absOffset;
-                  const itemOpacity = absOffset >= 3 ? 0.3 : absOffset === 2 ? 0.65 : 1;
+                    const coverSize = isCenter ? 340 : 260;
+                    const centerGap = 230;
+                    const stackSpacing = 100;
+                    const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
+                    const rotateY = isCenter ? 0 : side * -60;
+                    const translateZ = isCenter ? 140 : -(absOffset * 40);
+                    const zIndex = 20 - absOffset;
+                    const itemOpacity = absOffset >= 3 ? 0.25 : absOffset === 2 ? 0.6 : 1;
 
-                  return (
-                    <div
-                      key={`flow-${arrayIdx}`}
-                      className="absolute cursor-pointer"
-                      style={{
-                        zIndex,
-                        transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
-                        transition: "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease",
-                        transformStyle: "preserve-3d",
-                        opacity: itemOpacity,
-                        willChange: "transform, opacity",
-                      }}
-                      onClick={() => {
-                        if (offset < 0) goPrev();
-                        else if (offset > 0) goNext();
-                      }}
-                    >
+                    return (
                       <div
-                        className="relative overflow-hidden"
+                        key={`flow-${arrayIdx}`}
+                        className="absolute cursor-pointer"
                         style={{
-                          width: `${coverSize}px`,
-                          height: `${coverSize}px`,
-                          borderRadius: "3px",
-                          boxShadow: isCenter
-                            ? "0 8px 30px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)"
-                            : `${side * -3}px 2px 10px rgba(0,0,0,0.2)`,
+                          zIndex,
+                          transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
+                          transition: "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease",
+                          transformStyle: "preserve-3d",
+                          opacity: itemOpacity,
+                          willChange: "transform, opacity",
+                        }}
+                        onClick={() => {
+                          if (offset < 0) goPrev();
+                          else if (offset > 0) goNext();
                         }}
                       >
-                        <img
-                          src={artwork.imageUrl}
-                          alt={artwork.title}
-                          className="w-full h-full object-cover"
-                          draggable={false}
-                          loading="lazy"
-                        />
-                        {isCenter && (
-                          <div
-                            className="absolute inset-0 pointer-events-none"
-                            style={{
-                              background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%)",
-                              borderRadius: "3px",
-                            }}
+                        <div
+                          className="relative overflow-hidden"
+                          style={{
+                            width: `${coverSize}px`,
+                            height: `${coverSize}px`,
+                            borderRadius: "4px",
+                            boxShadow: isCenter
+                              ? "0 12px 40px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.15)"
+                              : `${side * -4}px 4px 16px rgba(0,0,0,0.2)`,
+                          }}
+                        >
+                          <img
+                            src={artwork.imageUrl}
+                            alt={artwork.title}
+                            className="w-full h-full object-cover"
+                            draggable={false}
+                            loading="lazy"
                           />
-                        )}
-                      </div>
+                          {isCenter && (
+                            <div
+                              className="absolute inset-0 pointer-events-none"
+                              style={{
+                                background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%)",
+                                borderRadius: "4px",
+                              }}
+                            />
+                          )}
+                        </div>
 
-                      <div
-                        className="overflow-hidden pointer-events-none"
-                        style={{
-                          width: `${coverSize}px`,
-                          height: `${coverSize * 0.3}px`,
-                          marginTop: "1px",
-                          transform: "scaleY(-1)",
-                          WebkitMaskImage: "linear-gradient(to top, transparent 15%, rgba(0,0,0,0.2) 100%)",
-                          maskImage: "linear-gradient(to top, transparent 15%, rgba(0,0,0,0.2) 100%)",
-                          opacity: isCenter ? 0.3 : 0.15,
-                        }}
-                      >
-                        <img
-                          src={artwork.imageUrl}
-                          alt=""
-                          className="w-full object-cover object-bottom"
-                          style={{ height: `${coverSize}px` }}
-                          draggable={false}
-                          loading="lazy"
-                        />
+                        <div
+                          className="overflow-hidden pointer-events-none"
+                          style={{
+                            width: `${coverSize}px`,
+                            height: `${coverSize * 0.28}px`,
+                            marginTop: "1px",
+                            transform: "scaleY(-1)",
+                            WebkitMaskImage: "linear-gradient(to top, transparent 20%, rgba(0,0,0,0.18) 100%)",
+                            maskImage: "linear-gradient(to top, transparent 20%, rgba(0,0,0,0.18) 100%)",
+                            opacity: isCenter ? 0.25 : 0.12,
+                          }}
+                        >
+                          <img
+                            src={artwork.imageUrl}
+                            alt=""
+                            className="w-full object-cover object-bottom"
+                            style={{ height: `${coverSize}px` }}
+                            draggable={false}
+                            loading="lazy"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            {/* Current Artwork Title */}
-            <div className="text-center mt-2">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentIndex}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-1"
+              <div className="text-center mt-4">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentIndex}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-1"
+                  >
+                    <h3 className="text-2xl md:text-3xl font-display font-bold" data-testid="text-coverflow-title">
+                      {currentArt.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground tracking-wide" data-testid="text-coverflow-artist">
+                      by {currentArt.artistName}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <div className="flex items-center justify-center gap-6 mt-6">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={goPrev}
+                  className="rounded-full border-[#9E8472]/30"
+                  data-testid="button-coverflow-prev"
                 >
-                  <h3 className="text-xl md:text-2xl font-display font-bold" data-testid="text-coverflow-title">
-                    {currentArt.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground" data-testid="text-coverflow-artist">
-                    by {currentArt.artistName}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                  <ChevronLeft className="w-5 h-5" />
+                </Button>
 
-            {/* Navigation Controls */}
-            <div className="flex items-center justify-center gap-6 mt-5">
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={goPrev}
-                className="rounded-full border-[#9E8472]/30"
-                data-testid="button-coverflow-prev"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
+                <div className="flex items-center gap-1.5">
+                  {coverFlowArtworks.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentIndex(i)}
+                      className={cn(
+                        "rounded-full transition-all duration-300",
+                        i === currentIndex
+                          ? "w-6 h-2 bg-[#B8965A]"
+                          : "w-2 h-2 bg-[#DDDAD3] dark:bg-[#3a3530]"
+                      )}
+                      data-testid={`coverflow-dot-${i}`}
+                    />
+                  ))}
+                </div>
 
-              <div className="flex items-center gap-1.5">
-                {coverFlowArtworks.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentIndex(i)}
-                    className={cn(
-                      "rounded-full transition-all duration-300",
-                      i === currentIndex
-                        ? "w-6 h-2 bg-[#B8965A]"
-                        : "w-2 h-2 bg-[#DDDAD3] dark:bg-[#3a3530] hover:bg-[#A89D92]"
-                    )}
-                    data-testid={`coverflow-dot-${i}`}
-                  />
-                ))}
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={goNext}
+                  className="rounded-full border-[#9E8472]/30"
+                  data-testid="button-coverflow-next"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </Button>
               </div>
-
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={goNext}
-                className="rounded-full border-[#9E8472]/30"
-                data-testid="button-coverflow-next"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="space-y-12" data-testid="section-how-it-works">
+        {/* How It Works — FLV Editorial Style */}
+        <section className="py-8" data-testid="section-how-it-works">
           <motion.div
-            className="text-center max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Simple Process</span>
-            <h2 className="text-3xl md:text-4xl font-display font-bold mt-2 mb-4">How It Works</h2>
-            <p className="text-muted-foreground text-lg">Whether you're a student artist or an art enthusiast, getting started is simple.</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <Card className="relative overflow-visible p-8 h-full" style={{ background: "linear-gradient(to bottom right, rgba(185,150,90,0.08), rgba(185,150,90,0.15))", borderColor: "rgba(185,150,90,0.25)" }}>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-12 h-12 rounded-xl bg-[#B8965A] flex items-center justify-center">
-                      <GraduationCap className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-display font-bold">For Artists</h3>
-                      <p className="text-sm text-muted-foreground">Start selling your work</p>
-                    </div>
-                  </div>
-                  <div className="space-y-5">
-                    {howItWorksArtist.map((step, i) => (
-                      <div key={step.title} className="flex gap-4 items-start">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#B8965A] text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-[#B8965A]/30">
-                          {i + 1}
-                        </div>
-                        <div className="pt-0.5">
-                          <h4 className="font-semibold flex items-center gap-2">
-                            <step.icon className="w-4 h-4 text-[#B8965A] dark:text-[#C9A84C]" />
-                            {step.title}
-                          </h4>
-                          <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <Link href="/submit-artwork">
-                    <Button data-testid="button-start-selling" className="mt-8 w-full rounded-md bg-[#B8965A] text-white" size="lg">Start Selling Your Art</Button>
-                  </Link>
-                </div>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Card className="relative overflow-visible p-8 h-full" style={{ background: "linear-gradient(to bottom right, rgba(168,174,181,0.08), rgba(168,174,181,0.15))", borderColor: "rgba(168,174,181,0.25)" }}>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-12 h-12 rounded-xl bg-[#96A0AB] flex items-center justify-center">
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-display font-bold">For Collectors</h3>
-                      <p className="text-sm text-muted-foreground">Discover emerging talent</p>
-                    </div>
-                  </div>
-                  <div className="space-y-5">
-                    {howItWorksBuyer.map((step, i) => (
-                      <div key={step.title} className="flex gap-4 items-start">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#96A0AB] text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-[#96A0AB]/30">
-                          {i + 1}
-                        </div>
-                        <div className="pt-0.5">
-                          <h4 className="font-semibold flex items-center gap-2">
-                            <step.icon className="w-4 h-4 text-[#96A0AB] dark:text-[#A8AEB5]" />
-                            {step.title}
-                          </h4>
-                          <p className="text-sm text-muted-foreground mt-1">{step.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <Link href="/gallery">
-                    <Button data-testid="button-browse-gallery" variant="outline" className="mt-8 w-full rounded-md border-[#96A0AB]/30 text-[#96A0AB] dark:text-[#A8AEB5]" size="lg">Browse the Gallery</Button>
-                  </Link>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6" data-testid="section-stats">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: 0.1 * i, duration: 0.5, type: "spring" }}
-            >
-              <Card className="text-center p-6 border bg-card">
-                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${stat.bg} flex items-center justify-center`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                </div>
-                <p className={`text-2xl md:text-3xl font-display font-bold ${stat.color}`} data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                  {stat.value}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-              </Card>
-            </motion.div>
-          ))}
-        </section>
-
-        {/* CTA */}
-        <section className="text-center space-y-6 py-12" data-testid="section-cta">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="space-y-4"
-          >
-            <h2 className="text-3xl md:text-4xl font-display font-bold">Ready to Start Your Journey?</h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Join a community of student artists and collectors making art accessible and impactful.
-            </p>
-          </motion.div>
-          <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="text-center max-w-2xl mx-auto mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5 }}
           >
-            <Link href="/submit-artwork">
-              <Button size="lg" className="rounded-md bg-[#B8965A] text-white gap-2 px-8" data-testid="button-cta-submit">
-                Submit Your Art <Upload className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link href="/gallery">
-              <Button size="lg" variant="outline" className="rounded-md gap-2 px-8" data-testid="button-cta-browse">
-                Browse Gallery <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
+            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight">How It Works</h2>
+            <p className="text-muted-foreground text-lg mt-4">Whether you're a student artist or an art enthusiast, getting started is simple.</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="mb-8">
+                <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
+                <h3 className="text-2xl md:text-3xl font-display font-bold mt-2">Start selling your work</h3>
+              </div>
+              <div className="space-y-8">
+                {howItWorksArtist.map((step, i) => (
+                  <div key={step.title} className="flex gap-5 items-start">
+                    <span className="flex-shrink-0 text-3xl font-display font-bold text-[#B8965A]/30 dark:text-[#C9A84C]/30 leading-none pt-0.5">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <h4 className="font-semibold text-base">{step.title}</h4>
+                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link href="/submit-artwork">
+                <Button data-testid="button-start-selling" className="mt-10 rounded-md bg-[#4C392D] text-white px-8" size="lg">Start Selling Your Art</Button>
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="mb-8">
+                <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
+                <h3 className="text-2xl md:text-3xl font-display font-bold mt-2">Discover emerging talent</h3>
+              </div>
+              <div className="space-y-8">
+                {howItWorksBuyer.map((step, i) => (
+                  <div key={step.title} className="flex gap-5 items-start">
+                    <span className="flex-shrink-0 text-3xl font-display font-bold text-[#96A0AB]/30 dark:text-[#A8AEB5]/30 leading-none pt-0.5">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <h4 className="font-semibold text-base">{step.title}</h4>
+                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link href="/gallery">
+                <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-md px-8" size="lg">Browse the Gallery</Button>
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Stats — Minimal Editorial */}
+        <section className="py-8" data-testid="section-stats">
+          <div className="border-t border-b border-[#e0d6cd] dark:border-border py-12 md:py-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 max-w-4xl mx-auto text-center">
+              {stats.map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: 0.08 * i, duration: 0.4 }}
+                >
+                  <p className={`text-3xl md:text-4xl font-display font-bold ${stat.color}`} data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2 tracking-wide">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA — Clean FLV Banner */}
+        <section className="py-16 md:py-24 text-center" data-testid="section-cta">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl mx-auto space-y-6"
+          >
+            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight">Ready to Start Your Journey?</h2>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              Join a community of student artists and collectors making art accessible and impactful.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Link href="/submit-artwork">
+                <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8" data-testid="button-cta-submit">
+                  Submit Your Art <Upload className="w-4 h-4" />
+                </Button>
+              </Link>
+              <Link href="/gallery">
+                <Button size="lg" variant="outline" className="rounded-md gap-2 px-8" data-testid="button-cta-browse">
+                  Browse Gallery <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         </section>
       </div>
