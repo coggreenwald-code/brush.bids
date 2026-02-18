@@ -2,13 +2,22 @@ import { Link } from "wouter";
 import { Mail, MapPin, Heart } from "lucide-react";
 import { SiInstagram, SiX, SiFacebook } from "react-icons/si";
 import logoImage from "@/assets/logo.png";
+import bgPollock from "@assets/1_OKIqvZsIqqeFhGIuij5EKA_1771386047538.jpg";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[#e0d6cd] bg-[#f0e6dc] dark:bg-[#1e1a17] dark:border-[#2a2420] mt-auto">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="relative border-t border-[#e0d6cd] bg-[#f0e6dc] dark:bg-[#1e1a17] dark:border-[#2a2420] mt-auto overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src={bgPollock}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.08] dark:opacity-[0.04]"
+          style={{ filter: "blur(2px)" }}
+        />
+      </div>
+      <div className="relative z-10 container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
