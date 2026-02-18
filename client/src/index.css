@@ -6,7 +6,7 @@
 
 :root {
   --font-sans: 'Jost', sans-serif;
-  --font-display: 'Jost', sans-serif;
+  --font-display: 'Playfair Display', serif;
 
   /* Warm Earth Tone Palette with Silver & Gold Accents */
   --background: 24 40% 95%;             /* #F9F0EA - Warm cream */

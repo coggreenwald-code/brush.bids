@@ -18,6 +18,10 @@ import artGeometric from "@assets/art-geometric-abstract.png";
 import artFloral from "@assets/art-floral-still-life.png";
 import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
+import bgWatercolor from "@assets/bg-watercolor-warm.png";
+import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
+import bgPaintSplatter from "@assets/bg-paint-splatter.png";
+
 
 const placeholderArtworks = [
   { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
@@ -214,11 +218,11 @@ export default function Home() {
                     const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
 
                     const coverSize = isCenter ? 340 : 260;
-                    const centerGap = 240;
-                    const stackSpacing = 130;
+                    const centerGap = 220;
+                    const stackSpacing = 110;
                     const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
-                    const rotateY = isCenter ? 0 : side * -60;
-                    const translateZ = isCenter ? 140 : -(absOffset * 40);
+                    const rotateY = isCenter ? 0 : side * -45;
+                    const translateZ = isCenter ? 120 : -(absOffset * 30);
                     const zIndex = 20 - absOffset;
                     const itemOpacity = absOffset >= 3 ? 0.25 : absOffset === 2 ? 0.6 : 1;
 
@@ -305,7 +309,7 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="space-y-0.5"
                   >
-                    <h3 className="text-xl md:text-2xl font-display font-semibold tracking-tight" data-testid="text-coverflow-title">
+                    <h3 className="text-xl md:text-2xl font-display font-bold tracking-tight" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
                     <p className="text-sm text-muted-foreground tracking-wide" data-testid="text-coverflow-artist">
@@ -356,135 +360,152 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works — FLV asymmetric editorial */}
-        <section className="mt-20 md:mt-32" data-testid="section-how-it-works">
-          <motion.div
-            className="text-right mb-12 md:mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-          >
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
-            <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight mt-2">How It Works</h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl">
+        {/* How It Works — Centered with decorative background */}
+        <section className="relative mt-20 md:mt-32 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
+          <div className="absolute inset-0 pointer-events-none">
+            <img src={bgWatercolor} alt="" className="w-full h-full object-cover opacity-[0.15] dark:opacity-[0.06]" />
+          </div>
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              className="text-center mb-12 md:mb-16"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
-                <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
-                <h3 className="text-xl md:text-2xl font-display font-semibold mt-2">Start selling your work</h3>
-              </div>
-              <div className="space-y-7">
-                {howItWorksArtist.map((step, i) => (
-                  <div key={step.title} className="flex gap-5 items-start">
-                    <span className="flex-shrink-0 text-2xl font-display font-light text-[#B8965A]/40 dark:text-[#C9A84C]/40 leading-none pt-0.5 tabular-nums">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <h4 className="font-medium text-sm uppercase tracking-wide">{step.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Link href="/submit-artwork">
-                <Button data-testid="button-start-selling" className="mt-10 rounded-md bg-[#4C392D] text-white px-8 uppercase tracking-wider text-xs" size="lg">Start Selling</Button>
-              </Link>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
+              <h2 className="text-3xl md:text-4xl font-display font-bold tracking-tight mt-2">How It Works</h2>
             </motion.div>
 
+            <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
+              <motion.div
+                className="flex flex-col"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
+                  <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
+                  <h3 className="text-xl md:text-2xl font-display font-bold mt-2">Start selling your work</h3>
+                </div>
+                <div className="space-y-7 flex-1">
+                  {howItWorksArtist.map((step, i) => (
+                    <div key={step.title} className="flex gap-5 items-start">
+                      <span className="flex-shrink-0 text-2xl font-display font-bold text-[#B8965A]/50 dark:text-[#C9A84C]/50 leading-none pt-0.5 tabular-nums">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <h4 className="font-bold text-sm uppercase tracking-wide">{step.title}</h4>
+                        <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/submit-artwork">
+                  <Button data-testid="button-start-selling" className="mt-10 rounded-md bg-[#4C392D] text-white px-8 uppercase tracking-wider text-xs" size="lg">Start Selling</Button>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                className="flex flex-col"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
+                  <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
+                  <h3 className="text-xl md:text-2xl font-display font-bold mt-2">Discover emerging talent</h3>
+                </div>
+                <div className="space-y-7 flex-1">
+                  {howItWorksBuyer.map((step, i) => (
+                    <div key={step.title} className="flex gap-5 items-start">
+                      <span className="flex-shrink-0 text-2xl font-display font-bold text-[#96A0AB]/50 dark:text-[#A8AEB5]/50 leading-none pt-0.5 tabular-nums">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <h4 className="font-bold text-sm uppercase tracking-wide">{step.title}</h4>
+                        <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/gallery">
+                  <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-md px-8 uppercase tracking-wider text-xs" size="lg">Browse Gallery</Button>
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats — with decorative background */}
+        <section className="relative mt-24 md:mt-36 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
+          <div className="absolute inset-0 pointer-events-none">
+            <img src={bgBrushstrokes} alt="" className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.05]" />
+          </div>
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              className="mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight leading-[0.95]">Our<br />Impact</h2>
+            </motion.div>
+            <div className="border-t border-[#e0d6cd] dark:border-border pt-10 md:pt-14">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                {stats.map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ delay: 0.08 * i, duration: 0.4 }}
+                  >
+                    <p className="text-3xl md:text-4xl font-display font-bold" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {stat.value}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2 tracking-wide uppercase">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA — with decorative background */}
+        <section className="relative mt-24 md:mt-36 mb-8 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+          <div className="absolute inset-0 pointer-events-none">
+            <img src={bgPaintSplatter} alt="" className="w-full h-full object-cover opacity-[0.1] dark:opacity-[0.04]" />
+          </div>
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.5 }}
+              className="text-right max-w-3xl ml-auto"
             >
-              <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
-                <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
-                <h3 className="text-xl md:text-2xl font-display font-semibold mt-2">Discover emerging talent</h3>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight leading-[1.05]">Ready to Start<br />Your Journey?</h2>
+              <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4 max-w-lg ml-auto">
+                Join a community of student artists and collectors making art accessible and impactful.
+              </p>
+              <div className="flex flex-wrap gap-4 justify-end mt-8">
+                <Link href="/submit-artwork">
+                  <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
+                    Submit Your Art <Upload className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href="/gallery">
+                  <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-browse">
+                    Browse Gallery <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
-              <div className="space-y-7">
-                {howItWorksBuyer.map((step, i) => (
-                  <div key={step.title} className="flex gap-5 items-start">
-                    <span className="flex-shrink-0 text-2xl font-display font-light text-[#96A0AB]/40 dark:text-[#A8AEB5]/40 leading-none pt-0.5 tabular-nums">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div>
-                      <h4 className="font-medium text-sm uppercase tracking-wide">{step.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Link href="/gallery">
-                <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-md px-8 uppercase tracking-wider text-xs" size="lg">Browse Gallery</Button>
-              </Link>
             </motion.div>
           </div>
-        </section>
-
-        {/* Stats — FLV style with left-aligned large heading */}
-        <section className="mt-24 md:mt-36" data-testid="section-stats">
-          <motion.div
-            className="mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-semibold tracking-tight leading-[0.95]">Our<br />Impact</h2>
-          </motion.div>
-          <div className="border-t border-[#e0d6cd] dark:border-border pt-10 md:pt-14">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: 0.08 * i, duration: 0.4 }}
-                >
-                  <p className="text-3xl md:text-4xl font-display font-semibold" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                    {stat.value}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2 tracking-wide uppercase">{stat.label}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA — FLV style, right-aligned */}
-        <section className="mt-24 md:mt-36 mb-8" data-testid="section-cta">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="text-right max-w-3xl ml-auto"
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold tracking-tight leading-[1.05]">Ready to Start<br />Your Journey?</h2>
-            <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4 max-w-lg ml-auto">
-              Join a community of student artists and collectors making art accessible and impactful.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-end mt-8">
-              <Link href="/submit-artwork">
-                <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
-                  Submit Your Art <Upload className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link href="/gallery">
-                <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-browse">
-                  Browse Gallery <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
         </section>
       </div>
 
