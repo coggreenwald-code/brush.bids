@@ -361,7 +361,7 @@ export default function Home() {
         </section>
 
         {/* How It Works — Centered with decorative background */}
-        <section className="relative mt-20 md:mt-32 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
+        <section className="relative mt-8 md:mt-12 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
           <div className="absolute inset-0 pointer-events-none">
             <img src={bgWatercolor} alt="" className="w-full h-full object-cover opacity-[0.15] dark:opacity-[0.06]" />
           </div>
@@ -374,7 +374,7 @@ export default function Home() {
               transition={{ duration: 0.5 }}
             >
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
-              <h2 className="text-3xl md:text-4xl font-display font-bold tracking-tight mt-2">How It Works</h2>
+              <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight mt-2">How It Works</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
@@ -387,7 +387,7 @@ export default function Home() {
               >
                 <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
                   <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
-                  <h3 className="text-xl md:text-2xl font-display font-bold mt-2">Start selling your work</h3>
+                  <h3 className="text-xl md:text-2xl font-sans font-semibold mt-2">Start selling your work</h3>
                 </div>
                 <div className="space-y-7 flex-1">
                   {howItWorksArtist.map((step, i) => (
@@ -416,7 +416,7 @@ export default function Home() {
               >
                 <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
                   <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
-                  <h3 className="text-xl md:text-2xl font-display font-bold mt-2">Discover emerging talent</h3>
+                  <h3 className="text-xl md:text-2xl font-sans font-semibold mt-2">Discover emerging talent</h3>
                 </div>
                 <div className="space-y-7 flex-1">
                   {howItWorksBuyer.map((step, i) => (
@@ -440,7 +440,7 @@ export default function Home() {
         </section>
 
         {/* Stats — with decorative background */}
-        <section className="relative mt-24 md:mt-36 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
+        <section className="relative mt-8 md:mt-12 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
           <div className="absolute inset-0 pointer-events-none">
             <img src={bgBrushstrokes} alt="" className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.05]" />
           </div>
@@ -452,7 +452,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight leading-[0.95]">Our<br />Impact</h2>
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-sans font-semibold tracking-tight leading-[0.95]">Our<br />Impact</h2>
             </motion.div>
             <div className="border-t border-[#e0d6cd] dark:border-border pt-10 md:pt-14">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">

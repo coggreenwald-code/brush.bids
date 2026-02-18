@@ -100,7 +100,7 @@ export default function Gallery() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Curated Collection</span>
-            <h1 className="text-4xl font-display font-bold mt-1">Gallery</h1>
+            <h1 className="text-4xl font-sans font-semibold mt-1">Gallery</h1>
             <p className="text-muted-foreground mt-2">Browse unique artworks from emerging student talent</p>
           </div>
           
