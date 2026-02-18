@@ -18,7 +18,7 @@ import artGeometric from "@assets/art-geometric-abstract.png";
 import artFloral from "@assets/art-floral-still-life.png";
 import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
-import bgWatercolor from "@assets/bg-watercolor-warm.png";
+import bgRothko from "@assets/50e3a0b1-17fc-484b-8e84-b145c7525973_copy_1771386626554.jpg";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
 import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
@@ -425,7 +425,7 @@ export default function Home() {
         {/* How It Works — Centered with decorative background */}
         <section className="relative mt-0 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
           <div className="absolute inset-0 pointer-events-none">
-            <img src={bgWatercolor} alt="" className="w-full h-full object-cover opacity-[0.15] dark:opacity-[0.06]" />
+            <img src={bgRothko} alt="" className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.06]" style={{ filter: "blur(3px)" }} />
           </div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
             <motion.div
