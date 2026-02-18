@@ -26,6 +26,7 @@ export const artworks = pgTable("artworks", {
   stripeSessionId: text("stripe_session_id"),
   promotionPercentage: integer("promotion_percentage").default(0),
   reviewType: reviewTypeEnum("review_type").default("ai_instant").notNull(),
+  views: integer("views").default(0).notNull(),
 });
 
 export const bids = pgTable("bids", {
