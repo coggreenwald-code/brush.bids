@@ -18,7 +18,7 @@ export function Footer() {
               <span className="text-xl font-display font-bold text-[#4C392D] dark:text-foreground">BrushBids</span>
             </Link>
             <p className="text-sm text-[#7a6b5e] dark:text-muted-foreground leading-relaxed">
-              The premier marketplace where student artists showcase their talent and collectors discover the next generation of creators.
+              BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience, allowing them to make their artistic dreams a reality.
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-9 h-9 rounded-full bg-[#4C392D]/8 dark:bg-white/10 flex items-center justify-center text-[#7a6b5e] dark:text-muted-foreground hover:text-[#4C392D] dark:hover:text-foreground transition-colors" data-testid="link-instagram" aria-label="Instagram">
@@ -94,7 +94,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 text-[#7a6b5e] dark:text-muted-foreground">
                 <MapPin className="w-4 h-4" />
-                <span>San Francisco, CA</span>
+                <span>New York, NY</span>
               </li>
             </ul>
             

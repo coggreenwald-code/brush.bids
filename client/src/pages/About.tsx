@@ -53,13 +53,16 @@ export default function About() {
           <h2 className="text-2xl font-display font-bold">Our Story</h2>
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <p className="text-muted-foreground leading-relaxed">
-              BrushBids was founded in 2024 with a simple belief: student artists deserve better opportunities to share and sell their work. Too often, talented young creators struggle to find platforms that take them seriously and offer fair compensation.
+              BrushBids was founded in 2024 at The Dwight School New York by Charlie Greenwald. The idea emerged during a junior-year course selection lecture led by the director of the art department. While the discussion focused on academics, a more structural issue stood out: exceptional student artwork filled the halls, yet there was no real infrastructure to help student artists gain exposure or sell their work through a credible online marketplace.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              We built BrushBids as the bridge between passionate student artists and discerning collectors. Our expert curation process ensures quality while eliminating bias. Every artwork that reaches our marketplace has been evaluated for technique, composition, and originality.
+              During that lecture, the first version of BrushBids was sketched on a napkin in the high school's Quad, the central gathering space of the campus. That napkin remained pinned to a bulletin board throughout the year, serving as a constant reminder of a simple but persistent problem in student art: talent without access.
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              But we didn't stop there. We believe art should give back. That's why 15% of every sale goes to a charity chosen by the artist. To date, our community has donated over $18,000 to causes ranging from environmental conservation to arts education.
+              Under Charlie's leadership, the concept was rigorously developed through hands-on iteration at the Tufts Entrepreneurship Center, where constant pitching, mentorship, and feedback refined the original model. Further progress came through collaboration with the Derby School of Entrepreneurship, helping transition BrushBids from an early idea into a working product.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              Today, BrushBids reflects Charlie's vision of a student-first art marketplace. The platform creates a direct pathway for student artists to share, sell, and be discovered without relying on elite galleries, institutions, or traditional gatekeepers, allowing exceptional work to stand on its own merits.
             </p>
           </div>
         </section>

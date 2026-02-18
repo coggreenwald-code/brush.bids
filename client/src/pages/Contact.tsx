@@ -58,7 +58,7 @@ export default function Contact() {
     {
       icon: MapPin,
       title: "Location",
-      description: "San Francisco, CA",
+      description: "New York, NY",
       note: "Remote-first team",
     },
   ];
