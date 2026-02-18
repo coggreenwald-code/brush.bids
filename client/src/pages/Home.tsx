@@ -235,19 +235,8 @@ export default function Home() {
 
         {/* Cover Flow Featured Works — Full Width */}
         <section className="relative mt-20 md:mt-28 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
-          <div className="absolute inset-0 pointer-events-none">
-            <div
-              className="absolute inset-0 opacity-[0.18] dark:opacity-[0.08]"
-              style={{
-                background: "linear-gradient(135deg, #D4A853 0%, #C9A84C 15%, #8BB174 30%, #6BA5A0 50%, #5B93C4 70%, #B8965A 85%, #E8C87A 100%)",
-              }}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: "radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, hsl(var(--background)) 100%)",
-              }}
-            />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(160deg, #E8D5A8 0%, #D4C49A 20%, #C2D4B4 40%, #A8C8C2 55%, #B5CBE0 70%, #D4C49A 85%, #E8D5A8 100%)" }}>
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 8%, transparent 92%, hsl(var(--background)) 100%)" }} />
           </div>
           <div className="relative z-10 pb-8 md:pb-12">
             <motion.div
