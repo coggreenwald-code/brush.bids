@@ -140,9 +140,9 @@ export default function ArtworkDetail() {
   const displayImage = artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800&auto=format&fit=crop";
 
   const revenueSplit = {
-    artist: currentPrice * 0.70,
+    artist: currentPrice * 0.75,
     platform: currentPrice * 0.15,
-    charity: currentPrice * 0.15,
+    charity: currentPrice * 0.10,
   };
 
   return (
@@ -177,7 +177,7 @@ export default function ArtworkDetail() {
             <h3 className="font-semibold mb-4">Revenue Distribution</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Artist (70%)</span>
+                <span className="text-sm text-muted-foreground">Artist (75%)</span>
                 <span className="font-mono font-semibold">${revenueSplit.artist.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
@@ -185,7 +185,7 @@ export default function ArtworkDetail() {
                 <span className="font-mono">${revenueSplit.platform.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center text-green-600">
-                <span className="text-sm">Charity (15%)</span>
+                <span className="text-sm">Charity (10%)</span>
                 <span className="font-mono font-semibold">${revenueSplit.charity.toFixed(2)}</span>
               </div>
             </div>

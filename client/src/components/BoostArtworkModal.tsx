@@ -183,12 +183,12 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
                   <span className="font-medium">~${estimatedFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Your earnings (70% - {selectedPercentage}%)</span>
-                  <span className="font-medium">~${((currentPrice * (70 - parseInt(selectedPercentage))) / 100).toFixed(2)}</span>
+                  <span className="text-muted-foreground">Your earnings (75% - {selectedPercentage}%)</span>
+                  <span className="font-medium">~${((currentPrice * (75 - parseInt(selectedPercentage))) / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t">
-                  <span className="text-muted-foreground">Charity (15%)</span>
-                  <span>~${(currentPrice * 0.15).toFixed(2)}</span>
+                  <span className="text-muted-foreground">Charity (10%)</span>
+                  <span>~${(currentPrice * 0.10).toFixed(2)}</span>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-2">

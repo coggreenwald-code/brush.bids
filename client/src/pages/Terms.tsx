@@ -48,7 +48,7 @@ export default function Terms() {
           <section>
             <h2 className="text-xl font-display font-bold">5. Bidding and Sales</h2>
             <p className="text-muted-foreground">
-              When you place a bid, you enter a binding commitment to purchase the artwork at your bid price if you are the winning bidder. All sales are final unless the artwork is materially different from its listing. The sale price is distributed as follows: 70% to the artist, 15% to BrushBids, and 15% to the artist's designated charity.
+              When you place a bid, you enter a binding commitment to purchase the artwork at your bid price if you are the winning bidder. All sales are final unless the artwork is materially different from its listing. The sale price is distributed as follows: 75% to the artist, 15% to BrushBids, and 10% to the artist's designated charity.
             </p>
           </section>
 

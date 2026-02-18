@@ -51,7 +51,7 @@ export default function ArtistProfile() {
     ? `${artist.firstName} ${artist.lastName}` 
     : artist.username || `Artist #${artistId}`;
 
-  const totalEarnings = soldWorks.reduce((sum, work) => sum + Number(work.price) * 0.70, 0);
+  const totalEarnings = soldWorks.reduce((sum, work) => sum + Number(work.price) * 0.75, 0);
 
   return (
     <Layout>

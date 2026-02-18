@@ -9,7 +9,7 @@ Key features:
 - Expert curation system with two review options: instant AI-assisted feedback or human curator review
 - Image upload from camera roll or direct artwork scanning via device camera
 - Real-time auction gallery with bidding functionality
-- Charity selection for artists (15% of sales go to chosen charity)
+- Charity selection for artists (10% of sales go to chosen charity)
 - Artist promotion tool (0-20% boost to increase listing visibility)
 - Admin panel for manual curation override
 - Replit Auth integration for user authentication
@@ -19,9 +19,9 @@ Key features:
 - Warm earth tone design with gold and silver accents on a cream background
 
 ### Revenue Split
-- Base: 70% artist, 15% platform, 15% charity
+- Base: 75% artist, 15% platform, 10% charity
 - With boost: Boost percentage deducted from artist's share, added to platform's share
-- Example: 10% boost = 60% artist, 25% platform, 15% charity
+- Example: 10% boost = 65% artist, 25% platform, 10% charity
 
 ### Promotion Feature
 - Artists can boost approved artworks by paying 0-20% of final sale price

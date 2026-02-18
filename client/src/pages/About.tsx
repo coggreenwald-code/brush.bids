@@ -27,7 +27,7 @@ export default function About() {
     {
       icon: TrendingUp,
       title: "Fair Compensation",
-      description: "Artists receive 70% of every sale, ensuring they're fairly compensated for their creative work.",
+      description: "Artists receive 75% of every sale, ensuring they're fairly compensated for their creative work.",
       bgPosition: "right bottom",
     },
   ];
@@ -85,7 +85,7 @@ export default function About() {
             </div>
             <div className="relative z-10 grid md:grid-cols-3 gap-8 text-center">
               <div>
-                <div className="text-5xl font-display font-bold text-primary mb-2">70%</div>
+                <div className="text-5xl font-display font-bold text-primary mb-2">75%</div>
                 <div className="text-lg font-semibold">Artist</div>
                 <p className="text-sm text-muted-foreground mt-1">Goes directly to the creator</p>
               </div>
@@ -95,7 +95,7 @@ export default function About() {
                 <p className="text-sm text-muted-foreground mt-1">Platform & operations</p>
               </div>
               <div>
-                <div className="text-5xl font-display font-bold text-green-600 mb-2">15%</div>
+                <div className="text-5xl font-display font-bold text-green-600 mb-2">10%</div>
                 <div className="text-lg font-semibold">Charity</div>
                 <p className="text-sm text-muted-foreground mt-1">Artist's chosen cause</p>
               </div>

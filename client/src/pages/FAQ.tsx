@@ -19,7 +19,7 @@ export default function FAQ() {
     },
     {
       question: "How much do I earn from a sale?",
-      answer: "You receive 70% of the final sale price. 15% goes to BrushBids for platform operations, and 15% goes to the charity you select when submitting your artwork.",
+      answer: "You receive 75% of the final sale price. 15% goes to BrushBids for platform operations, and 10% goes to the charity you select when submitting your artwork.",
     },
     {
       question: "How and when do I get paid?",
@@ -57,7 +57,7 @@ export default function FAQ() {
   const generalFaqs = [
     {
       question: "What makes BrushBids different from other art marketplaces?",
-      answer: "We focus exclusively on student artists, use expert curation for fair and unbiased reviews, and ensure 15% of every sale goes to charity. We're building a community, not just a marketplace.",
+      answer: "We focus exclusively on student artists, use expert curation for fair and unbiased reviews, and ensure 10% of every sale goes to charity. We're building a community, not just a marketplace.",
     },
     {
       question: "How do charities receive donations?",

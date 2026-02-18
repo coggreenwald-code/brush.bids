@@ -107,8 +107,8 @@ export default function Dashboard() {
   const totalEarnings = soldArtworks.reduce((sum, a) => {
     const price = Number(a.price) || 0;
     const boost = a.promotionPercentage || 0;
-    // Artist gets 70% minus boost percentage
-    return sum + (price * (0.70 - boost / 100));
+    // Artist gets 75% minus boost percentage
+    return sum + (price * (0.75 - boost / 100));
   }, 0);
   const totalSold = soldArtworks.length;
   const activeListings = myArtworks.filter(a => a.status === "approved" && !a.paidAt).length;
