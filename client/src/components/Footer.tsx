@@ -13,7 +13,7 @@ export function Footer() {
         <img
           src={bgPollock}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.08] dark:opacity-[0.04]"
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.25] dark:opacity-[0.12]"
           style={{ filter: "blur(2px)" }}
         />
       </div>
