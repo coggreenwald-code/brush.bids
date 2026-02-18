@@ -245,7 +245,7 @@ export default function Home() {
             <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 0%, transparent 60%, hsl(var(--background)) 100%)" }} />
             <div className="absolute top-0 left-0 right-0 h-[15%]" style={{ background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 100%)" }} />
           </div>
-          <div className="relative z-10 pt-16 md:pt-24 pb-8 md:pb-12">
+          <div className="relative z-10 pt-16 md:pt-24 pb-0">
             <motion.div
               className="text-left px-6 md:px-12 lg:px-16 mb-8"
               initial={{ opacity: 0, y: 20 }}
