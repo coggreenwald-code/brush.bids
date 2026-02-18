@@ -361,7 +361,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center -mt-2">
+              <div className="text-center -mt-12 relative z-20">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
@@ -381,7 +381,7 @@ export default function Home() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center justify-center gap-6 mt-4">
+              <div className="flex items-center justify-center gap-6 mt-3 relative z-20">
                 <Button
                   size="icon"
                   variant="outline"
