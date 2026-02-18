@@ -491,50 +491,69 @@ export default function Home() {
         </section>
 
         {/* CTA — with decorative background */}
-        <section className="relative mt-0 mb-8 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
-          <div className="absolute inset-0 pointer-events-none">
-            <img src={bgPaintSplatter} alt="" className="w-full h-full object-cover opacity-[0.1] dark:opacity-[0.04]" />
-          </div>
-          <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
-            <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6 }}
-                className="w-full md:w-5/12 flex-shrink-0"
-              >
-                <img
-                  src={ctaJourneyImage}
-                  alt="A person standing on a long road stretching toward mountains at sunset"
-                  className="w-full h-auto max-h-[340px] object-cover rounded-md"
-                  data-testid="img-cta-journey"
-                />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-center md:text-right flex-1"
-              >
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight leading-[1.05]">Ready to Start<br />Your Journey?</h2>
-                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4 max-w-lg mx-auto md:ml-auto md:mr-0">
+        <section className="relative mt-0 mb-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+          <div className="relative w-full min-h-[420px] md:min-h-[480px] lg:min-h-[520px] overflow-hidden">
+            <img
+              src={ctaJourneyImage}
+              alt="Artist painting on an easel"
+              className="absolute inset-0 w-full h-full object-cover"
+              data-testid="img-cta-journey"
+            />
+            <div
+              className="absolute inset-0 dark:opacity-90"
+              style={{
+                background: "linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 dark:opacity-90"
+              style={{
+                background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%)",
+              }}
+            />
+
+            <div className="relative z-10 h-full min-h-[420px] md:min-h-[480px] lg:min-h-[520px] flex items-end justify-end">
+              <div className="max-w-2xl px-6 md:px-12 lg:px-16 pb-12 md:pb-16 space-y-6 text-right">
+                <motion.h2
+                  className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-[1.05] tracking-tight drop-shadow-lg"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7 }}
+                  data-testid="text-cta-title"
+                >
+                  Ready to Start<br />Your Journey?
+                </motion.h2>
+
+                <motion.p
+                  className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg ml-auto"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                >
                   Join a community of student artists and collectors making art accessible and impactful.
-                </p>
-                <div className="flex flex-wrap gap-4 justify-center md:justify-end mt-8">
+                </motion.p>
+
+                <motion.div
+                  className="flex flex-wrap gap-4 justify-end"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7, delay: 0.2 }}
+                >
                   <Link href="/submit-artwork">
-                    <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
+                    <Button size="lg" className="rounded-md bg-white/95 text-[#4C392D] gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
                       Submit Your Art <Upload className="w-4 h-4" />
                     </Button>
                   </Link>
                   <Link href="/gallery">
-                    <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-browse">
+                    <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs border-white/40 text-white backdrop-blur-sm bg-white/10" data-testid="button-cta-browse">
                       Browse Gallery <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
           </div>
         </section>
