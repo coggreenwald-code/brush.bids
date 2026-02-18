@@ -21,7 +21,7 @@ import artFlow from "@assets/art-abstract-flow.png";
 import bgWatercolor from "@assets/bg-watercolor-warm.png";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
-import ctaJourneyImage from "@assets/pexels-adilgkkya-2902747_1771375865866.jpg";
+import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
 
 
 const placeholderArtworks = [
