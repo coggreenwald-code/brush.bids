@@ -1,20 +1,34 @@
 import { useState, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
-import { useArtworks, useUpdateArtworkStatus, useAiReview } from "@/hooks/use-artworks";
+import { useArtworks, useUpdateArtworkStatus, useAiReview, useDeleteArtwork } from "@/hooks/use-artworks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, X, Sparkles, Loader2, Search, Filter, Clock, AlertCircle } from "lucide-react";
+import { Check, X, Sparkles, Loader2, Search, Clock, AlertCircle, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Admin() {
+  const { user } = useAuth();
   const { data: allArtworks, isLoading } = useArtworks();
   const updateStatus = useUpdateArtworkStatus();
   const aiReview = useAiReview();
+  const deleteArtwork = useDeleteArtwork();
   const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,6 +72,21 @@ export default function Admin() {
   const approvedCount = allArtworks?.filter(a => a.status === "approved").length || 0;
   const rejectedCount = allArtworks?.filter(a => a.status === "rejected").length || 0;
 
+  if (user?.role !== "admin") {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Card className="p-8 text-center max-w-md">
+            <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
+            <h2 className="text-xl font-bold mb-2">Access Denied</h2>
+            <p className="text-muted-foreground">You don't have permission to access the admin panel.</p>
+          </Card>
+        </div>
+        <Footer />
+      </Layout>
+    );
+  }
+
   const handleReview = (id: number) => {
     aiReview.mutate(id, {
       onSuccess: (data) => {
@@ -80,14 +109,25 @@ export default function Admin() {
     });
   };
 
+  const handleDelete = (id: number) => {
+    deleteArtwork.mutate(id, {
+      onSuccess: () => {
+        toast({
+          title: "Artwork deleted",
+          description: "The artwork has been permanently removed.",
+          variant: "destructive",
+        });
+      }
+    });
+  };
+
   return (
     <Layout>
       <div className="space-y-6 pb-16">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-display font-bold">Curation Queue</h1>
-            <p className="text-muted-foreground">Review pending submissions with expert curation tools</p>
+            <h1 className="text-3xl font-display font-bold" data-testid="text-admin-title">Admin Curation Portal</h1>
+            <p className="text-muted-foreground">Review, approve, reject, or remove artwork submissions</p>
           </div>
           
           {pendingCount > 0 && (
@@ -98,23 +138,21 @@ export default function Admin() {
           )}
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-4">
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-[#B8965A]">{pendingCount}</div>
+            <div className="text-2xl font-bold text-[#B8965A]" data-testid="text-pending-count">{pendingCount}</div>
             <div className="text-sm text-muted-foreground">Pending</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
+            <div className="text-2xl font-bold text-green-600" data-testid="text-approved-count">{approvedCount}</div>
             <div className="text-sm text-muted-foreground">Approved</div>
           </Card>
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
+            <div className="text-2xl font-bold text-red-600" data-testid="text-rejected-count">{rejectedCount}</div>
             <div className="text-sm text-muted-foreground">Rejected</div>
           </Card>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -139,7 +177,6 @@ export default function Admin() {
           </Select>
         </div>
 
-        {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="pending" data-testid="tab-pending">
@@ -193,8 +230,8 @@ export default function Admin() {
                               artwork.status === 'pending' 
                                 ? "bg-[#B8965A]/10 text-[#4C392D] border-[#B8965A]/20" 
                                 : artwork.status === 'approved'
-                                ? "bg-green-100 text-green-800 border-green-200"
-                                : "bg-red-100 text-red-800 border-red-200"
+                                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800"
+                                : "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
                             }
                           >
                             {artwork.status.charAt(0).toUpperCase() + artwork.status.slice(1)}
@@ -216,7 +253,7 @@ export default function Admin() {
                           </div>
                           <p className="text-sm italic text-muted-foreground">"{artwork.aiFeedback}"</p>
                         </div>
-                      ) : activeTab === "pending" ? (
+                      ) : (
                         <Button 
                           variant="secondary" 
                           onClick={() => handleReview(artwork.id)}
@@ -224,20 +261,22 @@ export default function Admin() {
                           data-testid={`button-ai-review-${artwork.id}`}
                         >
                           {aiReview.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                          Generate Review
+                          Generate AI Review
                         </Button>
-                      ) : null}
+                      )}
                       
-                      {activeTab === "pending" && (
-                        <div className="flex gap-3 pt-4 border-t">
+                      <div className="flex gap-3 pt-4 border-t flex-wrap">
+                        {artwork.status !== "approved" && (
                           <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white" 
+                            className="bg-green-600 text-white" 
                             onClick={() => handleDecision(artwork.id, "approved")}
                             disabled={updateStatus.isPending}
                             data-testid={`button-approve-${artwork.id}`}
                           >
                             <Check className="w-4 h-4 mr-2" /> Approve
                           </Button>
+                        )}
+                        {artwork.status !== "rejected" && (
                           <Button 
                             variant="destructive"
                             onClick={() => handleDecision(artwork.id, "rejected")}
@@ -246,8 +285,39 @@ export default function Admin() {
                           >
                             <X className="w-4 h-4 mr-2" /> Reject
                           </Button>
-                        </div>
-                      )}
+                        )}
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              className="text-destructive border-destructive/30"
+                              disabled={deleteArtwork.isPending}
+                              data-testid={`button-delete-${artwork.id}`}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" /> Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete "{artwork.title}"?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently remove this artwork and all associated bids. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleDelete(artwork.id)}
+                                className="bg-destructive text-destructive-foreground"
+                                data-testid={`button-confirm-delete-${artwork.id}`}
+                              >
+                                Delete Permanently
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </Card>
                 ))}

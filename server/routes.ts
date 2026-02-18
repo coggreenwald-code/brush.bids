@@ -92,6 +92,11 @@ export async function registerRoutes(
   });
 
   app.patch(api.artworks.updateStatus.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    const adminUser = await storage.getUser((req.user as any).claims?.sub);
+    if (!adminUser || adminUser.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
     try {
       const { status, feedback } = api.artworks.updateStatus.input.parse(req.body);
       const artwork = await storage.updateArtworkStatus(Number(req.params.id), status, feedback);
@@ -105,6 +110,21 @@ export async function registerRoutes(
       }
       throw err;
     }
+  });
+
+  app.delete(api.artworks.delete.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    const deleteAdminUser = await storage.getUser((req.user as any).claims?.sub);
+    if (!deleteAdminUser || deleteAdminUser.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    const id = Number(req.params.id);
+    const artwork = await storage.getArtwork(id);
+    if (!artwork) {
+      return res.status(404).json({ message: "Artwork not found" });
+    }
+    await storage.deleteArtwork(id);
+    res.json({ message: "Artwork deleted successfully" });
   });
 
   app.patch(api.artworks.updatePromotion.path, async (req, res) => {
@@ -151,8 +171,13 @@ export async function registerRoutes(
     }
   });
 
-  // AI Review Endpoint
+  // AI Review Endpoint (Admin only)
   app.post(api.artworks.aiReview.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    const aiReviewAdminUser = await storage.getUser((req.user as any).claims?.sub);
+    if (!aiReviewAdminUser || aiReviewAdminUser.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
     const id = Number(req.params.id);
     const artwork = await storage.getArtwork(id);
     if (!artwork) return res.status(404).json({ message: "Artwork not found" });

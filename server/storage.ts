@@ -27,6 +27,8 @@ export interface IStorage {
   updateArtworkPromotion(id: number, promotionPercentage: number): Promise<Artwork>;
   getApprovedArtworksSortedByPromotion(): Promise<Artwork[]>;
 
+  deleteArtwork(id: number): Promise<void>;
+
   // Bids
   getBidsForArtwork(artworkId: number): Promise<Bid[]>;
   getBidsForUser(userId: string): Promise<{ 
@@ -106,6 +108,11 @@ export class DatabaseStorage implements IStorage {
   async createArtwork(artwork: InsertArtwork): Promise<Artwork> {
     const [newArtwork] = await db.insert(artworks).values(artwork).returning();
     return newArtwork;
+  }
+
+  async deleteArtwork(id: number): Promise<void> {
+    await db.delete(bids).where(eq(bids.artworkId, id));
+    await db.delete(artworks).where(eq(artworks.id, id));
   }
 
   async updateArtworkStatus(id: number, status: "pending" | "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork> {

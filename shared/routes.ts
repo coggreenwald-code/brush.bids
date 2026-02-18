@@ -96,7 +96,16 @@ export const api = {
         200: z.object({ imageUrl: z.string() }),
         400: errorSchemas.validation,
       },
-    }
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/artworks/:id',
+      responses: {
+        200: z.object({ message: z.string() }),
+        403: z.object({ message: z.string() }),
+        404: errorSchemas.notFound,
+      },
+    },
   },
   // Users/Artists
   users: {
