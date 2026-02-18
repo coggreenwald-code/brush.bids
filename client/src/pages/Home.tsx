@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 import heroImage from "@assets/Z-A18XdAxsiBvxgt_DavidHockney,PortraitofanArtist-PoolwithTwoF_1771370870284.avif";
@@ -34,9 +34,62 @@ const placeholderArtworks = [
   { id: 0, title: "Tidal Memory", artistName: "Nora Kim", imageUrl: artFlow },
 ];
 
+function parseStatValue(value: string): { prefix: string; number: number; suffix: string } {
+  const match = value.match(/^([^0-9]*)([0-9,]+(?:\.\d+)?)(.*)$/);
+  if (!match) return { prefix: "", number: 0, suffix: value };
+  return {
+    prefix: match[1],
+    number: parseFloat(match[2].replace(/,/g, "")),
+    suffix: match[3],
+  };
+}
+
+function CountUpNumber({ value, duration = 2000 }: { value: string; duration?: number }) {
+  const { prefix, number, suffix } = parseStatValue(value);
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const startTime = performance.now();
+          const animate = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.round(eased * number));
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasAnimated, number, duration]);
+
+  const formatted = count >= 1000 ? count.toLocaleString() : count.toString();
+  return <span ref={ref}>{prefix}{formatted}{suffix}</span>;
+}
+
 export default function Home() {
   const { data: artworks, isLoading } = useArtworks({ status: "approved" });
   const { isAuthenticated } = useAuth();
+  const [hasPointer, setHasPointer] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    setHasPointer(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setHasPointer(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const coverFlowArtworks = useMemo(() => {
     if (artworks && artworks.length >= 3) {
@@ -395,7 +448,7 @@ export default function Home() {
                     <motion.div
                       key={step.title}
                       className="flex gap-5 items-start rounded-md p-4 -mx-4 transition-colors md:hover:bg-[#B8965A]/[0.06] md:dark:hover:bg-[#C9A84C]/[0.08] cursor-default"
-                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileHover={hasPointer ? { scale: 1.03, y: -2 } : undefined}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       style={{ transformOrigin: "left center" }}
                       data-testid={`step-artist-${i}`}
@@ -431,7 +484,7 @@ export default function Home() {
                     <motion.div
                       key={step.title}
                       className="flex gap-5 items-start rounded-md p-4 -mx-4 transition-colors md:hover:bg-[#96A0AB]/[0.06] md:dark:hover:bg-[#A8AEB5]/[0.08] cursor-default"
-                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileHover={hasPointer ? { scale: 1.03, y: -2 } : undefined}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       style={{ transformOrigin: "left center" }}
                       data-testid={`step-collector-${i}`}
@@ -470,7 +523,7 @@ export default function Home() {
               <h2 className="text-5xl md:text-7xl lg:text-8xl font-sans font-semibold tracking-tight leading-[0.95]">Our<br />Impact</h2>
             </motion.div>
             <div className="border-t border-[#e0d6cd] dark:border-border pt-10 md:pt-14">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 {stats.map((stat, i) => (
                   <motion.div
                     key={stat.label}
@@ -478,9 +531,18 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ delay: 0.08 * i, duration: 0.4 }}
+                    whileHover={hasPointer ? {
+                      scale: 1.03,
+                      y: -2,
+                    } : undefined}
+                    style={{ transformOrigin: "center center" }}
+                    className="rounded-md p-5 md:p-6 transition-colors md:hover:bg-foreground/[0.04] md:dark:hover:bg-foreground/[0.06] cursor-default"
                   >
-                    <p className="text-3xl md:text-4xl font-display font-bold" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                      {stat.value}
+                    <div className={cn("w-10 h-10 rounded-md flex items-center justify-center mb-4", stat.bg)}>
+                      <stat.icon className={cn("w-5 h-5", stat.color)} />
+                    </div>
+                    <p className="text-3xl md:text-4xl font-display font-bold tabular-nums" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <CountUpNumber value={stat.value} />
                     </p>
                     <p className="text-sm text-muted-foreground mt-2 tracking-wide uppercase">{stat.label}</p>
                   </motion.div>
