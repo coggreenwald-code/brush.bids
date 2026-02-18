@@ -96,7 +96,7 @@ export default function Home() {
       return artworks.slice(0, 9).map(a => ({
         id: a.id,
         title: a.title,
-        artistName: `Artist #${a.artistId}`,
+        artistName: (a as any).artist?.firstName && (a as any).artist?.lastName ? `${(a as any).artist.firstName} ${(a as any).artist.lastName}` : a.artistId,
         imageUrl: a.imageUrl || artSunset,
       }));
     }

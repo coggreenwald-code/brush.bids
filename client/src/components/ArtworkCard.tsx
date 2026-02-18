@@ -65,7 +65,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
               {artwork.title}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              by <span className="font-medium text-foreground/80">{artwork.artistId}</span>
+              by <span className="font-medium text-foreground/80">{artwork.artist ? `${artwork.artist.firstName || ''} ${artwork.artist.lastName || ''}`.trim() || artwork.artistId : artwork.artistId}</span>
             </p>
           </div>
         </Card>

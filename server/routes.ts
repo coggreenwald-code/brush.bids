@@ -58,13 +58,18 @@ export async function registerRoutes(
     const status = req.query.status as "pending" | "approved" | "rejected" | undefined;
     const artistId = req.query.artistId as string | undefined;
     
+    let artworkList;
     if (status === "approved" && !artistId) {
-      const artworks = await storage.getApprovedArtworksSortedByPromotion();
-      return res.json(artworks);
+      artworkList = await storage.getApprovedArtworksSortedByPromotion();
+    } else {
+      artworkList = await storage.getArtworks(status, artistId);
     }
     
-    const artworks = await storage.getArtworks(status, artistId);
-    res.json(artworks);
+    const artistIds = Array.from(new Set(artworkList.map(a => a.artistId)));
+    const artists = await Promise.all(artistIds.map(id => storage.getUser(id)));
+    const artistMap = Object.fromEntries(artists.filter(Boolean).map(a => [a!.id, a]));
+    const enriched = artworkList.map(a => ({ ...a, artist: artistMap[a.artistId] || null }));
+    res.json(enriched);
   });
 
   app.get(api.artworks.get.path, async (req, res) => {
@@ -72,7 +77,8 @@ export async function registerRoutes(
     if (!artwork) {
       return res.status(404).json({ message: "Artwork not found" });
     }
-    res.json(artwork);
+    const artist = await storage.getUser(artwork.artistId);
+    res.json({ ...artwork, artist: artist || null });
   });
 
   app.post(api.artworks.create.path, async (req, res) => {
