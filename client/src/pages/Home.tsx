@@ -403,7 +403,7 @@ export default function Home() {
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div>
-                        <h4 className="font-sans font-bold text-sm uppercase tracking-wide">{step.title}</h4>
+                        <h4 className="font-sans font-medium text-sm uppercase tracking-wide">{step.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
@@ -439,7 +439,7 @@ export default function Home() {
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div>
-                        <h4 className="font-sans font-bold text-sm uppercase tracking-wide">{step.title}</h4>
+                        <h4 className="font-sans font-medium text-sm uppercase tracking-wide">{step.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
