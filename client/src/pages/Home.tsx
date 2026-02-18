@@ -496,7 +496,7 @@ export default function Home() {
             <img
               src={ctaJourneyImage}
               alt="Artist painting on an easel"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
               data-testid="img-cta-journey"
             />
             <div
