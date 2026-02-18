@@ -21,6 +21,7 @@ import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
 import bgHowItWorks from "@assets/Screenshot_2026-02-17_at_22.57.39_1771387077163.png";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
+import bgImpact from "@assets/the-persistence-of-memory-1931-1140x867_1771437317248.jpg";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
 import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
 
@@ -519,7 +520,7 @@ export default function Home() {
         {/* Stats — with decorative background */}
         <section className="relative mt-0 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
           <div className="absolute inset-0 pointer-events-none">
-            <img src={bgBrushstrokes} alt="" className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.05]" />
+            <img src={bgImpact} alt="" className="w-full h-full object-cover opacity-[0.19] dark:opacity-[0.10]" style={{ filter: "blur(2px)" }} />
           </div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
             <motion.div
