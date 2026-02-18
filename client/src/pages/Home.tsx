@@ -374,7 +374,7 @@ export default function Home() {
                     <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground tracking-wide" data-testid="text-coverflow-artist">
+                    <p className="text-muted-foreground tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
                       by {currentArt.artistName}
                     </p>
                   </motion.div>
@@ -628,7 +628,6 @@ export default function Home() {
           </div>
         </section>
       </div>
-
       <Footer />
     </Layout>
   );
