@@ -373,8 +373,8 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
-              <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight mt-2">How It Works</h2>
+              <span className="text-sm md:text-base font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-sans font-semibold tracking-tight mt-2">How It Works</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
@@ -476,7 +476,7 @@ export default function Home() {
         </section>
 
         {/* CTA — with decorative background */}
-        <section className="relative mt-24 md:mt-36 mb-8 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+        <section className="relative mt-8 md:mt-12 mb-8 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
           <div className="absolute inset-0 pointer-events-none">
             <img src={bgPaintSplatter} alt="" className="w-full h-full object-cover opacity-[0.1] dark:opacity-[0.04]" />
           </div>
