@@ -1,7 +1,8 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
-import { Gavel, Heart, Users, Award, Sparkles, TrendingUp } from "lucide-react";
+import { Heart, Users, Award, Sparkles, TrendingUp } from "lucide-react";
+import brushBidsLogo from "@assets/BrushBids_Logo_1769695882555.png";
 import bgFeininger from "@assets/Feininger-Fishing-Boats-hi-res-scaled-1_1771388372886.jpg";
 
 export default function About() {
@@ -44,8 +45,8 @@ export default function About() {
       <div className="space-y-16 pb-16 max-w-4xl mx-auto">
         {/* Hero */}
         <section className="text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-            <Gavel className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto overflow-hidden">
+            <img src={brushBidsLogo} alt="BrushBids Logo" className="w-12 h-12 object-contain" style={{ mixBlendMode: "multiply" }} />
           </div>
           <h1 className="text-4xl md:text-5xl font-display font-bold"><span className="text-[#E8C874]">About BrushBids</span></h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

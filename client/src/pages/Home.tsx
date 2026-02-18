@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 import heroImage from "@assets/Z-A18XdAxsiBvxgt_DavidHockney,PortraitofanArtist-PoolwithTwoF_1771370870284.avif";
+import brushBidsLogo from "@assets/BrushBids_Logo_1769695882555.png";
 import artSunset from "@assets/art-sunset-mountains.png";
 import artPortrait from "@assets/art-abstract-portrait.png";
 import artOcean from "@assets/art-ocean-watercolor.png";
@@ -185,7 +186,7 @@ export default function Home() {
                   transition={{ duration: 0.7 }}
                 >
                   <span className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full bg-white/15 text-white/90 backdrop-blur-sm">
-                    <Brush className="w-3.5 h-3.5" />
+                    <img src={brushBidsLogo} alt="BrushBids" className="w-5 h-5 object-contain" style={{ filter: "invert(1)" }} />
                     Turning Student Creativity Into Opportunity
                   </span>
                 </motion.div>
