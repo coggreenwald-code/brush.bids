@@ -21,6 +21,7 @@ import artFlow from "@assets/art-abstract-flow.png";
 import bgWatercolor from "@assets/bg-watercolor-warm.png";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
+import ctaJourneyImage from "@assets/pexels-adilgkkya-2902747_1771375865866.jpg";
 
 
 const placeholderArtworks = [
@@ -495,30 +496,46 @@ export default function Home() {
             <img src={bgPaintSplatter} alt="" className="w-full h-full object-cover opacity-[0.1] dark:opacity-[0.04]" />
           </div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5 }}
-              className="text-right max-w-3xl ml-auto"
-            >
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight leading-[1.05]">Ready to Start<br />Your Journey?</h2>
-              <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4 max-w-lg ml-auto">
-                Join a community of student artists and collectors making art accessible and impactful.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-end mt-8">
-                <Link href="/submit-artwork">
-                  <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
-                    Submit Your Art <Upload className="w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="/gallery">
-                  <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-browse">
-                    Browse Gallery <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
+            <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+                className="w-full md:w-5/12 flex-shrink-0"
+              >
+                <img
+                  src={ctaJourneyImage}
+                  alt="A person standing on a long road stretching toward mountains at sunset"
+                  className="w-full h-auto max-h-[340px] object-cover rounded-md"
+                  data-testid="img-cta-journey"
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="text-center md:text-right flex-1"
+              >
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight leading-[1.05]">Ready to Start<br />Your Journey?</h2>
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4 max-w-lg mx-auto md:ml-auto md:mr-0">
+                  Join a community of student artists and collectors making art accessible and impactful.
+                </p>
+                <div className="flex flex-wrap gap-4 justify-center md:justify-end mt-8">
+                  <Link href="/submit-artwork">
+                    <Button size="lg" className="rounded-md bg-[#4C392D] text-white gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
+                      Submit Your Art <Upload className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/gallery">
+                    <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-browse">
+                      Browse Gallery <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </section>
       </div>
