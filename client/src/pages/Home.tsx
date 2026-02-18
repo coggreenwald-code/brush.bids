@@ -361,7 +361,7 @@ export default function Home() {
         </section>
 
         {/* How It Works — Centered with decorative background */}
-        <section className="relative mt-8 md:mt-12 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
+        <section className="relative mt-20 md:mt-28 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
           <div className="absolute inset-0 pointer-events-none">
             <img src={bgWatercolor} alt="" className="w-full h-full object-cover opacity-[0.15] dark:opacity-[0.06]" />
           </div>
@@ -440,7 +440,7 @@ export default function Home() {
         </section>
 
         {/* Stats — with decorative background */}
-        <section className="relative mt-2 md:mt-4 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
+        <section className="relative mt-20 md:mt-28 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
           <div className="absolute inset-0 pointer-events-none">
             <img src={bgBrushstrokes} alt="" className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.05]" />
           </div>
@@ -476,7 +476,7 @@ export default function Home() {
         </section>
 
         {/* CTA — with decorative background */}
-        <section className="relative mt-2 md:mt-4 mb-8 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+        <section className="relative mt-20 md:mt-28 mb-8 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
           <div className="absolute inset-0 pointer-events-none">
             <img src={bgPaintSplatter} alt="" className="w-full h-full object-cover opacity-[0.1] dark:opacity-[0.04]" />
           </div>
