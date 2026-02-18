@@ -389,9 +389,16 @@ export default function Home() {
                   <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
                   <h3 className="text-xl md:text-2xl font-sans font-semibold mt-2">Start selling your work</h3>
                 </div>
-                <div className="space-y-7 flex-1">
+                <div className="space-y-4 flex-1">
                   {howItWorksArtist.map((step, i) => (
-                    <div key={step.title} className="flex gap-5 items-start">
+                    <motion.div
+                      key={step.title}
+                      className="flex gap-5 items-start rounded-md p-4 -mx-4 transition-colors md:hover:bg-[#B8965A]/[0.06] md:dark:hover:bg-[#C9A84C]/[0.08] cursor-default"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      style={{ transformOrigin: "left center" }}
+                      data-testid={`step-artist-${i}`}
+                    >
                       <span className="flex-shrink-0 text-2xl font-display font-bold text-[#B8965A]/50 dark:text-[#C9A84C]/50 leading-none pt-0.5 tabular-nums">
                         {String(i + 1).padStart(2, '0')}
                       </span>
@@ -399,7 +406,7 @@ export default function Home() {
                         <h4 className="font-bold text-sm uppercase tracking-wide">{step.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <Link href="/submit-artwork">
@@ -418,9 +425,16 @@ export default function Home() {
                   <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
                   <h3 className="text-xl md:text-2xl font-sans font-semibold mt-2">Discover emerging talent</h3>
                 </div>
-                <div className="space-y-7 flex-1">
+                <div className="space-y-4 flex-1">
                   {howItWorksBuyer.map((step, i) => (
-                    <div key={step.title} className="flex gap-5 items-start">
+                    <motion.div
+                      key={step.title}
+                      className="flex gap-5 items-start rounded-md p-4 -mx-4 transition-colors md:hover:bg-[#96A0AB]/[0.06] md:dark:hover:bg-[#A8AEB5]/[0.08] cursor-default"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      style={{ transformOrigin: "left center" }}
+                      data-testid={`step-collector-${i}`}
+                    >
                       <span className="flex-shrink-0 text-2xl font-display font-bold text-[#96A0AB]/50 dark:text-[#A8AEB5]/50 leading-none pt-0.5 tabular-nums">
                         {String(i + 1).padStart(2, '0')}
                       </span>
@@ -428,7 +442,7 @@ export default function Home() {
                         <h4 className="font-bold text-sm uppercase tracking-wide">{step.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 <Link href="/gallery">
