@@ -22,7 +22,6 @@ import bgWatercolor from "@assets/bg-watercolor-warm.png";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
 import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
-import bgPollock from "@assets/1_OKIqvZsIqqeFhGIuij5EKA_1771386047538.jpg";
 
 const placeholderArtworks = [
   { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
@@ -234,15 +233,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Cover Flow Featured Works — Full Width */}
+        {/* Cover Flow Featured Works — Full Width, seamless continuation from hero */}
         <section className="relative -mt-4 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <img
-              src={bgPollock}
+              src={heroImage}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-[0.08] dark:opacity-[0.04]"
-              style={{ filter: "blur(2px)" }}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: "center top", transform: "scaleY(-1)", filter: "blur(6px)", opacity: 0.45 }}
             />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 0%, transparent 60%, hsl(var(--background)) 100%)" }} />
+            <div className="absolute top-0 left-0 right-0 h-[15%]" style={{ background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 100%)" }} />
           </div>
           <div className="relative z-10 pt-16 md:pt-24 pb-8 md:pb-12">
             <motion.div
