@@ -22,8 +22,6 @@ import bgWatercolor from "@assets/bg-watercolor-warm.png";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
 import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
-import bgPedestal from "@assets/360_F_249367925_jOESIjxssSS2q5PoTBDc4ySp5gw7Ya38_1771384304250.jpg";
-
 
 const placeholderArtworks = [
   { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
@@ -258,14 +256,6 @@ export default function Home() {
                 }}
                 data-testid="cover-flow-container"
               >
-                <div className="absolute inset-0 pointer-events-none z-0">
-                  <img
-                    src={bgPedestal}
-                    alt=""
-                    className="w-full h-full object-cover object-[center_80%] opacity-[0.3] dark:opacity-[0.12]"
-                  />
-                  <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 75%, transparent 0%, hsl(var(--background)) 100%)" }} />
-                </div>
                 <div
                   className="absolute bottom-0 left-0 right-0 h-[35%] pointer-events-none"
                   style={{
