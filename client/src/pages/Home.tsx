@@ -371,7 +371,7 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="space-y-0.5"
                   >
-                    <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight" data-testid="text-coverflow-title">
+                    <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight italic" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
                     <p className="text-muted-foreground tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
