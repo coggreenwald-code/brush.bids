@@ -84,7 +84,7 @@ export default {
       },
       fontFamily: {
         sans: ["'Jost'", "sans-serif"],
-        display: ["'Jost'", "sans-serif"],
+        display: ["'Playfair Display'", "serif"],
         mono: ["var(--font-mono)"],
       },
       keyframes: {

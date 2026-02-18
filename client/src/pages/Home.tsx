@@ -134,7 +134,7 @@ export default function Home() {
                 </motion.div>
 
                 <motion.h1
-                  className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold text-white leading-[1.05] tracking-tight drop-shadow-lg"
+                  className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white leading-[1.05] tracking-tight drop-shadow-lg"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.1 }}
@@ -214,8 +214,8 @@ export default function Home() {
                     const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
 
                     const coverSize = isCenter ? 340 : 260;
-                    const centerGap = 230;
-                    const stackSpacing = 100;
+                    const centerGap = 240;
+                    const stackSpacing = 130;
                     const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
                     const rotateY = isCenter ? 0 : side * -60;
                     const translateZ = isCenter ? 140 : -(absOffset * 40);

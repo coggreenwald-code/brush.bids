@@ -51,7 +51,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <div className="w-7 h-7 flex items-center justify-center">
               <img src={logoImage} alt="BrushBids" className="w-full h-full dark:invert" />
             </div>
-            <span className="text-lg font-display font-semibold text-[#4C392D] dark:text-foreground tracking-tight">BrushBids</span>
+            <span className="text-lg font-display font-bold text-[#4C392D] dark:text-foreground tracking-tight">BrushBids</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8" data-testid="nav-desktop">
