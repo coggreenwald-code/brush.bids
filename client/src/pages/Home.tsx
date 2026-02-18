@@ -186,7 +186,7 @@ export default function Home() {
                   transition={{ duration: 0.7 }}
                 >
                   <span className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full bg-white/15 text-white/90 backdrop-blur-sm">
-                    <img src={brushBidsLogo} alt="BrushBids" className="w-5 h-5 object-contain" style={{ filter: "invert(1)" }} />
+                    <img src={brushBidsLogo} alt="BrushBids" className="w-5 h-5 object-contain" style={{ filter: "invert(1) brightness(2)", mixBlendMode: "screen" }} />
                     Turning Student Creativity Into Opportunity
                   </span>
                 </motion.div>
