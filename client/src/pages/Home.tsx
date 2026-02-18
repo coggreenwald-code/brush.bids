@@ -381,7 +381,7 @@ export default function Home() {
                 </AnimatePresence>
               </div>
 
-              <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-6 z-20">
+              <div className="absolute bottom-[18px] left-0 right-0 flex items-center justify-center gap-6 z-20">
                 <Button
                   size="icon"
                   variant="outline"
