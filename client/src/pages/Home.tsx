@@ -361,7 +361,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center -mt-12 relative z-20">
+              <div className="absolute bottom-[90px] left-0 z-20 px-6 md:px-12 lg:px-16 text-left" style={{ maxWidth: "calc(50% - 190px)" }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
@@ -371,7 +371,7 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="space-y-0.5"
                   >
-                    <h3 className="text-xl md:text-2xl font-display font-bold tracking-tight" data-testid="text-coverflow-title">
+                    <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
                     <p className="text-sm text-muted-foreground tracking-wide" data-testid="text-coverflow-artist">
@@ -381,7 +381,7 @@ export default function Home() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center justify-center gap-6 mt-3 relative z-20">
+              <div className="flex items-center justify-center gap-6 -mt-4 relative z-20">
                 <Button
                   size="icon"
                   variant="outline"
