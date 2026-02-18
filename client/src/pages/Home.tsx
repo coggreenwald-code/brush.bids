@@ -518,14 +518,8 @@ export default function Home() {
 
         {/* Stats — with decorative background */}
         <section className="relative mt-0 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <img
-              src={bgPollock}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-[0.12] dark:opacity-[0.06]"
-              style={{ filter: "blur(2px)" }}
-            />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 10%, transparent 90%, hsl(var(--background)) 100%)" }} />
+          <div className="absolute inset-0 pointer-events-none">
+            <img src={bgBrushstrokes} alt="" className="w-full h-full object-cover opacity-[0.12] dark:opacity-[0.05]" />
           </div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
             <motion.div
