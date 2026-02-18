@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Loader2, DollarSign, Clock, Heart, Share2, Sparkles, Twitter, Facebook, Link as LinkIcon, Copy, Check, User } from "lucide-react";
+import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Link as LinkIcon, Copy, Check, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
@@ -154,23 +154,6 @@ export default function ArtworkDetail() {
             <img src={displayImage} alt={artwork.title} className="w-full h-full object-cover" data-testid="img-artwork" />
           </div>
           
-          {artwork.aiFeedback && (
-            <Card className="p-6 bg-primary/5 border-primary/20">
-              <h3 className="font-semibold flex items-center gap-2 mb-2 text-primary">
-                <Sparkles className="w-4 h-4" /> Curator Feedback
-              </h3>
-              <p className="text-sm text-muted-foreground italic">"{artwork.aiFeedback}"</p>
-              <div className="mt-4 flex items-center gap-2">
-                <div className="h-2 flex-1 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary transition-all" 
-                    style={{ width: `${artwork.aiScore || 0}%` }} 
-                  />
-                </div>
-                <span className="text-xs font-bold">{artwork.aiScore}/100</span>
-              </div>
-            </Card>
-          )}
 
           {/* Revenue Split Info */}
           <Card className="p-6">

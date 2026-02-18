@@ -3,7 +3,7 @@ import { type Artwork, type User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Sparkles, Rocket } from "lucide-react";
+import { Rocket } from "lucide-react";
 
 interface ArtworkCardProps {
   artwork: Artwork & { artist?: User };
@@ -47,12 +47,6 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
             )}
             
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-              {artwork.aiScore && (
-                <Badge variant="outline" className="bg-black/60 text-white border-white/20 backdrop-blur-md flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  {artwork.aiScore}/100
-                </Badge>
-              )}
               {(artwork.promotionPercentage ?? 0) > 0 && (
                 <Badge className="bg-gradient-to-r from-[#B8965A] to-[#C9A84C] text-white border-0 shadow-lg flex items-center gap-1">
                   <Rocket className="w-3 h-3" />
