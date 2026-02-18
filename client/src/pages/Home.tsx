@@ -260,7 +260,7 @@ export default function Home() {
               <div
                 className="relative mx-auto overflow-hidden"
                 style={{
-                  height: "500px",
+                  height: "560px",
                   perspective: "1400px",
                   perspectiveOrigin: "50% 38%",
                 }}
@@ -361,7 +361,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center -mt-12 relative z-20">
+              <div className="text-center -mt-20 relative z-20">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
@@ -381,7 +381,7 @@ export default function Home() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center justify-center gap-6 mt-3 relative z-20">
+              <div className="flex items-center justify-center gap-6 mt-2 relative z-20">
                 <Button
                   size="icon"
                   variant="outline"
