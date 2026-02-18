@@ -520,7 +520,7 @@ export default function Home() {
         {/* Stats — with decorative background */}
         <section className="relative mt-0 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
           <div className="absolute inset-0 pointer-events-none">
-            <img src={bgImpact} alt="" className="w-full h-full object-cover opacity-[0.19] dark:opacity-[0.10]" style={{ filter: "blur(2px)" }} />
+            <img src={bgImpact} alt="" className="w-full h-full object-cover opacity-[0.17] dark:opacity-[0.08]" style={{ filter: "blur(2px)" }} />
           </div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
             <motion.div
