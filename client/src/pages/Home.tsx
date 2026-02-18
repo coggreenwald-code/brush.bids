@@ -375,7 +375,7 @@ export default function Home() {
                       {currentArt.title}
                     </h3>
                     <p className="text-muted-foreground tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
-                      by {currentArt.artistName}
+                      By {currentArt.artistName}
                     </p>
                   </motion.div>
                 </AnimatePresence>
