@@ -22,7 +22,7 @@ import bgWatercolor from "@assets/bg-watercolor-warm.png";
 import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
 import bgPaintSplatter from "@assets/bg-paint-splatter.png";
 import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
-import bgFeaturedGradient from "@assets/pexels-codioful-7135020_1771384891992.jpg";
+import bgFeaturedGradient from "@assets/pexels-codioful-7130563_1771384839368.jpg";
 
 const placeholderArtworks = [
   { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
