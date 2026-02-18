@@ -399,11 +399,11 @@ export default function Home() {
                       style={{ transformOrigin: "left center" }}
                       data-testid={`step-artist-${i}`}
                     >
-                      <span className="flex-shrink-0 text-2xl font-display font-bold text-[#B8965A]/50 dark:text-[#C9A84C]/50 leading-none pt-0.5 tabular-nums">
+                      <span className="flex-shrink-0 text-2xl font-sans font-bold text-[#B8965A]/50 dark:text-[#C9A84C]/50 leading-none pt-0.5 tabular-nums">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div>
-                        <h4 className="font-bold text-sm uppercase tracking-wide">{step.title}</h4>
+                        <h4 className="font-sans font-bold text-sm uppercase tracking-wide">{step.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
@@ -435,11 +435,11 @@ export default function Home() {
                       style={{ transformOrigin: "left center" }}
                       data-testid={`step-collector-${i}`}
                     >
-                      <span className="flex-shrink-0 text-2xl font-display font-bold text-[#96A0AB]/50 dark:text-[#A8AEB5]/50 leading-none pt-0.5 tabular-nums">
+                      <span className="flex-shrink-0 text-2xl font-sans font-bold text-[#96A0AB]/50 dark:text-[#A8AEB5]/50 leading-none pt-0.5 tabular-nums">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div>
-                        <h4 className="font-bold text-sm uppercase tracking-wide">{step.title}</h4>
+                        <h4 className="font-sans font-bold text-sm uppercase tracking-wide">{step.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
