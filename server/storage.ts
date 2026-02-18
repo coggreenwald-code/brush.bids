@@ -27,6 +27,7 @@ export interface IStorage {
   updateArtworkPromotion(id: number, promotionPercentage: number): Promise<Artwork>;
   getApprovedArtworksSortedByPromotion(): Promise<Artwork[]>;
 
+  incrementArtworkViews(id: number): Promise<void>;
   deleteArtwork(id: number): Promise<void>;
 
   // Bids
@@ -239,6 +240,12 @@ export class DatabaseStorage implements IStorage {
       .where(eq(artworks.id, id))
       .returning();
     return updated;
+  }
+
+  async incrementArtworkViews(id: number): Promise<void> {
+    await db.update(artworks)
+      .set({ views: sql`${artworks.views} + 1` })
+      .where(eq(artworks.id, id));
   }
 
   async getApprovedArtworksSortedByPromotion(): Promise<Artwork[]> {

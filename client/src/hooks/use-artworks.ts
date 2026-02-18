@@ -3,7 +3,7 @@ import { api, buildUrl } from "@shared/routes";
 import { z } from "zod";
 import type { Artwork, InsertArtwork, UpdateArtworkStatusRequest } from "@shared/schema";
 
-export function useArtworks(filters?: { status?: string; artistId?: number }) {
+export function useArtworks(filters?: { status?: string; artistId?: number; sortBy?: string }) {
   return useQuery({
     queryKey: [api.artworks.list.path, filters],
     queryFn: async () => {

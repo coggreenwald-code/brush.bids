@@ -79,7 +79,7 @@ function CountUpNumber({ value, duration = 2000 }: { value: string; duration?: n
 }
 
 export default function Home() {
-  const { data: artworks, isLoading } = useArtworks({ status: "approved" });
+  const { data: artworks, isLoading } = useArtworks({ status: "approved", sortBy: "views" });
   const { isAuthenticated } = useAuth();
   const [hasPointer, setHasPointer] = useState(false);
 
@@ -93,7 +93,7 @@ export default function Home() {
 
   const coverFlowArtworks = useMemo(() => {
     if (artworks && artworks.length >= 3) {
-      return artworks.slice(0, 9).map(a => ({
+      return artworks.slice(0, 12).map(a => ({
         id: a.id,
         title: a.title,
         artistName: (a as any).artist?.firstName && (a as any).artist?.lastName ? `${(a as any).artist.firstName} ${(a as any).artist.lastName}` : a.artistId,

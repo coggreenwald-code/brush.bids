@@ -57,12 +57,17 @@ export async function registerRoutes(
   app.get(api.artworks.list.path, async (req, res) => {
     const status = req.query.status as "pending" | "approved" | "rejected" | undefined;
     const artistId = req.query.artistId as string | undefined;
+    const sortBy = req.query.sortBy as "views" | undefined;
     
     let artworkList;
     if (status === "approved" && !artistId) {
       artworkList = await storage.getApprovedArtworksSortedByPromotion();
     } else {
       artworkList = await storage.getArtworks(status, artistId);
+    }
+
+    if (sortBy === "views") {
+      artworkList = [...artworkList].sort((a, b) => (b.views ?? 0) - (a.views ?? 0));
     }
     
     const artistIds = Array.from(new Set(artworkList.map(a => a.artistId)));
@@ -77,6 +82,7 @@ export async function registerRoutes(
     if (!artwork) {
       return res.status(404).json({ message: "Artwork not found" });
     }
+    storage.incrementArtworkViews(artwork.id).catch(() => {});
     const artist = await storage.getUser(artwork.artistId);
     res.json({ ...artwork, artist: artist || null });
   });
