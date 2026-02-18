@@ -75,8 +75,15 @@ export default function About() {
         {/* Revenue Split */}
         <section className="space-y-6">
           <h2 className="text-2xl font-display font-bold">How Revenue is Shared</h2>
-          <Card className="p-8">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
+          <Card className="relative overflow-hidden p-8">
+            <div className="absolute inset-0 pointer-events-none">
+              <img
+                src={bgFeininger}
+                alt=""
+                className="w-full h-full object-cover opacity-[0.24] dark:opacity-[0.12]"
+              />
+            </div>
+            <div className="relative z-10 grid md:grid-cols-3 gap-8 text-center">
               <div>
                 <div className="text-5xl font-display font-bold text-primary mb-2">70%</div>
                 <div className="text-lg font-semibold">Artist</div>
