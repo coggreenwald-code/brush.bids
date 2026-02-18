@@ -47,7 +47,7 @@ export default function About() {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
             <Gavel className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-display font-bold">About BrushBids</h1>
+          <h1 className="text-4xl md:text-5xl font-display font-bold">About <span className="text-[#E8C874]">BrushBids</span></h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             We're on a mission to connect emerging student artists with collectors who appreciate authentic, fresh creativity.
           </p>
