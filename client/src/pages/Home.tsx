@@ -235,15 +235,15 @@ export default function Home() {
 
         {/* Cover Flow Featured Works — Full Width, seamless continuation from hero */}
         <section className="relative -mt-4 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
-          <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <img
               src={heroImage}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: "center bottom" }}
+              style={{ objectPosition: "center top", transform: "scaleY(-1)", filter: "blur(6px)", opacity: 0.45 }}
             />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%)" }} />
-            <div className="absolute bottom-0 left-0 right-0 h-[30%]" style={{ background: "linear-gradient(to bottom, transparent 0%, hsl(var(--background)) 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 0%, transparent 60%, hsl(var(--background)) 100%)" }} />
+            <div className="absolute top-0 left-0 right-0 h-[15%]" style={{ background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 100%)" }} />
           </div>
           <div className="relative z-10 pt-16 md:pt-24 pb-8 md:pb-12">
             <motion.div
@@ -253,7 +253,7 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold tracking-tight leading-[1.05] text-white drop-shadow-lg">Featured<br />Works</h2>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold tracking-tight leading-[1.05]">Featured<br />Works</h2>
             </motion.div>
 
             <div className="relative select-none">
@@ -371,10 +371,10 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="space-y-0.5"
                   >
-                    <h3 className="text-xl md:text-2xl font-display font-bold tracking-tight text-white drop-shadow-md" data-testid="text-coverflow-title">
+                    <h3 className="text-xl md:text-2xl font-display font-bold tracking-tight" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
-                    <p className="text-sm text-white/70 tracking-wide drop-shadow-md" data-testid="text-coverflow-artist">
+                    <p className="text-sm text-muted-foreground tracking-wide" data-testid="text-coverflow-artist">
                       by {currentArt.artistName}
                     </p>
                   </motion.div>
@@ -386,7 +386,7 @@ export default function Home() {
                   size="icon"
                   variant="outline"
                   onClick={goPrev}
-                  className="rounded-full border-white/30 text-white"
+                  className="rounded-full border-[#9E8472]/30"
                   data-testid="button-coverflow-prev"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -400,8 +400,8 @@ export default function Home() {
                       className={cn(
                         "rounded-full transition-all duration-300",
                         i === currentIndex
-                          ? "w-6 h-2 bg-[#E8C874]"
-                          : "w-2 h-2 bg-white/40"
+                          ? "w-6 h-2 bg-[#B8965A]"
+                          : "w-2 h-2 bg-[#DDDAD3] dark:bg-[#3a3530]"
                       )}
                       data-testid={`coverflow-dot-${i}`}
                     />
@@ -412,7 +412,7 @@ export default function Home() {
                   size="icon"
                   variant="outline"
                   onClick={goNext}
-                  className="rounded-full border-white/30 text-white"
+                  className="rounded-full border-[#9E8472]/30"
                   data-testid="button-coverflow-next"
                 >
                   <ChevronRight className="w-5 h-5" />
