@@ -42,6 +42,8 @@ export const charities = pgTable("charities", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   website: text("website"),
+  category: text("category").default("global").notNull(),
+  featured: boolean("featured").default(false).notNull(),
 });
 
 // Insert Schemas

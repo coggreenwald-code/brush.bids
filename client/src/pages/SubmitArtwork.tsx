@@ -6,7 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateArtwork } from "@/hooks/use-artworks";
 import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
@@ -288,13 +288,34 @@ export default function SubmitArtwork() {
                             <SelectValue placeholder="Choose a cause" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          {charities?.map(c => (
-                            <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-                          ))}
+                        <SelectContent className="max-h-72">
+                          {(() => {
+                            const groups: Record<string, { label: string; items: Array<{ id: number; name: string; category?: string }> }> = {
+                              global: { label: "Global & National Charities", items: [] },
+                              nyc_art: { label: "NYC Art Charities", items: [] },
+                              us_art: { label: "U.S. Art Charities", items: [] },
+                            };
+                            (charities ?? []).forEach(c => {
+                              const cat = (c as any).category || "global";
+                              if (groups[cat]) groups[cat].items.push(c);
+                              else groups.global.items.push(c);
+                            });
+                            return Object.entries(groups).map(([key, group]) => (
+                              group.items.length > 0 ? (
+                                <SelectGroup key={key}>
+                                  <SelectLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{group.label}</SelectLabel>
+                                  {group.items.map(c => (
+                                    <SelectItem key={c.id} value={c.id.toString()} data-testid={`charity-option-${c.id}`}>
+                                      {c.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              ) : null
+                            ));
+                          })()}
                         </SelectContent>
                       </Select>
-                      <FormDescription>15% of proceeds go here.</FormDescription>
+                      <FormDescription>10% of proceeds go to your chosen charity.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

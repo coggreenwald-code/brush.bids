@@ -16,13 +16,21 @@ class AuthStorage implements IAuthStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    const ADMIN_EMAILS = ["cog.greenwald@gmail.com"];
+
+    const isAdmin = userData.email && ADMIN_EMAILS.includes(userData.email.toLowerCase());
+
     const [user] = await db
       .insert(users)
-      .values(userData)
+      .values({
+        ...userData,
+        ...(isAdmin ? { role: "admin" as const } : {}),
+      })
       .onConflictDoUpdate({
         target: users.id,
         set: {
           ...userData,
+          ...(isAdmin ? { role: "admin" as const } : {}),
           updatedAt: new Date(),
         },
       })
