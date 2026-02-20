@@ -29,6 +29,7 @@ export interface IStorage {
 
   incrementArtworkViews(id: number): Promise<void>;
   deleteArtwork(id: number): Promise<void>;
+  extendAuctionEndTime(id: number, newEndTime: Date): Promise<Artwork>;
 
   // Bids
   getBidsForArtwork(artworkId: number): Promise<Bid[]>;
@@ -121,6 +122,14 @@ export class DatabaseStorage implements IStorage {
     if (feedback) updates.aiFeedback = feedback;
     if (score) updates.aiScore = score;
     
+    if (status === "approved") {
+      const artwork = await this.getArtwork(id);
+      const durationDays = artwork?.auctionDurationDays || 7;
+      const endTime = new Date();
+      endTime.setDate(endTime.getDate() + durationDays);
+      updates.endTime = endTime;
+    }
+    
     const [updated] = await db.update(artworks)
       .set(updates)
       .where(eq(artworks.id, id))
@@ -204,9 +213,14 @@ export class DatabaseStorage implements IStorage {
         const artworkHighestBid = artworkBids.length > 0 ? Math.max(...artworkBids.map(b => Number(b.amount))) : userHighestBid;
         const isHighest = userHighestBid >= artworkHighestBid;
         
-        const auctionEndDate = new Date(artwork?.createdAt || new Date());
-        auctionEndDate.setDate(auctionEndDate.getDate() + 7);
-        const auctionEnded = auctionEndDate <= new Date();
+        let auctionEnded = false;
+        if (artwork?.endTime) {
+          auctionEnded = new Date(artwork.endTime) <= new Date();
+        } else {
+          const auctionEndDate = new Date(artwork?.createdAt || new Date());
+          auctionEndDate.setDate(auctionEndDate.getDate() + (artwork?.auctionDurationDays || 7));
+          auctionEnded = auctionEndDate <= new Date();
+        }
         const isPaid = !!artwork?.paidAt;
         
         return {
@@ -246,6 +260,14 @@ export class DatabaseStorage implements IStorage {
     await db.update(artworks)
       .set({ views: sql`${artworks.views} + 1` })
       .where(eq(artworks.id, id));
+  }
+
+  async extendAuctionEndTime(id: number, newEndTime: Date): Promise<Artwork> {
+    const [updated] = await db.update(artworks)
+      .set({ endTime: newEndTime })
+      .where(eq(artworks.id, id))
+      .returning();
+    return updated;
   }
 
   async getApprovedArtworksSortedByPromotion(): Promise<Artwork[]> {

@@ -17,6 +17,17 @@ Key features:
 - Welcome onboarding modal for new users to select their role and collect name
 - Role switching available anytime from Dashboard settings
 - Warm earth tone design with gold and silver accents on a cream background
+- Anti-sniping auction system with configurable duration and 2-minute extension rule
+
+### Anti-Sniping Auction System
+- Artworks have a configurable auction duration (1, 3, 5, 7, 14, or 30 days)
+- Auction timer starts when artwork is approved by admin
+- `endTime` field in database tracks exact auction end
+- If a bid is placed within the last 2 minutes, the auction automatically extends by 2 minutes
+- Bids are rejected after auction ends (server-side validation)
+- Live countdown timer on artwork detail page with urgent styling when < 5 minutes remain
+- Gallery cards show "Xd Xh left" or "Ended" time indicators
+- Auction end state disables bidding UI and shows "Auction Has Ended" notice
 
 ### Revenue Split
 - Base: 75% artist, 15% platform, 10% charity

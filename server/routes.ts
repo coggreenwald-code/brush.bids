@@ -228,7 +228,49 @@ export async function registerRoutes(
   app.post(api.bids.create.path, async (req, res) => {
     try {
       const input = api.bids.create.input.parse(req.body);
+      
+      const artwork = await storage.getArtwork(input.artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      if (artwork.status !== "approved") {
+        return res.status(400).json({ message: "Bidding is not open for this artwork" });
+      }
+      
+      if (artwork.paidAt) {
+        return res.status(400).json({ message: "This artwork has already been sold" });
+      }
+
+      const now = new Date();
+      let auctionEndTime: Date;
+      if (artwork.endTime) {
+        auctionEndTime = new Date(artwork.endTime);
+      } else {
+        auctionEndTime = new Date(artwork.createdAt || now);
+        auctionEndTime.setDate(auctionEndTime.getDate() + (artwork.auctionDurationDays || 7));
+      }
+      
+      if (now >= auctionEndTime) {
+        return res.status(400).json({ message: "This auction has ended" });
+      }
+
+      const existingBids = await storage.getBidsForArtwork(input.artworkId);
+      const currentHighest = existingBids.length > 0 ? Math.max(...existingBids.map(b => Number(b.amount))) : Number(artwork.price);
+      if (Number(input.amount) <= currentHighest) {
+        return res.status(400).json({ message: `Bid must be higher than the current price of $${currentHighest}` });
+      }
+
       const bid = await storage.createBid(input);
+
+      const ANTI_SNIPE_WINDOW_MS = 2 * 60 * 1000;
+      const timeRemaining = auctionEndTime.getTime() - now.getTime();
+      if (timeRemaining < ANTI_SNIPE_WINDOW_MS) {
+        const newEndTime = new Date(now.getTime() + ANTI_SNIPE_WINDOW_MS);
+        await storage.extendAuctionEndTime(artwork.id, newEndTime);
+        return res.status(201).json({ ...bid, auctionExtended: true, newEndTime: newEndTime.toISOString() });
+      }
+
       res.status(201).json(bid);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -454,9 +496,13 @@ export async function registerRoutes(
       // Allow re-checkout if previous session didn't complete (no paidAt means not paid)
       // This handles abandoned checkouts
 
-      // Check if auction has ended (createdAt + 7 days)
-      const auctionEndDate = new Date(artwork.createdAt || new Date());
-      auctionEndDate.setDate(auctionEndDate.getDate() + 7);
+      let auctionEndDate: Date;
+      if (artwork.endTime) {
+        auctionEndDate = new Date(artwork.endTime);
+      } else {
+        auctionEndDate = new Date(artwork.createdAt || new Date());
+        auctionEndDate.setDate(auctionEndDate.getDate() + (artwork.auctionDurationDays || 7));
+      }
       if (auctionEndDate > new Date()) {
         return res.status(400).json({ message: "Auction has not ended yet" });
       }

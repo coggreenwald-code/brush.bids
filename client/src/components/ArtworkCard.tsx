@@ -3,7 +3,25 @@ import { type Artwork, type User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Rocket } from "lucide-react";
+import { Rocket, Clock } from "lucide-react";
+
+function getAuctionEndDate(artwork: Artwork): Date {
+  if (artwork.endTime) return new Date(artwork.endTime);
+  const d = new Date(artwork.createdAt || new Date());
+  d.setDate(d.getDate() + (artwork.auctionDurationDays || 7));
+  return d;
+}
+
+function getTimeLeftLabel(endDate: Date): string {
+  const diff = endDate.getTime() - Date.now();
+  if (diff <= 0) return "Ended";
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  if (days > 0) return `${days}d ${hours}h left`;
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  if (hours > 0) return `${hours}h ${minutes}m left`;
+  return `${minutes}m left`;
+}
 
 interface ArtworkCardProps {
   artwork: Artwork & { artist?: User };
@@ -67,6 +85,16 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
             <p className="text-sm text-muted-foreground mt-1">
               by <span className="font-medium text-foreground/80">{artwork.artist ? `${artwork.artist.firstName || ''} ${artwork.artist.lastName || ''}`.trim() || artwork.artistId : artwork.artistId}</span>
             </p>
+            {artwork.status === 'approved' && (
+              <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground" data-testid={`auction-time-${artwork.id}`}>
+                <Clock className="w-3 h-3" />
+                {(() => {
+                  const endDate = getAuctionEndDate(artwork);
+                  const label = getTimeLeftLabel(endDate);
+                  return <span className={label === "Ended" ? "text-red-500 font-medium" : ""}>{label}</span>;
+                })()}
+              </div>
+            )}
           </div>
         </Card>
       </Link>

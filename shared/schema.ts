@@ -21,6 +21,8 @@ export const artworks = pgTable("artworks", {
   aiFeedback: text("ai_feedback"),
   charityId: integer("charity_id"),
   createdAt: timestamp("created_at").defaultNow(),
+  endTime: timestamp("end_time"),
+  auctionDurationDays: integer("auction_duration_days").default(7).notNull(),
   paidAt: timestamp("paid_at"),
   paidBy: varchar("paid_by").references(() => users.id),
   stripeSessionId: text("stripe_session_id"),
@@ -48,7 +50,7 @@ export const charities = pgTable("charities", {
 
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true, createdAt: true, aiScore: true, aiFeedback: true, status: true });
+export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true, createdAt: true, endTime: true, aiScore: true, aiFeedback: true, status: true });
 export const insertBidSchema = createInsertSchema(bids).omit({ id: true, createdAt: true });
 export const insertCharitySchema = createInsertSchema(charities).omit({ id: true });
 

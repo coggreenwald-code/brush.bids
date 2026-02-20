@@ -23,6 +23,7 @@ const formSchema = z.object({
   description: z.string().min(10, "Description too short"),
   imageUrl: z.string().min(1, "Please upload an image of your artwork"),
   price: z.coerce.number().min(1, "Price must be positive"),
+  auctionDurationDays: z.coerce.number().min(1).max(30).default(7),
   charityId: z.coerce.number().optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
 });
@@ -82,6 +83,7 @@ export default function SubmitArtwork() {
       description: "",
       imageUrl: "",
       price: 0,
+      auctionDurationDays: 7,
       reviewType: "ai_instant",
     },
   });
@@ -276,6 +278,34 @@ export default function SubmitArtwork() {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="auctionDurationDays"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Auction Duration</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-auction-duration">
+                            <SelectValue placeholder="Select duration" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="1">1 Day</SelectItem>
+                          <SelectItem value="3">3 Days</SelectItem>
+                          <SelectItem value="5">5 Days</SelectItem>
+                          <SelectItem value="7">7 Days</SelectItem>
+                          <SelectItem value="14">14 Days</SelectItem>
+                          <SelectItem value="30">30 Days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="charityId"

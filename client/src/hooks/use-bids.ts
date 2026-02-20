@@ -33,11 +33,14 @@ export function usePlaceBid() {
         }
         throw new Error('Failed to place bid');
       }
-      return api.bids.create.responses[201].parse(await res.json());
+      return await res.json();
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ 
         queryKey: [api.bids.list.path, variables.artworkId] 
+      });
+      queryClient.invalidateQueries({
+        queryKey: [api.artworks.get.path, variables.artworkId],
       });
     },
   });

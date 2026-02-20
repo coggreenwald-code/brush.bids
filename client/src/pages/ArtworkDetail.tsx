@@ -26,16 +26,15 @@ const bidSchema = z.object({
 });
 
 function CountdownTimer({ endDate }: { endDate: Date }) {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, ended: false });
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const update = () => {
       const now = new Date();
       const diff = endDate.getTime() - now.getTime();
       
       if (diff <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        clearInterval(timer);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, ended: true });
         return;
       }
 
@@ -44,23 +43,35 @@ function CountdownTimer({ endDate }: { endDate: Date }) {
         hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
         minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
         seconds: Math.floor((diff % (1000 * 60)) / 1000),
+        ended: false,
       });
-    }, 1000);
-
+    };
+    update();
+    const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
   }, [endDate]);
 
+  if (timeLeft.ended) {
+    return (
+      <div className="flex items-center gap-2 text-red-600 font-semibold" data-testid="text-auction-ended">
+        <Clock className="w-4 h-4" /> Auction Ended
+      </div>
+    );
+  }
+
+  const isUrgent = timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes < 5;
+
   return (
-    <div className="flex gap-2 text-center">
+    <div className="flex gap-2 text-center" data-testid="countdown-timer">
       {[
         { value: timeLeft.days, label: "Days" },
         { value: timeLeft.hours, label: "Hours" },
         { value: timeLeft.minutes, label: "Min" },
         { value: timeLeft.seconds, label: "Sec" },
       ].map(({ value, label }) => (
-        <div key={label} className="bg-muted rounded-lg px-3 py-2 min-w-[60px]">
-          <div className="text-xl font-mono font-bold">{value.toString().padStart(2, '0')}</div>
-          <div className="text-xs text-muted-foreground">{label}</div>
+        <div key={label} className={`rounded-lg px-3 py-2 min-w-[60px] ${isUrgent ? 'bg-red-100 border border-red-300' : 'bg-muted'}`}>
+          <div className={`text-xl font-mono font-bold ${isUrgent ? 'text-red-600' : ''}`}>{value.toString().padStart(2, '0')}</div>
+          <div className={`text-xs ${isUrgent ? 'text-red-500' : 'text-muted-foreground'}`}>{label}</div>
         </div>
       ))}
     </div>
@@ -95,8 +106,14 @@ export default function ArtworkDetail() {
     ? Math.max(...bids.map(b => Number(b.amount))) 
     : Number(artwork.price);
 
-  const auctionEndDate = new Date(artwork.createdAt || new Date());
-  auctionEndDate.setDate(auctionEndDate.getDate() + 7);
+  const auctionEndDate = artwork.endTime 
+    ? new Date(artwork.endTime)
+    : (() => {
+        const d = new Date(artwork.createdAt || new Date());
+        d.setDate(d.getDate() + ((artwork as any).auctionDurationDays || 7));
+        return d;
+      })();
+  const isAuctionEnded = auctionEndDate <= new Date();
 
   const onSubmit = (data: { amount: string }) => {
     const amount = Number(data.amount);
@@ -115,8 +132,15 @@ export default function ArtworkDetail() {
       bidderId: user.id as unknown as string,
       amount: amount.toString(),
     }, {
-      onSuccess: () => {
-        toast({ title: "Bid Placed!", description: `You successfully bid $${amount}` });
+      onSuccess: (data: any) => {
+        if (data?.auctionExtended) {
+          toast({ 
+            title: "Bid Placed + Time Extended!", 
+            description: `You bid $${amount}. The auction was extended by 2 minutes due to last-minute bidding.` 
+          });
+        } else {
+          toast({ title: "Bid Placed!", description: `You successfully bid $${amount}` });
+        }
         form.reset();
       }
     });
@@ -263,7 +287,7 @@ export default function ArtworkDetail() {
               </div>
             </div>
 
-            {artwork.status === 'approved' ? (
+            {artwork.status === 'approved' && !isAuctionEnded ? (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
@@ -304,11 +328,17 @@ export default function ArtworkDetail() {
                             </Button>
                           ))}
                         </div>
+                        <p className="text-xs text-muted-foreground mt-1">Bids in the last 2 minutes automatically extend the auction by 2 minutes to prevent sniping.</p>
                       </FormItem>
                     )}
                   />
                 </form>
               </Form>
+            ) : isAuctionEnded && artwork.status === 'approved' ? (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center" data-testid="auction-ended-notice">
+                <p className="font-semibold text-red-700">Auction Has Ended</p>
+                <p className="text-sm text-red-600 mt-1">Bidding is no longer available for this artwork.</p>
+              </div>
             ) : (
               <div className="p-4 bg-muted rounded-lg text-center text-muted-foreground">
                 Bidding is not open for this item yet.
