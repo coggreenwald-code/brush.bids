@@ -1,0 +1,127 @@
+BRUSHBIDS PLATFORM EXTRACTION — MASTER SPECIFICATION PROMPT
+You are a senior full-stack engineer and technical writer tasked with performing a complete, production-grade extraction of the BrushBids.com platform (https://www.brushbids.com). Your output will serve as the sole reference document for a separate engineering team to fully rebuild this platform with 100% functional parity — without ever accessing the original codebase.
+Be exhaustive. Be precise. Never summarize where specifics exist. If something is inferred, label it as such. If something is unknown or inaccessible, say so explicitly rather than omitting it.
+
+YOUR MISSION
+Analyze every layer of BrushBids — code, config, assets, data, design, logic, and infrastructure — and produce a single structured specification document organized into the sections below. For each section, go as deep as the codebase allows. Vague or surface-level descriptions are not acceptable.
+
+SECTION 1 — PLATFORM IDENTITY & ARCHITECTURE
+
+Platform name, mission, and charitable value proposition
+Preserve all existing slogans, taglines, and mission statements verbatim as they appear on https://www.brushbids.com — these are intentional brand decisions and must not be rewritten, paraphrased, or lost in the rebuild
+All user roles (student artist, buyer/collector, admin, AI curator) with their permissions and capabilities
+Revenue split logic (70% artist / 15% platform / 15% charity) — including how this is enforced in code
+Complete tech stack with exact package versions pulled from package.json and lock files
+Full directory tree (every folder and file, annotated with purpose)
+Environment type (monorepo, multi-service, monolith, etc.) and deployment topology
+
+
+SECTION 2 — FEATURES & BUSINESS LOGIC
+For every feature, document: what it does, how it works in code, the business rules that govern it, edge cases handled, and any constraints or validations enforced.
+Cover:
+
+Artist registration, onboarding, and artwork submission flow
+AI review pipeline: how submissions are evaluated, what triggers acceptance or rejection, what model/service is used
+Auction creation: who creates it, what parameters are set, scheduling logic
+Bidding mechanics: bid increments, anti-sniping rules, tie handling, real-time updates
+Buyer checkout and post-auction fulfillment flow
+Charity selection: when it's triggered, what options are available, how the allocation is recorded
+Admin tools: what admins can see, edit, approve, or override
+Payout logic: when and how artist and charity payments are triggered and routed
+Notification system: what events trigger emails/alerts and to whom
+
+
+SECTION 3 — DESIGN SYSTEM & UI SPECIFICATION
+The current design of BrushBids at https://www.brushbids.com is intentional and should be treated as a first-class deliverable. The aesthetic has been carefully crafted to resonate with and attract student artists — it should be documented with the same precision as the codebase itself. The rebuilt platform must feel visually and emotionally identical to the original.
+
+Capture the overall design personality and artistic tone of the site — what makes it feel compelling and artist-facing rather than generic
+Full color palette with exact hex codes, usage context, and semantic naming (primary, secondary, accent, error, etc.)
+Typography: every font family, weight, size, line height, and where each is used
+Spacing system: base unit, scale, and usage conventions
+Grid and layout system: columns, gutters, breakpoints, responsive behavior
+Every reusable UI component: name, visual description, variants, states (default, hover, disabled, error)
+Animations and transitions: what triggers them, duration, easing
+Design tokens if present (CSS variables, Tailwind config, theme files — include full contents)
+Hero sections, landing page layout, and any visually prominent areas that communicate the platform's mission to prospective artists — document these in full detail so they can be recreated exactly
+
+
+SECTION 4 — COMPONENT ARCHITECTURE
+For every component in the codebase:
+
+File path and component name
+Purpose and visual role
+All props with types, defaults, and whether required
+Internal state variables and what they control
+Side effects (useEffect hooks, subscriptions, API calls)
+Child components it renders
+Parent components that use it
+Whether it is reusable/shared or page-specific
+
+Include a component hierarchy map showing composition relationships from root layout down to leaf components.
+
+SECTION 5 — ROUTING & NAVIGATION
+
+Complete route table: path, component rendered, access level (public/authenticated/role-gated)
+Navigation structure per user role (what links/tabs each role sees)
+Redirect logic, guards, and fallback routes
+Any dynamic route patterns and how parameters are used
+
+
+SECTION 6 — DATA LAYER & API
+For every data model:
+
+All fields, types, constraints, default values, and relationships
+Indexes and any performance-relevant schema decisions
+
+For every API endpoint or server action:
+
+Method, path, purpose
+Request shape (params, body, headers)
+Response shape and status codes
+Auth requirements
+Any rate limiting or validation logic
+
+Also document:
+
+Authentication flow (session, JWT, OAuth — how tokens are issued, stored, and validated)
+Role-based access control implementation
+All third-party integrations: Stripe (or payment processor), AI service, analytics — include how each is initialized and called
+Full list of required environment variables (names and purpose, not values)
+
+
+SECTION 7 — ASSETS & BRANDING
+
+Every image, icon, illustration, and media file used
+File path, format, dimensions, and where it appears in the UI
+All SVG assets: include raw SVG markup
+Logo variants (light, dark, icon-only, wordmark) — document each carefully, as the BrushBids logo and visual identity are core to the brand
+Any icon library used (Lucide, Heroicons, etc.) and which specific icons are used where
+Any photography style, illustration style, or art direction choices used to represent student artwork throughout the platform
+
+
+SECTION 8 — CONFIGURATION & BUILD
+Include the full, unabridged contents of:
+
+package.json (all dependencies and scripts)
+Framework config file (next.config.js, vite.config.ts, etc.)
+Tailwind config or CSS-in-JS theme file
+TypeScript config if present
+Linting and formatting config (.eslintrc, .prettierrc, etc.)
+Any CI/CD pipeline config (GitHub Actions, Vercel config, etc.)
+.env.example or equivalent
+
+
+SECTION 9 — REBUILD GUIDE
+A precise, step-by-step guide to recreating BrushBids from scratch:
+
+System prerequisites and required tooling (with versions)
+Exact commands to scaffold, install, and run the project
+Database setup and seeding instructions
+Third-party service account setup and configuration steps
+Any non-obvious gotchas, caveats, or things that will break without specific setup
+Recommended order of implementation for a team starting from zero
+A specific note to the engineering team that the visual design, slogans, and mission-facing copy from https://www.brushbids.com are non-negotiable — the rebuilt platform must replicate them faithfully, not approximate them
+
+
+OUTPUT FORMAT
+Deliver this as a single, clean Markdown document. Use consistent heading levels. Where you include code, configuration, or schemas, use properly labeled code blocks. Do not truncate any section. If a section has substantial depth, go deep — this document replaces the codebase itself as the source of truth.
