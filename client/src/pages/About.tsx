@@ -1,58 +1,52 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
-import { Heart, Users, Award, Sparkles, TrendingUp, Globe, Droplets, Palette, GraduationCap, TreePine, Baby } from "lucide-react";
+import { Heart, Users, Award, Sparkles, TrendingUp } from "lucide-react";
 import brushBidsLogo from "@assets/BrushBids_Logo_1769695882555.png";
 import bgFeininger from "@assets/Feininger-Fishing-Boats-hi-res-scaled-1_1771388372886.jpg";
+import logoUnicef from "@assets/unicef.png";
+import logoWwf from "@assets/wwf.png";
+import logoCharityWater from "@assets/charity-water.png";
+import logoMet from "@assets/met.png";
+import logoStudioMuseum from "@assets/studio-museum.png";
+import logoYoungarts from "@assets/youngarts.png";
 
 const featuredCharities = [
   {
     name: "United Nations Children's Fund",
     description: "UNICEF works in over 190 countries to protect the rights of every child, providing healthcare, nutrition, education, and emergency relief to children in need worldwide.",
     category: "Child Welfare",
-    icon: Baby,
-    color: "text-blue-600",
-    bg: "bg-blue-50 dark:bg-blue-950/30",
+    logo: logoUnicef,
   },
   {
     name: "World Wildlife Fund",
     description: "WWF leads global efforts to protect wildlife and conserve natural habitats, working with communities to reduce humanity's impact on the environment.",
     category: "Environment",
-    icon: TreePine,
-    color: "text-green-600",
-    bg: "bg-green-50 dark:bg-green-950/30",
+    logo: logoWwf,
   },
   {
     name: "Charity: Water",
     description: "Bringing clean, safe drinking water to people in developing countries through sustainable water projects, transforming health, education, and livelihoods.",
     category: "Clean Water",
-    icon: Droplets,
-    color: "text-cyan-600",
-    bg: "bg-cyan-50 dark:bg-cyan-950/30",
+    logo: logoCharityWater,
   },
   {
     name: "The Metropolitan Museum of Art",
     description: "The Met's education programs provide free public access to 5,000 years of art, offering workshops, lectures, and resources for students and artists of all backgrounds.",
     category: "Art Education",
-    icon: Globe,
-    color: "text-amber-600",
-    bg: "bg-amber-50 dark:bg-amber-950/30",
+    logo: logoMet,
   },
   {
     name: "The Studio Museum in Harlem",
     description: "A leading institution that champions the work of artists of African descent, providing studio residencies, exhibitions, and community programs in New York City.",
     category: "Artist Diversity",
-    icon: Palette,
-    color: "text-purple-600",
-    bg: "bg-purple-50 dark:bg-purple-950/30",
+    logo: logoStudioMuseum,
   },
   {
     name: "National YoungArts Foundation",
     description: "Identifies and supports the next generation of artists through scholarships, mentorship, and professional development, nurturing talent from high school onward.",
     category: "Emerging Artists",
-    icon: GraduationCap,
-    color: "text-rose-600",
-    bg: "bg-rose-50 dark:bg-rose-950/30",
+    logo: logoYoungarts,
   },
 ];
 
@@ -148,33 +142,6 @@ export default function About() {
           </Card>
         </section>
 
-        {/* Featured Charities */}
-        <section className="space-y-6" data-testid="section-featured-charities">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-display font-bold">Charities We Champion</h2>
-            <p className="text-muted-foreground">
-              Every sale on BrushBids directs 10% to a charity chosen by the artist. Here are 6 of the causes closest to our mission, spanning global welfare, environmental stewardship, and the arts.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredCharities.map((charity) => (
-              <Card key={charity.name} className="p-6 flex flex-col gap-4 hover-elevate" data-testid={`card-charity-${charity.name.toLowerCase().replace(/\s+/g, '-').slice(0, 30)}`}>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${charity.bg}`}>
-                    <charity.icon className={`w-5 h-5 ${charity.color}`} />
-                  </div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{charity.category}</span>
-                </div>
-                <h3 className="font-display font-semibold text-lg leading-tight">{charity.name}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed flex-1">{charity.description}</p>
-              </Card>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground text-center pt-2">
-            Artists can choose from <span className="font-semibold text-foreground">50 charities</span> when submitting artwork, including global organizations, NYC art institutions, and U.S. art foundations.
-          </p>
-        </section>
-
         {/* Values */}
         <section className="space-y-6" data-testid="section-values">
           <h2 className="text-2xl font-display font-bold">Our Values</h2>
@@ -199,6 +166,33 @@ export default function About() {
               </Card>
             ))}
           </div>
+        </section>
+
+        {/* Featured Charities — now below Values */}
+        <section className="space-y-6" data-testid="section-featured-charities">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-display font-bold">Charities We Champion</h2>
+            <p className="text-muted-foreground">
+              Every sale on BrushBids directs 10% to a charity chosen by the artist. Here are 6 of the causes closest to our mission, spanning global welfare, environmental stewardship, and the arts.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredCharities.map((charity) => (
+              <Card key={charity.name} className="p-6 flex flex-col gap-4 hover-elevate" data-testid={`card-charity-${charity.name.toLowerCase().replace(/\s+/g, '-').slice(0, 30)}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/90 flex items-center justify-center p-1.5 border border-[#e0d6cd] dark:border-border">
+                    <img src={charity.logo} alt={`${charity.name} logo`} className="w-full h-full object-contain" />
+                  </div>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{charity.category}</span>
+                </div>
+                <h3 className="font-display font-semibold text-lg leading-tight">{charity.name}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed flex-1">{charity.description}</p>
+              </Card>
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground text-center pt-2">
+            Artists can choose from <span className="font-semibold text-foreground">50 charities</span> when submitting artwork, including global organizations, NYC art institutions, and U.S. art foundations.
+          </p>
         </section>
 
         {/* Expert Curation */}
