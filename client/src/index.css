@@ -242,8 +242,7 @@
   .watermark-text {
     position: absolute;
     top: -0.5em;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
     font-size: clamp(6rem, 15vw, 14rem);
     font-family: var(--font-sans);
     font-weight: 800;
