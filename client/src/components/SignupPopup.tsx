@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Palette, Heart, DollarSign, Award } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const POPUP_DISMISSED_KEY = "brushbids_signup_popup_dismissed";
 
@@ -11,6 +11,7 @@ export function SignupPopup() {
   const { isAuthenticated } = useAuth();
   const [location] = useLocation();
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     if (isAuthenticated || location !== "/") return;
@@ -36,56 +37,40 @@ export function SignupPopup() {
 
   return (
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
-      <DialogContent className="sm:max-w-md" data-testid="signup-popup">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-display text-center">Join the BrushBids Community</DialogTitle>
-          <DialogDescription className="text-center text-base mt-2">
-            Connect with emerging student artists, discover unique artwork, and support charitable causes.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-md p-8" data-testid="signup-popup">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <h2 className="text-2xl font-display font-bold text-[#E8C874]" data-testid="text-popup-title">
+            Get 5% Off Your First Purchase
+          </h2>
 
-        <div className="grid grid-cols-2 gap-3 my-4">
-          {[
-            { icon: Palette, label: "Submit & sell your art" },
-            { icon: Award, label: "Bid on unique pieces" },
-            { icon: Heart, label: "Support charities" },
-            { icon: DollarSign, label: "Earn as an artist" },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-2 p-3 rounded-lg bg-[#F9F0EA] text-sm">
-              <Icon className="w-4 h-4 text-[#B8965A] flex-shrink-0" />
-              <span className="text-[#4C392D]">{label}</span>
-            </div>
-          ))}
-        </div>
+          <p className="text-sm text-[#4C392D]" data-testid="text-popup-description">
+            Enter your email. Get your 5% off code. Be the first to know about all things BrushBids.
+          </p>
 
-        <div className="space-y-2">
+          <Input
+            type="email"
+            placeholder="Your email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border-[#9E8472]/40 focus-visible:ring-[#E8C874]"
+            data-testid="input-popup-email"
+          />
+
           <Button
-            className="w-full rounded-full bg-[#4C392D] hover:bg-[#3a2b22] text-white"
-            onClick={() => { handleDismiss(); setLoc("/auth"); }}
-            data-testid="button-signup-popup-create"
+            className="w-full rounded-full bg-[#E8C874] hover:bg-[#d4b563] text-[#4C392D] font-semibold text-base py-5"
+            onClick={() => { handleDismiss(true); setLoc("/auth"); }}
+            data-testid="button-popup-get-discount"
           >
-            Create Free Account
+            Get my 5% off
           </Button>
-          <div className="flex justify-between items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs text-muted-foreground"
-              onClick={() => handleDismiss(true)}
-              data-testid="button-signup-popup-dont-show"
-            >
-              Don't show again
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs text-muted-foreground"
-              onClick={() => handleDismiss()}
-              data-testid="button-signup-popup-dismiss"
-            >
-              Maybe later
-            </Button>
-          </div>
+
+          <button
+            className="text-xs font-bold underline text-[#4C392D]/70 hover:text-[#4C392D] transition-colors cursor-pointer"
+            onClick={() => handleDismiss(true)}
+            data-testid="button-popup-reject"
+          >
+            Reject my 5% off
+          </button>
         </div>
       </DialogContent>
     </Dialog>

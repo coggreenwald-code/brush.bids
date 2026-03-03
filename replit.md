@@ -18,7 +18,7 @@ Key features:
 - Role switching available anytime from Dashboard settings
 - Warm earth tone design with gold and silver accents on a cream background
 - Anti-sniping auction system with configurable duration and 2-minute extension rule
-- Artist portfolio section with 2-week sell pipeline
+- Artist portfolio section with 2-week sell pipeline (integrated as Dashboard tab)
 - QR code generation for approved artworks (for art shows)
 - 20-second delayed signup popup for new homepage visitors
 - Artwork dimensions (Length x Width in inches) required during submission

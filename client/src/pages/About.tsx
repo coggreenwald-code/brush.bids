@@ -55,25 +55,21 @@ const values = [
     icon: Heart,
     title: "Supporting Artists",
     description: "We believe every student artist deserves a platform to showcase their work and earn recognition.",
-    bgPosition: "left top",
   },
   {
     icon: Award,
     title: "Quality First",
     description: "Our expert curation ensures only the highest quality work reaches collectors, maintaining trust on both sides.",
-    bgPosition: "right top",
   },
   {
     icon: Users,
     title: "Community Driven",
     description: "We're building a community where artists, collectors, and charities come together for a common good.",
-    bgPosition: "left bottom",
   },
   {
     icon: TrendingUp,
     title: "Fair Compensation",
     description: "Artists receive 75% of every sale, ensuring they're fairly compensated for their creative work.",
-    bgPosition: "right bottom",
   },
 ];
 
@@ -147,22 +143,12 @@ export default function About() {
           <h2 className="text-2xl font-display font-bold">Our Values</h2>
           <div className="grid sm:grid-cols-2 gap-6">
             {values.map((value) => (
-              <Card key={value.title} className="relative overflow-hidden p-6">
-                <div className="absolute inset-0 pointer-events-none">
-                  <img
-                    src={bgFeininger}
-                    alt=""
-                    className="w-[200%] h-[200%] object-cover opacity-[0.22] dark:opacity-[0.11]"
-                    style={{ objectPosition: value.bgPosition }}
-                  />
+              <Card key={value.title} className="p-6">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <value.icon className="w-5 h-5 text-primary" />
                 </div>
-                <div className="relative z-10">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <value.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
-                  <p className="text-sm text-muted-foreground">{value.description}</p>
-                </div>
+                <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
+                <p className="text-sm text-muted-foreground">{value.description}</p>
               </Card>
             ))}
           </div>

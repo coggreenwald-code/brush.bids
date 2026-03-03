@@ -10,8 +10,7 @@ import {
   Home,
   Heart,
   ChevronDown,
-  Users,
-  FolderOpen
+  Users
 } from "lucide-react";
 import logoImage from "@/assets/logo.png";
 import { useState } from "react";
@@ -36,7 +35,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { label: "Gallery", href: "/gallery", icon: Palette, roles: ["all"] },
     { label: "About", href: "/about", icon: Users, roles: ["all"] },
     { label: "My Bids", href: "/my-bids", icon: Heart, roles: ["buyer", "both"] },
-    { label: "Portfolio", href: "/portfolio", icon: FolderOpen, roles: ["artist", "both"] },
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["artist", "both"] },
     { label: "Admin", href: "/admin", icon: ShieldCheck, roles: ["admin"] },
   ];
