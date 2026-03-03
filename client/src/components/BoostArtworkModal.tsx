@@ -50,14 +50,14 @@ const boostTiers = [
     name: "Premium Boost",
     description: "Top placement + featured badge",
     icon: Zap,
-    color: "text-[#E8C874]",
+    color: "text-[#A78BFA]",
   },
   {
     percentage: 20,
     name: "Elite Boost",
     description: "Maximum visibility + special highlighting",
     icon: Crown,
-    color: "text-[#E8C874]",
+    color: "text-[#A78BFA]",
   },
 ];
 
@@ -102,8 +102,8 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10" data-testid="dialog-boost-artwork">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[#E8C874]">
-            <Rocket className="w-5 h-5 text-[#E8C874]" />
+          <DialogTitle className="flex items-center gap-2 text-[#A78BFA]">
+            <Rocket className="w-5 h-5 text-[#A78BFA]" />
             Boost Your Listing
           </DialogTitle>
           <DialogDescription className="text-white/50">
@@ -141,10 +141,10 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
                 />
                 <Label
                   htmlFor={`boost-${tier.percentage}`}
-                  className="flex items-center gap-4 p-4 border border-white/10 rounded-lg cursor-pointer transition-all peer-data-[state=checked]:border-[#E8C874]/50 peer-data-[state=checked]:bg-[#E8C874]/5 hover:bg-white/5"
+                  className="flex items-center gap-4 p-4 border border-white/10 rounded-lg cursor-pointer transition-all peer-data-[state=checked]:border-[#A78BFA]/50 peer-data-[state=checked]:bg-[#A78BFA]/5 hover:bg-white/5"
                   data-testid={`option-boost-${tier.percentage}`}
                 >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tier.icon ? 'bg-[#E8C874]/10' : 'bg-white/5'}`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tier.icon ? 'bg-[#A78BFA]/10' : 'bg-white/5'}`}>
                     {tier.icon ? <tier.icon className={`w-5 h-5 ${tier.color}`} /> : <span className="text-white/40">-</span>}
                   </div>
                   <div className="flex-1">
@@ -172,8 +172,8 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
           </RadioGroup>
 
           {parseInt(selectedPercentage) > 0 && (
-            <div className="bg-[#E8C874]/5 border border-[#E8C874]/20 rounded-lg p-4 space-y-2">
-              <h5 className="font-medium flex items-center gap-2 text-[#E8C874]">
+            <div className="bg-[#F472B6]/5 border border-[#F472B6]/20 rounded-lg p-4 space-y-2">
+              <h5 className="font-medium flex items-center gap-2 text-[#F472B6]">
                 {selectedTier?.icon && <selectedTier.icon className={`w-4 h-4 ${selectedTier.color}`} />}
                 Fee Breakdown
               </h5>
@@ -205,7 +205,7 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
           <Button 
             onClick={handleSave} 
             disabled={mutation.isPending}
-            className="rounded-full bg-[#E8C874] hover:bg-[#d4b563] text-[#0a0a0f] font-semibold"
+            className="rounded-full bg-[#A78BFA] text-white font-semibold"
             data-testid="button-save-boost"
           >
             {mutation.isPending ? "Saving..." : "Save Boost Settings"}

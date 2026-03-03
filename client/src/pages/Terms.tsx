@@ -7,10 +7,10 @@ export default function Terms() {
     <Layout>
       <div className="space-y-12 pb-16 max-w-3xl mx-auto">
         <section className="text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-[#E8C874]/10 flex items-center justify-center mx-auto">
-            <FileText className="w-8 h-8 text-[#E8C874]" />
+          <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">
+            <FileText className="w-8 h-8 text-[#A78BFA]" />
           </div>
-          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Legal</span>
+          <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Legal</span>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-white">Terms & Conditions</h1>
           <p className="text-white/40">Last updated: January 2026</p>
         </section>

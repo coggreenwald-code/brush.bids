@@ -96,7 +96,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   >
                     {item.label}
                     {isActive && (
-                      <span className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E8C874] to-transparent" />
+                      <span className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#A78BFA] to-transparent" />
                     )}
                   </button>
                 </Link>
@@ -110,7 +110,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors" data-testid="button-user-menu">
                     <Avatar className="w-7 h-7">
-                      <AvatarFallback className="bg-[#E8C874]/20 text-[#E8C874] text-xs font-bold border border-[#E8C874]/30">
+                      <AvatarFallback className="bg-[#A78BFA]/20 text-[#A78BFA] text-xs font-bold border border-[#A78BFA]/30">
                         {user?.firstName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -140,7 +140,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link href="/auth">
                 <Button 
-                  className="rounded-full text-sm bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] font-medium px-6"
+                  className="rounded-full text-sm bg-[#A78BFA] text-[#0a0a0f] font-medium px-6"
                   data-testid="button-sign-in"
                 >
                   Sign In
@@ -169,7 +169,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                       className={cn(
                         "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm transition-colors",
                         isActive 
-                          ? "text-[#E8C874] bg-[#E8C874]/10 font-medium" 
+                          ? "text-[#A78BFA] bg-[#A78BFA]/10 font-medium" 
                           : "text-white/60 hover:text-white hover:bg-white/5"
                       )}
                       onClick={() => setMobileMenuOpen(false)}

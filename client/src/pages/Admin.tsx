@@ -125,13 +125,13 @@ export default function Admin() {
       <div className="space-y-6 pb-16">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Administration</span>
+            <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Administration</span>
             <h1 className="text-3xl font-display font-bold text-white mt-1" data-testid="text-admin-title">Admin Curation Portal</h1>
             <p className="text-white/50">Review, approve, reject, or remove artwork submissions</p>
           </div>
           
           {pendingCount > 0 && (
-            <Badge variant="outline" className="bg-[#E8C874]/10 text-[#E8C874] border-[#E8C874]/20">
+            <Badge variant="outline" className="bg-[#A78BFA]/10 text-[#A78BFA] border-[#A78BFA]/20">
               <AlertCircle className="w-3 h-3 mr-1" />
               {pendingCount} pending review
             </Badge>
@@ -140,7 +140,7 @@ export default function Admin() {
 
         <div className="grid grid-cols-3 gap-4">
           <div className="p-4 text-center rounded-xl bg-white/[0.02] border border-white/5">
-            <div className="text-2xl font-bold text-[#E8C874]" data-testid="text-pending-count">{pendingCount}</div>
+            <div className="text-2xl font-bold text-[#A78BFA]" data-testid="text-pending-count">{pendingCount}</div>
             <div className="text-sm text-white/40">Pending</div>
           </div>
           <div className="p-4 text-center rounded-xl bg-white/[0.02] border border-white/5">
@@ -228,7 +228,7 @@ export default function Admin() {
                             variant="outline" 
                             className={
                               artwork.status === 'pending' 
-                                ? "bg-[#E8C874]/10 text-[#E8C874] border-[#E8C874]/20" 
+                                ? "bg-[#A78BFA]/10 text-[#A78BFA] border-[#A78BFA]/20" 
                                 : artwork.status === 'approved'
                                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                                 : "bg-red-500/10 text-red-400 border-red-500/20"
@@ -246,10 +246,10 @@ export default function Admin() {
                       <p className="text-sm text-white/60 line-clamp-2">{artwork.description}</p>
                       
                       {artwork.aiScore ? (
-                        <div className="bg-[#E8C874]/5 border border-[#E8C874]/10 p-4 rounded-lg">
+                        <div className="bg-[#A78BFA]/5 border border-[#A78BFA]/10 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <Sparkles className="w-4 h-4 text-[#E8C874]" />
-                            <span className="font-bold text-[#E8C874]">AI Score: {artwork.aiScore}/100</span>
+                            <Sparkles className="w-4 h-4 text-[#A78BFA]" />
+                            <span className="font-bold text-[#A78BFA]">AI Score: {artwork.aiScore}/100</span>
                           </div>
                           <p className="text-sm italic text-white/50">"{artwork.aiFeedback}"</p>
                         </div>

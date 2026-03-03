@@ -210,7 +210,7 @@ export default function SubmitArtwork() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Create Listing</span>
+          <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Create Listing</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">Submit Artwork</h1>
           <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
         </div>
@@ -418,7 +418,7 @@ export default function SubmitArtwork() {
                           </div>
                         ) : (
                           <div 
-                            className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-[#E8C874]/30 hover:bg-white/[0.02]"
+                            className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-[#A78BFA]/30 hover:bg-white/[0.02]"
                             onClick={() => fileInputRef.current?.click()}
                             data-testid="dropzone-image"
                           >
@@ -513,11 +513,11 @@ export default function SubmitArtwork() {
                     <FormControl>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div 
-                          className={`cursor-pointer transition-all rounded-xl p-4 flex flex-col items-center text-center gap-3 border ${field.value === "ai_instant" ? "ring-2 ring-[#E8C874] border-[#E8C874]/30 bg-[#E8C874]/5" : "border-white/5 bg-white/[0.02] hover:border-white/10"}`}
+                          className={`cursor-pointer transition-all rounded-xl p-4 flex flex-col items-center text-center gap-3 border ${field.value === "ai_instant" ? "ring-2 ring-[#A78BFA] border-[#A78BFA]/30 bg-[#A78BFA]/5" : "border-white/5 bg-white/[0.02] hover:border-white/10"}`}
                           onClick={() => field.onChange("ai_instant")}
                           data-testid="card-review-ai"
                         >
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-[#E8C874] text-[#0a0a0f]" : "bg-white/5 text-white/50"}`}>
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-[#A78BFA] text-[#0a0a0f]" : "bg-white/5 text-white/50"}`}>
                             <Zap className="w-6 h-6" />
                           </div>
                           <div>
@@ -525,7 +525,7 @@ export default function SubmitArtwork() {
                             <p className="text-xs text-white/40 mt-1">
                               Get immediate feedback from our review tool, trained by experienced curators for accurate, expert-level analysis.
                             </p>
-                            <span className="inline-block mt-2 text-xs font-medium text-[#E8C874]">Results in seconds</span>
+                            <span className="inline-block mt-2 text-xs font-medium text-[#A78BFA]">Results in seconds</span>
                           </div>
                         </div>
 
@@ -555,7 +555,7 @@ export default function SubmitArtwork() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90"
+                className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90"
                 disabled={createArtwork.isPending}
                 data-testid="button-submit-artwork"
               >

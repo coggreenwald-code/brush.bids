@@ -99,7 +99,7 @@ export default function Gallery() {
           className="border-b border-white/5 mb-12"
         >
           <div className="max-w-7xl mx-auto px-6 py-16">
-            <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+            <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">
               Curated Collection
             </span>
             <h1 className="text-5xl md:text-6xl font-display font-bold mt-4 text-white">
@@ -121,7 +121,7 @@ export default function Gallery() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                 <input
                   placeholder="Search artworks..."
-                  className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-white/20 focus:bg-white/[0.07] transition-colors"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-[#A78BFA]/40 focus:bg-white/[0.07] transition-colors"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   data-testid="input-gallery-search"
@@ -135,7 +135,7 @@ export default function Gallery() {
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-4 py-2 rounded-full text-sm transition-all duration-200 ${
                       selectedCategory === cat
-                        ? "bg-[#E8C874] text-[#0a0a0f] font-medium"
+                        ? "bg-[#A78BFA] text-[#0a0a0f] font-medium"
                         : "border border-white/10 text-white/60 hover:bg-white/5 hover:text-white hover:border-white/20"
                     }`}
                     data-testid={`filter-category-${cat.toLowerCase().replace(/\s+/g, "-")}`}
@@ -241,7 +241,7 @@ export default function Gallery() {
             ))}
             <button
               onClick={clearFilters}
-              className="text-sm text-[#E8C874] hover:text-[#E8C874]/80 transition-colors"
+              className="text-sm text-[#A78BFA] hover:text-[#A78BFA]/80 transition-colors"
               data-testid="button-clear-all"
             >
               Clear all
@@ -258,8 +258,8 @@ export default function Gallery() {
             </div>
           ) : filteredArtworks.length === 0 ? (
             <div className="py-24 text-center border border-white/5 rounded-md bg-white/[0.02]">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#E8C874]/10 flex items-center justify-center">
-                <Palette className="w-10 h-10 text-[#E8C874]" />
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#A78BFA]/10 flex items-center justify-center">
+                <Palette className="w-10 h-10 text-[#A78BFA]" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">No Artworks Found</h3>
               <p className="text-white/50 mb-6">

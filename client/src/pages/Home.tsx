@@ -105,7 +105,7 @@ function TestimonialSlider() {
             "{testimonials[current].quote}"
           </p>
           <div>
-            <p className="text-[#E8C874] font-semibold">{testimonials[current].name}</p>
+            <p className="text-[#F472B6] font-semibold">{testimonials[current].name}</p>
             <p className="text-white/40 text-sm">{testimonials[current].role}</p>
           </div>
         </motion.div>
@@ -117,7 +117,7 @@ function TestimonialSlider() {
             onClick={() => setCurrent(i)}
             className={cn(
               "rounded-full transition-all duration-300",
-              i === current ? "w-8 h-2 bg-[#E8C874]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
+              i === current ? "w-8 h-2 bg-[#A78BFA]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
             )}
             data-testid={`testimonial-dot-${i}`}
           />
@@ -238,7 +238,7 @@ export default function Home() {
                   data-testid="text-hero-title"
                 >
                   Your Art.{" "}
-                  <span className="gradient-text" style={{ backgroundImage: "linear-gradient(135deg, #E8C874, #F5DFA0, #E8C874)" }}>Your Future.</span>
+                  <span className="gradient-text">Your Future.</span>
                 </motion.h1>
 
                 <motion.p
@@ -258,7 +258,7 @@ export default function Home() {
                   transition={{ duration: 0.7, delay: 0.3 }}
                 >
                   <Link href="/gallery">
-                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] gap-2 px-8 font-semibold">
+                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-full bg-[#A78BFA] text-white gap-2 px-8 font-semibold">
                       Explore Gallery <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
@@ -283,7 +283,7 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Curated Collection</span>
+              <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Curated Collection</span>
               <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">Featured<br />Works</h2>
             </motion.div>
 
@@ -444,7 +444,7 @@ export default function Home() {
                       className={cn(
                         "rounded-full transition-all duration-300",
                         i === currentIndex
-                          ? "w-6 h-2 bg-[#E8C874]"
+                          ? "w-6 h-2 bg-[#A78BFA]"
                           : "w-2 h-2 bg-white/20"
                       )}
                       data-testid={`coverflow-dot-${i}`}
@@ -468,184 +468,211 @@ export default function Home() {
 
         {/* How It Works */}
         <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
-          <div className="absolute inset-0 hero-gradient" />
+          <div className="absolute inset-0 bg-mesh-purple section-tint-purple" />
+          <div className="geometric-lines" />
+          <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
+          <div className="floating-orb gradient-orb-blue w-[250px] h-[250px] -bottom-16 -left-16 animate-float-reverse opacity-30" />
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
-            <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5 }}
-            >
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Simple Process</span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">How It Works</h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
+            <div className="section-outlined p-8 md:p-12 lg:p-16">
+              <div className="watermark-text">Process</div>
               <motion.div
-                className="flex flex-col"
-                initial={{ opacity: 0, y: 30 }}
+                className="text-center mb-16 relative z-10"
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="mb-8 border-b border-white/10 pb-4">
-                  <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.2em]">Artists</span>
-                  <h3 className="text-xl md:text-2xl font-semibold mt-2 text-white">Start selling your work</h3>
-                </div>
-                <div className="space-y-2 flex-1">
-                  {howItWorksArtist.map((step, i) => (
-                    <motion.div
-                      key={step.title}
-                      className="flex gap-5 items-start rounded-lg p-4 -mx-4 transition-colors hover:bg-white/5 cursor-default"
-                      whileHover={hasPointer ? { x: 4 } : undefined}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      data-testid={`step-artist-${i}`}
-                    >
-                      <span className="flex-shrink-0 text-2xl font-bold text-[#E8C874]/30 leading-none pt-0.5 tabular-nums">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <div>
-                        <h4 className="font-semibold text-base text-white uppercase tracking-wide">{step.title}</h4>
-                        <p className="text-sm text-white/50 mt-1 leading-relaxed">{step.description}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-                <Link href="/submit-artwork">
-                  <Button data-testid="button-start-selling" className="mt-10 rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] px-8 font-semibold" size="lg">Start Selling</Button>
-                </Link>
+                <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Simple Process</span>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">How It Works</h2>
               </motion.div>
 
-              <motion.div
-                className="flex flex-col"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <div className="mb-8 border-b border-white/10 pb-4">
-                  <span className="text-xs font-medium text-white/40 uppercase tracking-[0.2em]">Collectors</span>
-                  <h3 className="text-xl md:text-2xl font-semibold mt-2 text-white">Discover emerging talent</h3>
-                </div>
-                <div className="space-y-2 flex-1">
-                  {howItWorksBuyer.map((step, i) => (
-                    <motion.div
-                      key={step.title}
-                      className="flex gap-5 items-start rounded-lg p-4 -mx-4 transition-colors hover:bg-white/5 cursor-default"
-                      whileHover={hasPointer ? { x: 4 } : undefined}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      data-testid={`step-collector-${i}`}
-                    >
-                      <span className="flex-shrink-0 text-2xl font-bold text-white/15 leading-none pt-0.5 tabular-nums">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <div>
-                        <h4 className="font-semibold text-base text-white uppercase tracking-wide">{step.title}</h4>
-                        <p className="text-sm text-white/50 mt-1 leading-relaxed">{step.description}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-                <Link href="/gallery">
-                  <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-full px-8 border-white/20 text-white hover:bg-white/10 bg-transparent font-semibold" size="lg">Browse Gallery</Button>
-                </Link>
-              </motion.div>
+              <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto relative z-10">
+                <motion.div
+                  className="flex flex-col"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="mb-8 border-b border-white/10 pb-4">
+                    <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.2em]">Artists</span>
+                    <h3 className="text-xl md:text-2xl font-semibold mt-2 text-white">Start selling your work</h3>
+                  </div>
+                  <div className="space-y-2 flex-1">
+                    {howItWorksArtist.map((step, i) => (
+                      <motion.div
+                        key={step.title}
+                        className="flex gap-5 items-start rounded-lg p-4 -mx-4 transition-colors hover:bg-white/5 cursor-default"
+                        whileHover={hasPointer ? { x: 4 } : undefined}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        data-testid={`step-artist-${i}`}
+                      >
+                        <span className="flex-shrink-0 text-2xl font-bold text-[#A78BFA]/30 leading-none pt-0.5 tabular-nums">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <div>
+                          <h4 className="font-semibold text-base text-white uppercase tracking-wide">{step.title}</h4>
+                          <p className="text-sm text-white/50 mt-1 leading-relaxed">{step.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <Link href="/submit-artwork">
+                    <Button data-testid="button-start-selling" className="mt-10 rounded-full bg-[#A78BFA] text-white px-8 font-semibold" size="lg">Start Selling</Button>
+                  </Link>
+                </motion.div>
+
+                <motion.div
+                  className="flex flex-col"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  <div className="mb-8 border-b border-white/10 pb-4">
+                    <span className="text-xs font-medium text-[#60A5FA] uppercase tracking-[0.2em]">Collectors</span>
+                    <h3 className="text-xl md:text-2xl font-semibold mt-2 text-white">Discover emerging talent</h3>
+                  </div>
+                  <div className="space-y-2 flex-1">
+                    {howItWorksBuyer.map((step, i) => (
+                      <motion.div
+                        key={step.title}
+                        className="flex gap-5 items-start rounded-lg p-4 -mx-4 transition-colors hover:bg-white/5 cursor-default"
+                        whileHover={hasPointer ? { x: 4 } : undefined}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        data-testid={`step-collector-${i}`}
+                      >
+                        <span className="flex-shrink-0 text-2xl font-bold text-[#60A5FA]/20 leading-none pt-0.5 tabular-nums">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <div>
+                          <h4 className="font-semibold text-base text-white uppercase tracking-wide">{step.title}</h4>
+                          <p className="text-sm text-white/50 mt-1 leading-relaxed">{step.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <Link href="/gallery">
+                    <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-full px-8 border-white/20 text-white hover:bg-white/10 bg-transparent font-semibold" size="lg">Browse Gallery</Button>
+                  </Link>
+                </motion.div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Stats */}
         <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
-          <div className="absolute inset-0 bg-[#0d0d14]" />
+          <div className="absolute inset-0 bg-mesh-blue section-tint-blue bg-dots" />
+          <div className="floating-orb gradient-orb-blue w-[280px] h-[280px] -top-16 -left-20 animate-float-slow opacity-35" />
+          <div className="floating-orb gradient-orb-pink w-[220px] h-[220px] -bottom-12 -right-16 animate-float-reverse opacity-30" />
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
-            <motion.div
-              className="mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">By The Numbers</span>
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">Our<br />Impact</h2>
-            </motion.div>
-            <div className="divider-line mb-12" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: 0.08 * i, duration: 0.4 }}
-                  className="rounded-xl p-6 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-default"
-                >
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-[#E8C874]/10 border border-[#E8C874]/20">
-                    <stat.icon className="w-5 h-5 text-[#E8C874]" />
-                  </div>
-                  <p className="text-3xl md:text-4xl font-bold tabular-nums text-white" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <CountUpNumber value={stat.value} />
-                  </p>
-                  <p className="text-sm text-white/40 mt-2 tracking-wide uppercase">{stat.label}</p>
-                </motion.div>
-              ))}
+            <div className="section-outlined p-8 md:p-12 lg:p-16">
+              <div className="watermark-text">Impact</div>
+              <motion.div
+                className="mb-12 relative z-10"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="text-xs font-medium text-[#60A5FA] uppercase tracking-[0.3em] mb-3 block">By The Numbers</span>
+                <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">Our<br />Impact</h2>
+              </motion.div>
+              <div className="divider-line mb-12 relative z-10" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative z-10">
+                {stats.map((stat, i) => {
+                  const statColors = ["#A78BFA", "#34D399", "#F472B6", "#60A5FA"];
+                  const color = statColors[i % statColors.length];
+                  return (
+                    <motion.div
+                      key={stat.label}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ delay: 0.08 * i, duration: 0.4 }}
+                      className="rounded-xl p-6 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-default"
+                    >
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: `${color}15`, borderColor: `${color}30`, borderWidth: '1px' }}>
+                        <stat.icon className="w-5 h-5" style={{ color }} />
+                      </div>
+                      <p className="text-3xl md:text-4xl font-bold tabular-nums text-white" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                        <CountUpNumber value={stat.value} />
+                      </p>
+                      <p className="text-sm text-white/40 mt-2 tracking-wide uppercase">{stat.label}</p>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Testimonials */}
         <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-testimonials">
-          <div className="absolute inset-0 hero-gradient" />
+          <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
+          <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
+          <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
-            <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Community</span>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">What People Say</h2>
-            </motion.div>
-            <TestimonialSlider />
+            <div className="section-outlined p-8 md:p-12 lg:p-16">
+              <div className="watermark-text">Voices</div>
+              <motion.div
+                className="text-center mb-12 relative z-10"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="text-xs font-medium text-[#F472B6] uppercase tracking-[0.3em] mb-3 block">Community</span>
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight">What People Say</h2>
+              </motion.div>
+              <div className="relative z-10">
+                <TestimonialSlider />
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Revenue Split */}
         <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-revenue-split">
-          <div className="absolute inset-0 bg-[#0d0d14]" />
+          <div className="absolute inset-0 bg-mesh-purple bg-grid-fine" />
+          <div className="floating-orb gradient-orb-emerald w-[240px] h-[240px] -top-16 -right-16 animate-float-slow opacity-30" />
+          <div className="floating-orb gradient-orb-purple w-[200px] h-[200px] -bottom-12 -left-12 animate-float-reverse opacity-25" />
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
-            <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Transparent Pricing</span>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Where Your Money Goes</h2>
-              <p className="text-white/50 mt-4 max-w-xl mx-auto">Every sale is split transparently between the artist, the platform, and a charity of the artist's choice.</p>
-            </motion.div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { pct: "75%", label: "Artist", desc: "Goes directly to the student artist", color: "#E8C874" },
-                { pct: "15%", label: "Platform", desc: "Supports BrushBids operations", color: "#6B7280" },
-                { pct: "10%", label: "Charity", desc: "Donated to a cause the artist chooses", color: "#34D399" },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 * i, duration: 0.4 }}
-                  className="rounded-xl border border-white/5 bg-white/[0.02] p-8 text-center hover:border-white/10 transition-colors"
-                  data-testid={`revenue-split-${item.label.toLowerCase()}`}
-                >
-                  <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: item.color }}>{item.pct}</p>
-                  <p className="text-white font-semibold text-lg mb-1">{item.label}</p>
-                  <p className="text-white/40 text-sm">{item.desc}</p>
-                </motion.div>
-              ))}
+            <div className="section-outlined p-8 md:p-12 lg:p-16">
+              <div className="watermark-text">Transparency</div>
+              <motion.div
+                className="text-center mb-16 relative z-10"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Transparent Pricing</span>
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Where Your Money Goes</h2>
+                <p className="text-white/50 mt-4 max-w-xl mx-auto">Every sale is split transparently between the artist, the platform, and a charity of the artist's choice.</p>
+              </motion.div>
+              <div className="grid md:grid-cols-3 gap-6 relative z-10">
+                {[
+                  { pct: "75%", label: "Artist", desc: "Goes directly to the student artist", color: "#A78BFA" },
+                  { pct: "15%", label: "Platform", desc: "Supports BrushBids operations", color: "#60A5FA" },
+                  { pct: "10%", label: "Charity", desc: "Donated to a cause the artist chooses", color: "#34D399" },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 * i, duration: 0.4 }}
+                    className="rounded-xl border border-white/5 bg-white/[0.02] p-8 text-center hover:border-white/10 transition-colors"
+                    data-testid={`revenue-split-${item.label.toLowerCase()}`}
+                  >
+                    <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: item.color }}>{item.pct}</p>
+                    <p className="text-white font-semibold text-lg mb-1">{item.label}</p>
+                    <p className="text-white/40 text-sm">{item.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -693,7 +720,7 @@ export default function Home() {
                   transition={{ duration: 0.7, delay: 0.2 }}
                 >
                   <Link href="/submit-artwork">
-                    <Button size="lg" className="rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] gap-2 px-8 font-semibold" data-testid="button-cta-submit">
+                    <Button size="lg" className="rounded-full bg-[#A78BFA] text-white gap-2 px-8 font-semibold" data-testid="button-cta-submit">
                       Submit Your Art <Upload className="w-4 h-4" />
                     </Button>
                   </Link>

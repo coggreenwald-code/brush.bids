@@ -61,7 +61,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
 
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
             {(artwork.promotionPercentage ?? 0) > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#E8C874]/20 text-[#E8C874] border border-[#E8C874]/30 backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#A78BFA]/20 text-[#A78BFA] border border-[#A78BFA]/30 backdrop-blur-sm">
                 <Rocket className="w-3 h-3" />
                 Boosted
               </span>
@@ -71,7 +71,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
           <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
             <p className="text-white/80 text-sm font-medium">View artwork</p>
             {artwork.price && (
-              <p className="text-[#E8C874] text-sm font-semibold mt-1">
+              <p className="text-[#34D399] text-sm font-semibold mt-1">
                 Starting at ${Number(artwork.price).toLocaleString()}
               </p>
             )}
@@ -79,7 +79,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
         </div>
 
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="font-display text-lg font-semibold text-white line-clamp-1 group-hover:text-[#E8C874] transition-colors duration-300">
+          <h3 className="font-display text-lg font-semibold text-white line-clamp-1 group-hover:text-[#F472B6] transition-colors duration-300">
             {artwork.title}
           </h3>
           <p className="text-sm text-white/50 mt-1">
@@ -92,7 +92,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
           </p>
           {artwork.status === "approved" && (
             <div
-              className="flex items-center gap-1 mt-3 text-xs text-white/40"
+              className="flex items-center gap-1 mt-3 text-xs text-[#60A5FA]/70"
               data-testid={`auction-time-${artwork.id}`}
             >
               <Clock className="w-3 h-3" />

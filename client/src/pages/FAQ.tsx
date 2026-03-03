@@ -77,10 +77,10 @@ export default function FAQ() {
     <Layout>
       <div className="space-y-16 pb-16 max-w-3xl mx-auto">
         <section className="text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-[#E8C874]/10 flex items-center justify-center mx-auto">
-            <HelpCircle className="w-8 h-8 text-[#E8C874]" />
+          <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">
+            <HelpCircle className="w-8 h-8 text-[#A78BFA]" />
           </div>
-          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Support</span>
+          <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Support</span>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-white">Frequently Asked Questions</h1>
           <p className="text-xl text-white/50">
             Find answers to common questions about BrushBids.
@@ -92,7 +92,7 @@ export default function FAQ() {
           <Accordion type="single" collapsible className="space-y-2">
             {artistFaqs.map((faq, i) => (
               <AccordionItem key={i} value={`artist-${i}`} className="border border-white/5 rounded-lg px-4 bg-white/[0.02]" data-testid={`faq-artist-${i}`}>
-                <AccordionTrigger className="text-left hover:no-underline text-white/90 hover:text-[#E8C874]">
+                <AccordionTrigger className="text-left hover:no-underline text-white/90 hover:text-[#A78BFA]">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-white/50">
@@ -108,7 +108,7 @@ export default function FAQ() {
           <Accordion type="single" collapsible className="space-y-2">
             {buyerFaqs.map((faq, i) => (
               <AccordionItem key={i} value={`buyer-${i}`} className="border border-white/5 rounded-lg px-4 bg-white/[0.02]" data-testid={`faq-buyer-${i}`}>
-                <AccordionTrigger className="text-left hover:no-underline text-white/90 hover:text-[#E8C874]">
+                <AccordionTrigger className="text-left hover:no-underline text-white/90 hover:text-[#A78BFA]">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-white/50">
@@ -124,7 +124,7 @@ export default function FAQ() {
           <Accordion type="single" collapsible className="space-y-2">
             {generalFaqs.map((faq, i) => (
               <AccordionItem key={i} value={`general-${i}`} className="border border-white/5 rounded-lg px-4 bg-white/[0.02]" data-testid={`faq-general-${i}`}>
-                <AccordionTrigger className="text-left hover:no-underline text-white/90 hover:text-[#E8C874]">
+                <AccordionTrigger className="text-left hover:no-underline text-white/90 hover:text-[#A78BFA]">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-white/50">
@@ -138,7 +138,7 @@ export default function FAQ() {
         <section className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/5">
           <h3 className="text-xl font-bold text-white mb-2">Still have questions?</h3>
           <p className="text-white/50 mb-4">Can't find what you're looking for? Reach out to our support team.</p>
-          <a href="/contact" className="text-[#E8C874] font-semibold hover:underline" data-testid="link-faq-contact">Contact Support</a>
+          <a href="/contact" className="text-[#A78BFA] font-semibold hover:underline" data-testid="link-faq-contact">Contact Support</a>
         </section>
       </div>
 

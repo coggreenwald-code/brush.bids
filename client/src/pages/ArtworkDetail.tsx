@@ -194,7 +194,7 @@ export default function ArtworkDetail() {
             </div>
 
             <div className="bg-white/[0.02] border border-white/5 rounded-md p-6">
-              <p className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-5">Revenue Distribution</p>
+              <p className="text-xs font-medium text-violet-400 uppercase tracking-[0.3em] mb-5">Revenue Distribution</p>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-center mb-2">
@@ -202,7 +202,7 @@ export default function ArtworkDetail() {
                     <span className="font-mono text-sm font-semibold text-white">${revenueSplit.artist.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-[#E8C874]" style={{ width: '75%' }} />
+                    <div className="h-full rounded-full bg-violet-500" style={{ width: '75%' }} />
                   </div>
                 </div>
                 <div>
@@ -211,7 +211,7 @@ export default function ArtworkDetail() {
                     <span className="font-mono text-sm text-white/70">${revenueSplit.platform.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-white/30" style={{ width: '15%' }} />
+                    <div className="h-full rounded-full bg-blue-400" style={{ width: '15%' }} />
                   </div>
                 </div>
                 <div>
@@ -236,10 +236,10 @@ export default function ArtworkDetail() {
             <div>
               <div className="flex items-center gap-2 mb-4 flex-wrap">
                 {artwork.status === 'pending' && (
-                  <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Pending Review</span>
+                  <span className="text-xs font-medium text-violet-400 uppercase tracking-[0.3em]">Pending Review</span>
                 )}
                 {artwork.status === 'approved' && (
-                  <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Live Auction</span>
+                  <span className="text-xs font-medium text-violet-400 uppercase tracking-[0.3em]">Live Auction</span>
                 )}
               </div>
               <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-6 leading-tight" data-testid="text-artwork-title">{artwork.title}</h1>
@@ -251,7 +251,7 @@ export default function ArtworkDetail() {
                   </Avatar>
                   <div>
                     <p className="text-xs text-white/40 uppercase tracking-widest">Artist</p>
-                    <p className="text-sm font-medium text-white group-hover:text-[#E8C874] transition-colors">
+                    <p className="text-sm font-medium text-white group-hover:text-violet-400 transition-colors">
                       {artist?.firstName && artist?.lastName 
                         ? `${artist.firstName} ${artist.lastName}` 
                         : artist?.username || `Artist #${artwork.artistId}`}
@@ -264,7 +264,7 @@ export default function ArtworkDetail() {
             <div className="h-px bg-white/5" />
 
             <div className="space-y-3">
-              <p className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">About This Work</p>
+              <p className="text-xs font-medium text-violet-400 uppercase tracking-[0.3em]">About This Work</p>
               <p className="text-base leading-relaxed text-white/60">
                 {artwork.description}
               </p>
@@ -278,7 +278,7 @@ export default function ArtworkDetail() {
 
             {artist && (
               <div className="bg-white/[0.02] border border-white/5 rounded-md p-5">
-                <p className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                <p className="text-xs font-medium text-violet-400 uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
                   <User className="w-3.5 h-3.5" /> About the Artist
                 </p>
                 <Link href={`/artist/${artwork.artistId}`}>
@@ -288,7 +288,7 @@ export default function ArtworkDetail() {
                       <AvatarFallback className="bg-white/[0.05] text-white/60">{artist.firstName?.charAt(0) || 'A'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="font-medium text-white group-hover:text-[#E8C874] transition-colors">
+                      <p className="font-medium text-white group-hover:text-violet-400 transition-colors">
                         {artist.firstName && artist.lastName 
                           ? `${artist.firstName} ${artist.lastName}` 
                           : artist.username || `Artist #${artwork.artistId}`}
@@ -298,7 +298,7 @@ export default function ArtworkDetail() {
                       ) : (
                         <p className="text-sm text-white/30 mt-1 italic">This artist hasn't added a bio yet.</p>
                       )}
-                      <span className="text-xs text-[#E8C874] mt-2 inline-block" data-testid="link-view-artist-profile">
+                      <span className="text-xs text-violet-400 mt-2 inline-block" data-testid="link-view-artist-profile">
                         View Full Profile
                       </span>
                     </div>
@@ -307,11 +307,11 @@ export default function ArtworkDetail() {
               </div>
             )}
 
-            <div className={`bg-white/[0.02] border rounded-md p-6 space-y-6 ${isActiveAuction ? 'border-[#E8C874]/30 glow-gold' : 'border-white/5'}`}>
+            <div className={`bg-white/[0.02] border rounded-md p-6 space-y-6 ${isActiveAuction ? 'border-violet-400/30 glow-purple' : 'border-white/5'}`}>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <p className="text-xs text-white/40 uppercase tracking-widest mb-1">Current Price</p>
-                  <div className="text-3xl font-mono font-bold text-[#E8C874]" data-testid="text-current-price">
+                  <div className="text-3xl font-mono font-bold text-emerald-400" data-testid="text-current-price">
                     ${currentPrice.toLocaleString()}
                   </div>
                 </div>
@@ -337,7 +337,7 @@ export default function ArtworkDetail() {
                               <FormControl>
                                 <Input 
                                   type="number" 
-                                  className="pl-9 h-12 text-lg bg-white/[0.03] border-white/10 text-white placeholder:text-white/30 focus:border-[#E8C874]/50 focus:ring-[#E8C874]/20" 
+                                  className="pl-9 h-12 text-lg bg-white/[0.03] border-white/10 text-white placeholder:text-white/30 focus:border-violet-400/50 focus:ring-violet-400/20" 
                                   placeholder={(currentPrice + 10).toString()} 
                                   data-testid="input-bid-amount"
                                   {...field} 
@@ -346,7 +346,7 @@ export default function ArtworkDetail() {
                             </div>
                             <Button 
                               type="submit" 
-                              className="h-12 px-8 rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b566] font-semibold" 
+                              className="h-12 px-8 rounded-full bg-violet-500 text-white font-semibold" 
                               disabled={placeBid.isPending} 
                               data-testid="button-place-bid"
                             >
@@ -432,7 +432,7 @@ export default function ArtworkDetail() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-5">Bid History</p>
+              <p className="text-xs font-medium text-violet-400 uppercase tracking-[0.3em] mb-5">Bid History</p>
               <div className="space-y-0 max-h-72 overflow-y-auto pr-1">
                 {loadingBids ? (
                   <p className="text-white/40">Loading bids...</p>
@@ -448,7 +448,7 @@ export default function ArtworkDetail() {
                         <div>
                           <p className="font-medium text-sm text-white/80 flex items-center gap-2 flex-wrap">
                             Bidder #{bid.bidderId}
-                            {index === 0 && <Badge className="text-[10px] bg-[#E8C874]/10 text-[#E8C874] border-[#E8C874]/20">Highest</Badge>}
+                            {index === 0 && <Badge className="text-[10px] bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Highest</Badge>}
                           </p>
                           <p className="text-xs text-white/30">
                             {new Date(bid.createdAt || "").toLocaleString()}

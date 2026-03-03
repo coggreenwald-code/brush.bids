@@ -39,7 +39,7 @@ export function SignupPopup() {
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
       <DialogContent className="sm:max-w-md p-8 bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10" data-testid="signup-popup">
         <div className="flex flex-col items-center text-center space-y-4">
-          <h2 className="text-2xl font-display font-bold text-[#E8C874]" data-testid="text-popup-title">
+          <h2 className="text-2xl font-display font-bold gradient-text" data-testid="text-popup-title">
             Get 5% Off Your First Purchase
           </h2>
 
@@ -52,12 +52,12 @@ export function SignupPopup() {
             placeholder="Your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-[#E8C874]"
+            className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-[#A78BFA]"
             data-testid="input-popup-email"
           />
 
           <Button
-            className="w-full rounded-full bg-[#E8C874] hover:bg-[#d4b563] text-[#0a0a0f] font-semibold text-base py-5"
+            className="w-full rounded-full bg-[#A78BFA] text-white font-semibold text-base py-5"
             onClick={() => { handleDismiss(true); setLoc("/auth"); }}
             data-testid="button-popup-get-discount"
           >

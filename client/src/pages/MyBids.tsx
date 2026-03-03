@@ -122,7 +122,7 @@ export default function MyBids() {
             <p className="text-white/50 mb-6">
               Please sign in to view your bids and watchlist.
             </p>
-            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid="button-login-bids">
+            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid="button-login-bids">
               Sign In
             </Button>
           </div>
@@ -133,7 +133,7 @@ export default function MyBids() {
   }
 
   const stats = [
-    { label: "Active Bids", value: activeBids.length, icon: Gavel, color: "text-[#E8C874]" },
+    { label: "Active Bids", value: activeBids.length, icon: Gavel, color: "text-[#A78BFA]" },
     { label: "Auctions Won", value: wonBids.length, icon: TrendingUp, color: "text-emerald-400" },
     { label: "Outbid", value: outbidBids.length, icon: AlertCircle, color: "text-orange-400" },
   ];
@@ -142,7 +142,7 @@ export default function MyBids() {
     <Layout>
       <div className="space-y-8 pb-16">
         <div>
-          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Activity</span>
+          <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Activity</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">My Bids</h1>
           <p className="text-white/50">Track your active bids and auction history</p>
         </div>
@@ -198,7 +198,7 @@ export default function MyBids() {
                   You're not currently the highest bidder on any active auction.
                 </p>
                 <Link href="/gallery">
-                  <Button className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid="button-browse-gallery-bids">Browse Gallery</Button>
+                  <Button className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid="button-browse-gallery-bids">Browse Gallery</Button>
                 </Link>
               </div>
             ) : (
@@ -215,7 +215,7 @@ export default function MyBids() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <h3 className="font-semibold text-white hover:text-[#E8C874] truncate transition-colors" data-testid={`link-bid-artwork-${bid.artworkId}`}>
+                          <h3 className="font-semibold text-white hover:text-[#A78BFA] truncate transition-colors" data-testid={`link-bid-artwork-${bid.artworkId}`}>
                             {bid.artwork?.title || `Artwork #${bid.artworkId}`}
                           </h3>
                         </Link>
@@ -263,7 +263,7 @@ export default function MyBids() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <h3 className="font-semibold text-white hover:text-[#E8C874] truncate transition-colors">
+                          <h3 className="font-semibold text-white hover:text-[#A78BFA] truncate transition-colors">
                             {bid.artwork?.title || `Artwork #${bid.artworkId}`}
                           </h3>
                         </Link>
@@ -280,7 +280,7 @@ export default function MyBids() {
                       </div>
                       {!bid.auctionEnded && (
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <Button size="sm" className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid={`button-rebid-${bid.artworkId}`}>Bid Again</Button>
+                          <Button size="sm" className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid={`button-rebid-${bid.artworkId}`}>Bid Again</Button>
                         </Link>
                       )}
                     </div>
@@ -303,8 +303,8 @@ export default function MyBids() {
             )}
             {paymentStatus === 'success' && paymentArtworkId && 
              !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
-              <div className="mb-6 p-5 rounded-xl bg-[#E8C874]/5 border border-[#E8C874]/10">
-                <div className="flex items-center gap-2 text-[#E8C874] font-semibold text-base pb-2">
+              <div className="mb-6 p-5 rounded-xl bg-[#A78BFA]/5 border border-[#A78BFA]/10">
+                <div className="flex items-center gap-2 text-[#A78BFA] font-semibold text-base pb-2">
                   <Clock className="w-5 h-5" />
                   Payment Processing
                 </div>
@@ -337,7 +337,7 @@ export default function MyBids() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <h3 className="font-semibold text-white hover:text-[#E8C874] truncate transition-colors">
+                          <h3 className="font-semibold text-white hover:text-[#A78BFA] truncate transition-colors">
                             {bid.artwork?.title || `Artwork #${bid.artworkId}`}
                           </h3>
                         </Link>
@@ -346,13 +346,13 @@ export default function MyBids() {
                       <div className="text-right">
                         <p className="text-sm text-white/40">Winning Bid</p>
                         <p className="text-lg font-mono font-bold text-emerald-400">${bid.userHighestBid.toLocaleString()}</p>
-                        <Badge className={`mt-1 ${bid.isPaid ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-[#E8C874]/20 text-[#E8C874] border border-[#E8C874]/20'}`}>{bid.isPaid ? 'Paid' : 'Won'}</Badge>
+                        <Badge className={`mt-1 ${bid.isPaid ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-[#A78BFA]/20 text-[#A78BFA] border border-[#A78BFA]/20'}`}>{bid.isPaid ? 'Paid' : 'Won'}</Badge>
                       </div>
                       {!bid.isPaid && (
                         <Button 
                           onClick={() => handlePayNow(bid.artworkId)}
                           disabled={processingPayment === bid.artworkId}
-                          className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90"
+                          className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90"
                           data-testid={`button-pay-${bid.artworkId}`}
                         >
                           {processingPayment === bid.artworkId ? (

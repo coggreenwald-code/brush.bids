@@ -30,7 +30,7 @@ export default function Auth() {
             <div className="w-12 h-12 mx-auto mb-4">
               <img src={logoImage} alt="BrushBids" className="w-full h-full invert" />
             </div>
-            <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Welcome Back</span>
+            <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Welcome Back</span>
             <h1 className="text-3xl font-display font-semibold tracking-tight text-white mt-2" data-testid="text-auth-title">
               Welcome to BrushBids
             </h1>
@@ -57,11 +57,11 @@ export default function Auth() {
           <div className="mt-8 text-center">
             <p className="text-xs text-white/40 leading-relaxed">
               By continuing, you agree to our{" "}
-              <a href="/terms" className="underline underline-offset-2 text-[#E8C874]/70 hover:text-[#E8C874] transition-colors" data-testid="link-terms">
+              <a href="/terms" className="underline underline-offset-2 text-[#A78BFA]/70 hover:text-[#A78BFA] transition-colors" data-testid="link-terms">
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="/terms" className="underline underline-offset-2 text-[#E8C874]/70 hover:text-[#E8C874] transition-colors" data-testid="link-privacy">
+              <a href="/terms" className="underline underline-offset-2 text-[#A78BFA]/70 hover:text-[#A78BFA] transition-colors" data-testid="link-privacy">
                 Privacy Policy
               </a>
               .

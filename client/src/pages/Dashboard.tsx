@@ -32,7 +32,7 @@ function SaleCountdown({ listedAt }: { listedAt: string }) {
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
   return (
-    <span className="text-xs text-[#E8C874] font-medium flex items-center gap-1" data-testid="text-sale-countdown">
+    <span className="text-xs text-[#A78BFA] font-medium flex items-center gap-1" data-testid="text-sale-countdown">
       <Clock className="w-3 h-3" /> {days}d {hours}h left to sell
     </span>
   );
@@ -235,7 +235,7 @@ export default function Dashboard() {
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-bold text-white">Please Sign In</h2>
             <p className="text-white/60">You need to be logged in to view your dashboard.</p>
-            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b563]">Login</Button>
+            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#A78BFA] text-[#0a0a0f]">Login</Button>
           </div>
         </div>
       </Layout>
@@ -247,7 +247,7 @@ export default function Dashboard() {
       <div className="space-y-8">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
-            <span className="text-sm font-medium text-[#E8C874] uppercase tracking-widest">Your Studio</span>
+            <span className="text-sm font-medium text-[#A78BFA] uppercase tracking-widest">Your Studio</span>
             <h1 className="text-3xl font-display font-bold mt-1 text-white">
               {user.role === "buyer" ? "Collector Dashboard" : user.role === "both" ? "Artist & Collector Dashboard" : "Artist Dashboard"}
             </h1>
@@ -255,7 +255,7 @@ export default function Dashboard() {
           </div>
           {(user.role === "artist" || user.role === "both") && (
             <Link href="/submit-artwork">
-              <Button className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold px-6">
+              <Button className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold px-6">
                 <Plus className="mr-2 h-5 w-5" /> Submit New Art
               </Button>
             </Link>
@@ -266,7 +266,7 @@ export default function Dashboard() {
           <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
             <div className="flex items-center justify-between gap-2 mb-3">
               <span className="text-sm font-medium text-white/50">Total Earnings</span>
-              <DollarSign className="h-4 w-4 text-[#E8C874]" />
+              <DollarSign className="h-4 w-4 text-emerald-400" />
             </div>
             <div className="text-2xl font-bold text-white">${Math.round(totalEarnings).toLocaleString()}</div>
             <p className="text-xs text-white/40 mt-1">{totalSold > 0 ? `From ${totalSold} sale${totalSold > 1 ? 's' : ''}` : 'No sales yet'}</p>
@@ -275,7 +275,7 @@ export default function Dashboard() {
           <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
             <div className="flex items-center justify-between gap-2 mb-3">
               <span className="text-sm font-medium text-white/50">Active Listings</span>
-              <Palette className="h-4 w-4 text-[#E8C874]" />
+              <Palette className="h-4 w-4 text-[#A78BFA]" />
             </div>
             <div className="text-2xl font-bold text-white">{activeListings}</div>
             <p className="text-xs text-white/40 mt-1">{pendingReview > 0 ? `${pendingReview} pending review` : 'None pending review'}</p>
@@ -306,16 +306,16 @@ export default function Dashboard() {
               
               <TabsContent value="artworks" className="space-y-6">
                 {isLoading ? (
-                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#E8C874]" /></div>
+                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#A78BFA]" /></div>
                 ) : myArtworks.length === 0 ? (
                   <div className="text-center py-16 border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#E8C874]/10 flex items-center justify-center">
-                      <Palette className="w-8 h-8 text-[#E8C874]" />
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#A78BFA]/10 flex items-center justify-center">
+                      <Palette className="w-8 h-8 text-[#A78BFA]" />
                     </div>
                     <h3 className="text-lg font-semibold text-white">No artworks yet</h3>
                     <p className="text-white/50 mb-4">Start your journey by submitting your first piece.</p>
                     <Link href="/submit-artwork">
-                      <Button className="rounded-full bg-[#E8C874] text-[#0a0a0f]">Submit Art</Button>
+                      <Button className="rounded-full bg-[#A78BFA] text-[#0a0a0f]">Submit Art</Button>
                     </Link>
                   </div>
                 ) : (
@@ -341,7 +341,7 @@ export default function Dashboard() {
                               {artwork.status}
                             </Badge>
                             {(artwork.promotionPercentage ?? 0) > 0 && (
-                              <Badge variant="outline" className="bg-[#E8C874]/90 text-[#0a0a0f] border-[#E8C874]/50">
+                              <Badge variant="outline" className="bg-[#A78BFA]/90 text-white border-[#A78BFA]/50">
                                 <Rocket className="w-3 h-3 mr-1" />
                                 {artwork.promotionPercentage}% Boost
                               </Badge>
@@ -367,7 +367,7 @@ export default function Dashboard() {
                           <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
                             <div>
                               <div className="text-xs text-white/40">Current Bid</div>
-                              <div className="font-bold text-[#E8C874]">${Number(artwork.price).toLocaleString()}</div>
+                              <div className="font-bold text-emerald-400">${Number(artwork.price).toLocaleString()}</div>
                             </div>
                             <div className="flex gap-2 flex-wrap">
                               {artwork.status === 'approved' && !artwork.paidAt && (
@@ -386,7 +386,7 @@ export default function Dashboard() {
                                   </Button>
                                   <Button 
                                     size="sm" 
-                                    className={`rounded-full ${(artwork.promotionPercentage ?? 0) > 0 ? 'border-white/10 text-white/70 bg-transparent border' : 'bg-[#E8C874] text-[#0a0a0f]'}`}
+                                    className={`rounded-full ${(artwork.promotionPercentage ?? 0) > 0 ? 'border-white/10 text-white/70 bg-transparent border' : 'bg-[#A78BFA] text-[#0a0a0f]'}`}
                                     onClick={(e) => {
                                       e.preventDefault();
                                       setBoostArtwork(artwork);
@@ -410,18 +410,18 @@ export default function Dashboard() {
               <TabsContent value="portfolio" className="space-y-6">
                 <div className="flex justify-between items-center flex-wrap gap-2">
                   <p className="text-sm text-white/50">Showcase your artwork. List pieces for sale or submit them to auction.</p>
-                  <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full bg-[#E8C874] text-[#0a0a0f] gap-1" data-testid="button-add-portfolio">
+                  <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full bg-[#A78BFA] text-[#0a0a0f] gap-1" data-testid="button-add-portfolio">
                     <Plus className="w-4 h-4" /> Add Artwork
                   </Button>
                 </div>
                 {portfolioLoading ? (
-                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#E8C874]" /></div>
+                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#A78BFA]" /></div>
                 ) : !portfolioItems || portfolioItems.length === 0 ? (
                   <div className="text-center py-16 border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
                     <Palette className="w-12 h-12 mx-auto mb-4 text-white/30" />
                     <h3 className="text-lg font-semibold text-white">Your portfolio is empty</h3>
                     <p className="text-white/50 mb-4">Start building your portfolio by adding your artwork.</p>
-                    <Button onClick={() => setShowAddForm(true)} className="rounded-full bg-[#E8C874] text-[#0a0a0f] gap-2" data-testid="button-add-portfolio-empty">
+                    <Button onClick={() => setShowAddForm(true)} className="rounded-full bg-[#A78BFA] text-[#0a0a0f] gap-2" data-testid="button-add-portfolio-empty">
                       <Plus className="w-4 h-4" /> Add Your First Piece
                     </Button>
                   </div>
@@ -432,7 +432,7 @@ export default function Dashboard() {
                         <div className="aspect-square overflow-hidden bg-white/[0.02] relative rounded-t-lg">
                           <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                           {item.listedForSale && (
-                            <Badge className="absolute top-2 right-2 bg-[#E8C874] text-[#0a0a0f]" data-testid={`badge-listed-${item.id}`}>
+                            <Badge className="absolute top-2 right-2 bg-emerald-500 text-white" data-testid={`badge-listed-${item.id}`}>
                               <DollarSign className="w-3 h-3 mr-1" /> Listed
                             </Badge>
                           )}
@@ -504,7 +504,7 @@ export default function Dashboard() {
                         contentStyle={{ backgroundColor: '#0d0d14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
                         labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
                       />
-                      <Bar dataKey="earnings" fill="#E8C874" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="earnings" fill="#A78BFA" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -522,7 +522,7 @@ export default function Dashboard() {
             <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
               <div className="flex items-center justify-between gap-2 mb-4">
                 <h3 className="text-white font-semibold flex items-center gap-2">
-                  <User className="w-5 h-5 text-[#E8C874]" /> Your Profile
+                  <User className="w-5 h-5 text-[#A78BFA]" /> Your Profile
                 </h3>
               </div>
               <div className="space-y-4">
@@ -575,7 +575,7 @@ export default function Dashboard() {
                         </Button>
                         <Button 
                           size="sm" 
-                          className="rounded-full bg-[#E8C874] text-[#0a0a0f]"
+                          className="rounded-full bg-[#A78BFA] text-[#0a0a0f]"
                           onClick={() => updateNameMutation.mutate({ firstName: firstName.trim(), lastName: lastName.trim() })}
                           disabled={updateNameMutation.isPending || !firstName.trim() || !lastName.trim()}
                           data-testid="button-save-name"
@@ -640,7 +640,7 @@ export default function Dashboard() {
                         </Button>
                         <Button 
                           size="sm" 
-                          className="rounded-full bg-[#E8C874] text-[#0a0a0f]"
+                          className="rounded-full bg-[#A78BFA] text-[#0a0a0f]"
                           onClick={() => updateBioMutation.mutate(bioText)}
                           disabled={updateBioMutation.isPending}
                           data-testid="button-save-bio"
@@ -677,7 +677,7 @@ export default function Dashboard() {
 
             <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
               <h3 className="text-white font-semibold flex items-center gap-2 mb-3">
-                <Settings className="w-5 h-5 text-[#E8C874]" /> Account Type
+                <Settings className="w-5 h-5 text-[#60A5FA]" /> Account Type
               </h3>
               <div className="space-y-3">
                 <p className="text-sm text-white/50">
@@ -687,7 +687,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "artist" ? "default" : "outline"} 
                     size="sm"
-                    className={`rounded-full ${user?.role === "artist" ? "bg-[#E8C874] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
+                    className={`rounded-full ${user?.role === "artist" ? "bg-[#A78BFA] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("artist")}
                     disabled={updateRoleMutation.isPending || user?.role === "artist"}
                     data-testid="button-role-artist"
@@ -697,7 +697,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "buyer" ? "default" : "outline"} 
                     size="sm"
-                    className={`rounded-full ${user?.role === "buyer" ? "bg-[#E8C874] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
+                    className={`rounded-full ${user?.role === "buyer" ? "bg-[#A78BFA] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("buyer")}
                     disabled={updateRoleMutation.isPending || user?.role === "buyer"}
                     data-testid="button-role-collector"
@@ -707,7 +707,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "both" ? "default" : "outline"} 
                     size="sm"
-                    className={`rounded-full ${user?.role === "both" ? "bg-[#E8C874] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
+                    className={`rounded-full ${user?.role === "both" ? "bg-[#A78BFA] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("both")}
                     disabled={updateRoleMutation.isPending || user?.role === "both"}
                     data-testid="button-role-both"
@@ -723,8 +723,8 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="rounded-lg p-5 border border-[#E8C874]/20 bg-gradient-to-br from-[#E8C874]/10 to-transparent">
-              <h3 className="text-[#E8C874] font-semibold mb-2">Pro Tip</h3>
+            <div className="rounded-lg p-5 border border-[#A78BFA]/20 bg-gradient-to-br from-[#A78BFA]/10 to-transparent">
+              <h3 className="text-[#A78BFA] font-semibold mb-2">Pro Tip</h3>
               <p className="text-white/60 text-sm">
                 Boost your listings to get more visibility! Promoted artworks appear first in the gallery and attract more bidders.
               </p>
@@ -781,14 +781,14 @@ export default function Dashboard() {
                   <img src={imagePreview} alt="Preview" className="w-full max-h-48 object-contain" />
                 </div>
               ) : (
-                <div className="border border-dashed border-white/10 rounded-md p-6 text-center cursor-pointer hover:border-[#E8C874]/30 hover:bg-white/[0.02] transition-colors" onClick={() => fileInputRef.current?.click()} data-testid="dropzone-portfolio-image">
+                <div className="border border-dashed border-white/10 rounded-md p-6 text-center cursor-pointer hover:border-[#A78BFA]/30 hover:bg-white/[0.02] transition-colors" onClick={() => fileInputRef.current?.click()} data-testid="dropzone-portfolio-image">
                   <ImagePlus className="w-8 h-8 mx-auto mb-2 text-white/30" />
                   <p className="text-sm text-white/40">Click to upload</p>
                 </div>
               )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} data-testid="input-portfolio-file" />
             </div>
-            <Button className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold" disabled={!newItem.title || !newItem.imageUrl || createItem.isPending} onClick={() => createItem.mutate(newItem)} data-testid="button-save-portfolio">
+            <Button className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold" disabled={!newItem.title || !newItem.imageUrl || createItem.isPending} onClick={() => createItem.mutate(newItem)} data-testid="button-save-portfolio">
               {createItem.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Add to Portfolio
             </Button>
@@ -807,7 +807,7 @@ export default function Dashboard() {
               <Label className="text-white/60">Price ($)</Label>
               <Input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} placeholder="100" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-sell-price" />
             </div>
-            <Button className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold" disabled={!sellPrice || Number(sellPrice) <= 0 || listForSale.isPending} onClick={() => showSellDialog && listForSale.mutate({ id: showSellDialog.id, price: Number(sellPrice) })} data-testid="button-confirm-list">
+            <Button className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold" disabled={!sellPrice || Number(sellPrice) <= 0 || listForSale.isPending} onClick={() => showSellDialog && listForSale.mutate({ id: showSellDialog.id, price: Number(sellPrice) })} data-testid="button-confirm-list">
               {listForSale.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               List for Sale (2-Week Window)
             </Button>
@@ -856,7 +856,7 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
+            <Button className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
               {convertToAuction.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Submit for Review
             </Button>

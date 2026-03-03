@@ -66,10 +66,10 @@ export default function Contact() {
     <Layout>
       <div className="space-y-16 pb-16 max-w-5xl mx-auto">
         <section className="text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-[#E8C874]/10 flex items-center justify-center mx-auto">
-            <MessageSquare className="w-8 h-8 text-[#E8C874]" />
+          <div className="w-16 h-16 rounded-2xl bg-[#60A5FA]/10 flex items-center justify-center mx-auto">
+            <MessageSquare className="w-8 h-8 text-[#A78BFA]" />
           </div>
-          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Get in Touch</span>
+          <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Get in Touch</span>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-white">Contact Us</h1>
           <p className="text-xl text-white/50 max-w-2xl mx-auto">
             Have a question or feedback? We'd love to hear from you.
@@ -81,8 +81,8 @@ export default function Contact() {
             {contactInfo.map((info) => (
               <div key={info.title} className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#E8C874]/10 flex items-center justify-center flex-shrink-0">
-                    <info.icon className="w-5 h-5 text-[#E8C874]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#60A5FA]/10 flex items-center justify-center flex-shrink-0">
+                    <info.icon className="w-5 h-5 text-[#60A5FA]" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-white">{info.title}</h3>
@@ -93,13 +93,13 @@ export default function Contact() {
               </div>
             ))}
 
-            <div className="p-6 rounded-xl bg-[#E8C874]/5 border border-[#E8C874]/10">
+            <div className="p-6 rounded-xl bg-[#60A5FA]/5 border border-[#60A5FA]/10">
               <div className="flex items-start gap-4">
-                <HelpCircle className="w-5 h-5 text-[#E8C874] mt-1" />
+                <HelpCircle className="w-5 h-5 text-[#A78BFA] mt-1" />
                 <div>
                   <h3 className="font-semibold text-white mb-2">Need Quick Help?</h3>
                   <p className="text-sm text-white/50">
-                    Check our <a href="/faq" className="text-[#E8C874] hover:underline" data-testid="link-contact-faq">FAQ page</a> for instant answers to common questions.
+                    Check our <a href="/faq" className="text-[#A78BFA] hover:underline" data-testid="link-contact-faq">FAQ page</a> for instant answers to common questions.
                   </p>
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function Contact() {
                   )}
                 />
 
-                <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid="button-contact-submit">
+                <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid="button-contact-submit">
                   Send Message
                 </Button>
               </form>

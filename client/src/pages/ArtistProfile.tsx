@@ -67,7 +67,7 @@ export default function ArtistProfile() {
               <AvatarFallback className="text-4xl bg-white/10 text-white">{artist.firstName?.charAt(0) || 'A'}</AvatarFallback>
             </Avatar>
             <div className="flex-1 text-center md:text-left">
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Artist Profile</span>
+              <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Artist Profile</span>
               <h1 className="text-3xl font-display font-bold text-white mt-1" data-testid="text-artist-name">{artistName}</h1>
               <Badge variant="outline" className="mt-2 capitalize border-white/10 text-white/60">{artist.role}</Badge>
               {artist.createdAt && (
@@ -90,7 +90,7 @@ export default function ArtistProfile() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-6 text-center rounded-xl bg-white/[0.02] border border-white/5">
-            <Palette className="w-8 h-8 mx-auto mb-2 text-[#E8C874]" />
+            <Palette className="w-8 h-8 mx-auto mb-2 text-[#A78BFA]" />
             <p className="text-3xl font-bold text-white">{artistArtworks.length}</p>
             <p className="text-sm text-white/40">Total Artworks</p>
           </div>
@@ -100,7 +100,7 @@ export default function ArtistProfile() {
             <p className="text-sm text-white/40">Works Sold</p>
           </div>
           <div className="p-6 text-center rounded-xl bg-white/[0.02] border border-white/5">
-            <DollarSign className="w-8 h-8 mx-auto mb-2 text-[#E8C874]" />
+            <DollarSign className="w-8 h-8 mx-auto mb-2 text-emerald-400" />
             <p className="text-3xl font-bold text-white">${totalEarnings.toLocaleString()}</p>
             <p className="text-sm text-white/40">Total Earnings</p>
           </div>
@@ -120,12 +120,12 @@ export default function ArtistProfile() {
                         className="w-full h-full object-cover"
                       />
                       {artwork.promotionPercentage && artwork.promotionPercentage > 0 && (
-                        <Badge className="absolute top-2 right-2 bg-[#E8C874] text-[#0a0a0f]">Boosted</Badge>
+                        <Badge className="absolute top-2 right-2 bg-[#A78BFA] text-[#0a0a0f]">Boosted</Badge>
                       )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-white truncate">{artwork.title}</h3>
-                      <p className="text-lg font-mono font-bold text-[#E8C874] mt-1">${Number(artwork.price).toLocaleString()}</p>
+                      <p className="text-lg font-mono font-bold text-emerald-400 mt-1">${Number(artwork.price).toLocaleString()}</p>
                     </div>
                   </div>
                 </Link>
@@ -168,7 +168,7 @@ export default function ArtistProfile() {
         {portfolioItems && portfolioItems.length > 0 && (
           <div>
             <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-2">
-              <FolderOpen className="w-6 h-6 text-[#E8C874]" /> Portfolio
+              <FolderOpen className="w-6 h-6 text-[#60A5FA]" /> Portfolio
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {portfolioItems.map((item) => (
@@ -176,14 +176,14 @@ export default function ArtistProfile() {
                   <div className="aspect-square bg-white/5 relative rounded-t-xl overflow-hidden">
                     <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
                     {item.listedForSale && (
-                      <Badge className="absolute top-2 right-2 bg-[#E8C874] text-[#0a0a0f]">For Sale</Badge>
+                      <Badge className="absolute top-2 right-2 bg-[#A78BFA] text-[#0a0a0f]">For Sale</Badge>
                     )}
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold text-white truncate">{item.title}</h3>
                     {item.dimensions && <p className="text-xs text-white/30">{item.dimensions}</p>}
                     {item.listedForSale && item.price && (
-                      <p className="text-lg font-mono font-bold text-[#E8C874] mt-1">${Number(item.price).toLocaleString()}</p>
+                      <p className="text-lg font-mono font-bold text-emerald-400 mt-1">${Number(item.price).toLocaleString()}</p>
                     )}
                   </div>
                 </div>

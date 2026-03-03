@@ -52,28 +52,32 @@ const values = [
     icon: Heart,
     title: "Supporting Artists",
     description: "We believe every student artist deserves a platform to showcase their work and earn recognition.",
+    iconColor: "text-[#F472B6]",
   },
   {
     icon: Award,
     title: "Quality First",
     description: "Our expert curation ensures only the highest quality work reaches collectors, maintaining trust on both sides.",
+    iconColor: "text-[#A78BFA]",
   },
   {
     icon: Users,
     title: "Community Driven",
     description: "We're building a community where artists, collectors, and charities come together for a common good.",
+    iconColor: "text-[#60A5FA]",
   },
   {
     icon: TrendingUp,
     title: "Fair Compensation",
     description: "Artists receive 75% of every sale, ensuring they're fairly compensated for their creative work.",
+    iconColor: "text-[#34D399]",
   },
 ];
 
 const revenueSplits = [
-  { percent: 75, label: "Artist", sublabel: "Goes directly to the creator", color: "#E8C874" },
-  { percent: 15, label: "BrushBids", sublabel: "Platform & operations", color: "rgba(255,255,255,0.7)" },
-  { percent: 10, label: "Charity", sublabel: "Artist's chosen cause", color: "#6BCB77" },
+  { percent: 75, label: "Artist", sublabel: "Goes directly to the creator", color: "#A78BFA" },
+  { percent: 15, label: "BrushBids", sublabel: "Platform & operations", color: "#60A5FA" },
+  { percent: 10, label: "Charity", sublabel: "Artist's chosen cause", color: "#34D399" },
 ];
 
 export default function About() {
@@ -86,7 +90,7 @@ export default function About() {
           data-testid="section-about-hero"
         >
           <div className="max-w-3xl mx-auto px-6 space-y-6">
-            <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]" data-testid="label-about">
+            <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]" data-testid="label-about">
               About Us
             </span>
             <h1 className="text-4xl md:text-6xl font-display font-bold text-white leading-tight">
@@ -99,13 +103,16 @@ export default function About() {
         </section>
 
         <section
-          className="py-20 md:py-28"
+          className="py-20 md:py-28 relative bg-mesh-purple"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-about-story"
         >
-          <div className="max-w-3xl mx-auto px-6 space-y-10">
+          <div className="watermark-text" aria-hidden="true">Mission</div>
+          <div className="floating-orb w-64 h-64 gradient-orb-purple animate-float-slow" style={{ top: '-5%', right: '-3%' }} />
+          <div className="floating-orb-sm w-40 h-40 gradient-orb-blue animate-float-reverse" style={{ bottom: '10%', left: '-2%' }} />
+          <div className="max-w-3xl mx-auto px-6 space-y-10 relative z-10">
             <div className="space-y-3">
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+              <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">
                 Our Story
               </span>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
@@ -132,17 +139,18 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
-          className="py-20 md:py-28"
+          className="py-20 md:py-28 relative bg-mesh-mixed"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-founder"
         >
-          <div className="max-w-4xl mx-auto px-6">
-            <div className="bg-white/[0.02] border border-white/5 rounded-md p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center">
+          <div className="floating-orb-sm w-48 h-48 gradient-orb-pink animate-float" style={{ top: '5%', left: '5%' }} />
+          <div className="max-w-4xl mx-auto px-6 relative z-10">
+            <div className="section-outlined bg-white/[0.02] p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center">
               <div className="w-20 h-20 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-9 h-9 text-[#E8C874]" />
+                <GraduationCap className="w-9 h-9 text-[#A78BFA]" />
               </div>
               <div className="space-y-3 text-center md:text-left">
-                <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+                <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">
                   Founder
                 </span>
                 <h3 className="text-2xl font-display font-bold text-white" data-testid="text-founder-name">
@@ -159,13 +167,16 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
-          className="py-20 md:py-28"
+          className="py-20 md:py-28 relative bg-mesh-blue bg-dots"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-values"
         >
-          <div className="max-w-5xl mx-auto px-6 space-y-12">
+          <div className="watermark-text" aria-hidden="true">Values</div>
+          <div className="floating-orb w-72 h-72 gradient-orb-blue animate-float-slow" style={{ top: '-8%', left: '-4%' }} />
+          <div className="floating-orb-sm w-48 h-48 gradient-orb-pink animate-float-reverse" style={{ bottom: '5%', right: '-2%' }} />
+          <div className="max-w-5xl mx-auto px-6 space-y-12 relative z-10">
             <div className="text-center space-y-3">
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+              <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">
                 What We Stand For
               </span>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
@@ -176,11 +187,11 @@ export default function About() {
               {values.map((value) => (
                 <div
                   key={value.title}
-                  className="bg-white/[0.02] border border-white/5 rounded-md p-6 md:p-8 transition-colors duration-300 hover:border-white/10"
+                  className="section-outlined bg-white/[0.02] p-6 md:p-8 transition-colors duration-300 hover:border-white/10"
                   data-testid={`card-value-${value.title.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   <div className="w-11 h-11 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center mb-5">
-                    <value.icon className="w-5 h-5 text-[#E8C874]" />
+                    <value.icon className={`w-5 h-5 ${value.iconColor}`} />
                   </div>
                   <h3 className="font-semibold text-lg text-white mb-2">{value.title}</h3>
                   <p className="text-sm text-white/50 leading-relaxed">{value.description}</p>
@@ -193,43 +204,48 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
-          className="py-20 md:py-28"
+          className="py-20 md:py-28 relative bg-mesh-purple bg-grid-fine"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-revenue-split"
         >
-          <div className="max-w-4xl mx-auto px-6 space-y-12">
-            <div className="text-center space-y-3">
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
-                Transparent Model
-              </span>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
-                How Revenue is Shared
-              </h2>
-              <p className="text-white/50 max-w-xl mx-auto">
-                Every sale is split transparently so artists earn the most, the platform sustains itself, and a meaningful portion goes to charity.
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex rounded-full overflow-hidden h-4 bg-white/[0.04]">
-                <div className="h-full bg-[#E8C874]" style={{ width: "75%" }} />
-                <div className="h-full bg-white/20" style={{ width: "15%" }} />
-                <div className="h-full bg-[#6BCB77]" style={{ width: "10%" }} />
+          <div className="watermark-text" aria-hidden="true">Impact</div>
+          <div className="floating-orb w-56 h-56 gradient-orb-emerald animate-float" style={{ top: '-5%', right: '2%' }} />
+          <div className="floating-orb-sm w-44 h-44 gradient-orb-purple animate-float-reverse" style={{ bottom: '0%', left: '-1%' }} />
+          <div className="max-w-4xl mx-auto px-6 space-y-12 relative z-10">
+            <div className="section-outlined bg-white/[0.02] p-8 md:p-12">
+              <div className="text-center space-y-3 mb-10">
+                <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">
+                  Transparent Model
+                </span>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
+                  How Revenue is Shared
+                </h2>
+                <p className="text-white/50 max-w-xl mx-auto">
+                  Every sale is split transparently so artists earn the most, the platform sustains itself, and a meaningful portion goes to charity.
+                </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 text-center">
-                {revenueSplits.map((split) => (
-                  <div key={split.label} className="space-y-2" data-testid={`revenue-${split.label.toLowerCase()}`}>
-                    <div
-                      className="text-5xl font-display font-bold"
-                      style={{ color: split.color }}
-                    >
-                      {split.percent}%
+              <div className="space-y-6">
+                <div className="flex rounded-full overflow-hidden h-4 bg-white/[0.04]">
+                  <div className="h-full bg-[#A78BFA]" style={{ width: "75%" }} />
+                  <div className="h-full bg-[#60A5FA]" style={{ width: "15%" }} />
+                  <div className="h-full bg-[#34D399]" style={{ width: "10%" }} />
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                  {revenueSplits.map((split) => (
+                    <div key={split.label} className="space-y-2" data-testid={`revenue-${split.label.toLowerCase()}`}>
+                      <div
+                        className="text-5xl font-display font-bold"
+                        style={{ color: split.color }}
+                      >
+                        {split.percent}%
+                      </div>
+                      <div className="text-lg font-semibold text-white">{split.label}</div>
+                      <p className="text-sm text-white/40">{split.sublabel}</p>
                     </div>
-                    <div className="text-lg font-semibold text-white">{split.label}</div>
-                    <p className="text-sm text-white/40">{split.sublabel}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -238,13 +254,17 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
-          className="py-20 md:py-28"
+          className="py-20 md:py-28 relative bg-mesh-mixed bg-dots-sparse"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-featured-charities"
         >
-          <div className="max-w-5xl mx-auto px-6 space-y-12">
+          <div className="watermark-text" aria-hidden="true">Partners</div>
+          <div className="floating-orb w-60 h-60 gradient-orb-emerald animate-float-slow" style={{ top: '-5%', left: '-3%' }} />
+          <div className="floating-orb-sm w-52 h-52 gradient-orb-pink animate-float" style={{ bottom: '5%', right: '-2%' }} />
+          <div className="floating-orb-sm w-36 h-36 gradient-orb-blue animate-float-reverse" style={{ top: '40%', right: '5%' }} />
+          <div className="max-w-5xl mx-auto px-6 space-y-12 relative z-10">
             <div className="text-center space-y-3">
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+              <span className="text-xs font-medium text-[#34D399] uppercase tracking-[0.3em]">
                 Giving Back
               </span>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
@@ -258,14 +278,14 @@ export default function About() {
               {featuredCharities.map((charity) => (
                 <div
                   key={charity.name}
-                  className="bg-white/[0.02] border border-white/5 rounded-md p-6 flex flex-col gap-4 transition-colors duration-300 hover:border-white/10"
+                  className="section-outlined bg-white/[0.02] p-6 flex flex-col gap-4 transition-colors duration-300 hover:border-white/10"
                   data-testid={`card-charity-${charity.name.toLowerCase().replace(/\s+/g, '-').slice(0, 30)}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-md bg-white/90 flex items-center justify-center p-1.5">
                       <img src={charity.logo} alt={`${charity.name} logo`} className="w-full h-full object-contain" />
                     </div>
-                    <span className="text-xs font-medium uppercase tracking-wider text-[#E8C874]">{charity.category}</span>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[#34D399]">{charity.category}</span>
                   </div>
                   <h3 className="font-semibold text-lg text-white leading-tight">{charity.name}</h3>
                   <p className="text-sm text-white/40 leading-relaxed flex-1">{charity.description}</p>
@@ -281,13 +301,16 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
-          className="py-20 md:py-28"
+          className="py-20 md:py-28 relative bg-mesh-blue"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-curation"
         >
-          <div className="max-w-4xl mx-auto px-6 space-y-12">
+          <div className="geometric-lines" />
+          <div className="floating-orb w-48 h-48 gradient-orb-purple animate-float" style={{ top: '0%', right: '0%' }} />
+          <div className="floating-orb-sm w-40 h-40 gradient-orb-blue animate-float-reverse" style={{ bottom: '5%', left: '3%' }} />
+          <div className="max-w-4xl mx-auto px-6 space-y-12 relative z-10">
             <div className="text-center space-y-3">
-              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+              <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">
                 Quality Assurance
               </span>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
@@ -295,18 +318,18 @@ export default function About() {
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white/[0.02] border border-white/5 rounded-md p-6 md:p-8 space-y-4">
+              <div className="section-outlined bg-white/[0.02] p-6 md:p-8 space-y-4">
                 <div className="w-11 h-11 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-[#E8C874]" />
+                  <Sparkles className="w-5 h-5 text-[#F472B6]" />
                 </div>
                 <h3 className="font-semibold text-lg text-white">Rigorous Review</h3>
                 <p className="text-sm text-white/50 leading-relaxed">
                   Our curation team, supported by advanced review tools trained by experienced art professionals, evaluates every submission based on technical execution, composition, creativity, and market appeal.
                 </p>
               </div>
-              <div className="bg-white/[0.02] border border-white/5 rounded-md p-6 md:p-8 space-y-4">
+              <div className="section-outlined bg-white/[0.02] p-6 md:p-8 space-y-4">
                 <div className="w-11 h-11 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center">
-                  <Palette className="w-5 h-5 text-[#E8C874]" />
+                  <Palette className="w-5 h-5 text-[#60A5FA]" />
                 </div>
                 <h3 className="font-semibold text-lg text-white">Growth-Oriented</h3>
                 <p className="text-sm text-white/50 leading-relaxed">

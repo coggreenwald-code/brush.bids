@@ -16,7 +16,7 @@ Key features:
 - Role-based accounts: Artist, Collector, or Both
 - Welcome onboarding modal for new users to select their role and collect name
 - Role switching available anytime from Dashboard settings
-- Warm earth tone design with gold and silver accents on a cream background
+- Dark Artie.com-inspired design with multi-color accents (violet, pink, blue, emerald) on deep navy background
 - Anti-sniping auction system with configurable duration and 2-minute extension rule
 - Artist portfolio section with 2-week sell pipeline (integrated as Dashboard tab)
 - QR code generation for approved artworks (for art shows)
@@ -51,35 +51,57 @@ Preferred communication style: Simple, everyday language.
 
 ## Design System (Artie.com-inspired redesign)
 
-### Color Palette
+### Color Palette (Multi-color)
 - **Background**: #0a0a0f (deep navy/charcoal) - hsl(240 10% 6%)
 - **Card Background**: bg-white/[0.02] with border-white/5
-- **Gold Accent**: #E8C874 - Primary brand accent, CTAs, highlights, badges
+- **Primary — Violet**: #A78BFA — CTAs, section labels, active indicators, primary buttons
+- **Accent — Pink**: #F472B6 — Secondary highlights, hover effects, badges
+- **Info — Blue**: #60A5FA — Collector elements, info accents, secondary data
+- **Success — Emerald**: #34D399 — Money/earnings, charity, success states
 - **Text Primary**: White (#f2f2f2)
 - **Text Secondary**: white/60, white/50, white/40 opacity levels
-- **Section backgrounds**: Alternate between bg-background and bg-[#0d0d14]
 - **Glass effects**: backdrop-blur-xl with bg-white/5 or bg-[#0a0a0f]/80
 
 ### Typography
 - **Body Font**: Inter (sans-serif) - Clean geometric, used for headings and body
 - **Display Font**: Playfair Display (serif) - Used sparingly for artistic display moments (carousel titles, testimonials)
-- **Section Labels**: text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]
+- **Section Labels**: text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]
+- **Gradient text**: `.gradient-text` — purple→pink→blue multi-color gradient
+
+### Section Design (Artie.com-style)
+- **Outlined sections**: `.section-outlined` — thin white/8 border, rounded-2xl, relative overflow-hidden
+- **Gradient border sections**: `.section-gradient-border` — purple→blue→pink gradient border via mask
+- **Watermark text**: `.watermark-text` — Giant faint stroke-only text behind section content (e.g., "Process", "Impact", "Voices")
+- **Rich backgrounds**: Each section has unique visual depth:
+  - `.bg-mesh-purple`: Multi-layered purple radial gradients
+  - `.bg-mesh-blue`: Multi-layered blue radial gradients
+  - `.bg-mesh-mixed`: Combined purple+blue+pink+emerald gradients
+  - `.bg-dots` / `.bg-dots-sparse`: Subtle dot pattern overlays
+  - `.bg-grid-fine`: Fine grid line pattern
+  - `.bg-noise`: CSS noise texture overlay
+- **Decorative shapes**: Floating gradient orbs at section edges
+  - `.floating-orb` / `.floating-orb-sm` with blur filter
+  - `.gradient-orb-purple`, `.gradient-orb-blue`, `.gradient-orb-pink`, `.gradient-orb-emerald`
+  - `.geometric-lines` — Abstract circle outlines at section edges
+- **Section tints**: `.section-tint-purple`, `.section-tint-blue`, `.section-tint-mixed`
 
 ### Design Elements
 - **Lenis smooth scroll**: Premium slow scroll feel via Lenis library, initialized in App.tsx
 - **Cards**: Dark glass cards (bg-white/[0.02] border-white/5), hover:border-white/10
-- **Buttons**: Pill-shaped (rounded-full), gold CTA (bg-[#E8C874] text-[#0a0a0f]), outline (border-white/20 text-white)
+- **Buttons**: Pill-shaped (rounded-full), violet CTA (bg-[#A78BFA] text-white), outline (border-white/20 text-white)
 - **Navbar**: Glass-morphic (glass-nav), scroll-aware (hides on scroll down, shows on scroll up)
-- **Footer**: 3 link columns + large outlined SVG BrushBids wordmark (stroke-only, no fill)
-- **Animations**: Framer Motion fade-ins, CSS transitions, hover elevation effects
-- **Dividers**: Gradient divider lines (divider-line utility class)
-- **Hero sections**: Full-width with overlay gradients on images, animated gradient backgrounds (hero-gradient)
+- **Footer**: 3 link columns + large outlined SVG BrushBids wordmark (stroke-only, no fill) + bg-mesh-purple
+- **Animations**: Framer Motion fade-ins, CSS transitions, hover elevation, floating orbs (animate-float, animate-float-slow, animate-float-reverse, animate-orb-drift)
+- **Dividers**: Gradient divider lines (divider-line utility — purple-tinted)
+- **Glow effects**: `.glow-purple`, `.glow-blue`, `.glow-pink` (replaced `.glow-gold`)
+- **Hero sections**: Full-width with overlay gradients, animated gradient backgrounds (hero-gradient — purple/blue/pink)
 
 ### Component Patterns
-- Page headers include gold uppercase section labels above bold titles
+- Page headers include violet uppercase section labels above bold titles
 - Full-width sections: width: 100vw, marginLeft: calc(-50vw + 50%)
 - Testimonial slider with progress bullet indicators
 - Stats counters with Intersection Observer count-up animations
+- Sections wrapped in outlined containers with watermark text and floating orbs
 
 ## System Architecture
 
