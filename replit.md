@@ -83,11 +83,11 @@ Preferred communication style: Simple, everyday language.
   - `.floating-orb` / `.floating-orb-sm` with blur filter
   - `.gradient-orb-purple`, `.gradient-orb-blue`, `.gradient-orb-pink`, `.gradient-orb-emerald`
   - `.geometric-lines` — Abstract circle outlines at section edges
-- **3D blob objects**: Artie.com-inspired solid 3D-looking shapes at section edges
-  - `.blob-3d` base class with `.blob-3d-teal`, `.blob-3d-purple`, `.blob-3d-blue`, `.blob-3d-pink` color variants
-  - Multi-layered gradients with inset box-shadows for 3D depth effect
-  - `animate-blob-morph` for organic shape-shifting border-radius animation
-  - `animate-blob-rotate` for slow rotation
+- **3D shape images**: Artie.com-style pre-rendered 3D geometric objects placed at section edges
+  - AI-generated PNG images with transparent backgrounds: torus rings (teal, purple, blue), spheres (teal, blue), rounded cube (pink), thin ring (purple), gem (green)
+  - Imported via `@assets/3d-*.png` and rendered as `<img>` elements with absolute positioning
+  - Animated with existing float utilities (animate-float, animate-float-slow, animate-float-reverse)
+  - Each section has 2 shapes: one large at bottom-right corner, one smaller accent at opposite corner
 - **Section tints**: `.section-tint-purple`, `.section-tint-blue`, `.section-tint-mixed`
 
 ### Design Elements

@@ -19,6 +19,15 @@ import artFloral from "@assets/art-floral-still-life.png";
 import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
 
+import shape3dTorusTeal from "@assets/3d-torus-teal.png";
+import shape3dTorusPurple from "@assets/3d-torus-purple.png";
+import shape3dTorusBlue from "@assets/3d-torus-blue.png";
+import shape3dSphereTeal from "@assets/3d-sphere-teal.png";
+import shape3dSphereBlue from "@assets/3d-sphere-blue.png";
+import shape3dCubePink from "@assets/3d-cube-pink.png";
+import shape3dRingPurple from "@assets/3d-ring-purple.png";
+import shape3dGemGreen from "@assets/3d-gem-green.png";
+
 
 const placeholderArtworks = [
   { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
@@ -472,7 +481,8 @@ export default function Home() {
           <div className="geometric-lines" />
           <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
           <div className="floating-orb gradient-orb-blue w-[250px] h-[250px] -bottom-16 -left-16 animate-float-reverse opacity-30" />
-          <div className="blob-3d blob-3d-teal w-[130px] h-[130px] -bottom-10 -right-8 animate-blob-morph z-[1]" />
+          <img src={shape3dTorusTeal} alt="" className="absolute -bottom-10 -right-8 w-[140px] h-[140px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
+          <img src={shape3dSphereTeal} alt="" className="absolute -top-6 right-20 w-[50px] h-[50px] pointer-events-none z-[1] animate-float" draggable={false} />
           <div className="watermark-text" style={{ top: "-30px" }}>Process</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -560,7 +570,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-blue section-tint-blue bg-dots" />
           <div className="floating-orb gradient-orb-blue w-[280px] h-[280px] -top-16 -left-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-pink w-[220px] h-[220px] -bottom-12 -right-16 animate-float-reverse opacity-30" />
-          <div className="blob-3d blob-3d-purple w-[120px] h-[120px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
+          <img src={shape3dTorusPurple} alt="" className="absolute -bottom-10 -right-8 w-[130px] h-[130px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
+          <img src={shape3dGemGreen} alt="" className="absolute top-8 -left-6 w-[60px] h-[60px] pointer-events-none z-[1] animate-float-reverse" draggable={false} />
           <div className="watermark-text">Impact</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -601,7 +612,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
           <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
-          <div className="blob-3d blob-3d-pink w-[110px] h-[110px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
+          <img src={shape3dSphereBlue} alt="" className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[100px] h-[100px] pointer-events-none z-[1] animate-float" draggable={false} />
+          <img src={shape3dRingPurple} alt="" className="absolute -top-8 left-16 w-[80px] h-[80px] pointer-events-none z-[1] animate-float-reverse opacity-80" draggable={false} />
           <div className="watermark-text" style={{ left: "50%", transform: "translateX(-50%)" }}>Testimonials</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -620,7 +632,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-purple bg-grid-fine" />
           <div className="floating-orb gradient-orb-emerald w-[240px] h-[240px] -top-16 -right-16 animate-float-slow opacity-30" />
           <div className="floating-orb gradient-orb-purple w-[200px] h-[200px] -bottom-12 -left-12 animate-float-reverse opacity-25" />
-          <div className="blob-3d blob-3d-blue w-[120px] h-[120px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
+          <img src={shape3dTorusBlue} alt="" className="absolute -bottom-10 -right-8 w-[130px] h-[130px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
+          <img src={shape3dCubePink} alt="" className="absolute -top-8 left-12 w-[70px] h-[70px] pointer-events-none z-[1] animate-float" draggable={false} />
           <div className="watermark-text">Transparency</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -665,7 +678,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed" />
           <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />
-          <div className="blob-3d blob-3d-teal w-[110px] h-[110px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
+          <img src={shape3dGemGreen} alt="" className="absolute -bottom-8 -right-6 w-[90px] h-[90px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
+          <img src={shape3dSphereTeal} alt="" className="absolute top-10 -left-4 w-[45px] h-[45px] pointer-events-none z-[1] animate-float" draggable={false} />
 
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">

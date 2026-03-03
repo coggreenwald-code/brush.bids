@@ -451,43 +451,6 @@
     border-radius: 50%;
   }
 
-  .blob-3d {
-    @apply absolute pointer-events-none;
-    animation: blob-morph 15s ease-in-out infinite;
-  }
-
-  .blob-3d-teal {
-    background: linear-gradient(135deg, hsla(175, 60%, 45%, 0.9) 0%, hsla(220, 70%, 40%, 0.8) 50%, hsla(200, 60%, 30%, 0.7) 100%);
-    box-shadow:
-      inset -8px -8px 20px rgba(0, 0, 0, 0.3),
-      inset 8px 8px 20px rgba(255, 255, 255, 0.1),
-      0 10px 40px rgba(0, 200, 180, 0.15);
-  }
-
-  .blob-3d-purple {
-    background: linear-gradient(135deg, hsla(263, 70%, 60%, 0.85) 0%, hsla(280, 60%, 40%, 0.8) 50%, hsla(263, 50%, 30%, 0.7) 100%);
-    box-shadow:
-      inset -8px -8px 20px rgba(0, 0, 0, 0.3),
-      inset 8px 8px 20px rgba(255, 255, 255, 0.1),
-      0 10px 40px rgba(167, 139, 250, 0.15);
-  }
-
-  .blob-3d-blue {
-    background: linear-gradient(135deg, hsla(217, 71%, 55%, 0.85) 0%, hsla(230, 60%, 40%, 0.8) 50%, hsla(217, 50%, 30%, 0.7) 100%);
-    box-shadow:
-      inset -8px -8px 20px rgba(0, 0, 0, 0.3),
-      inset 8px 8px 20px rgba(255, 255, 255, 0.1),
-      0 10px 40px rgba(96, 165, 250, 0.15);
-  }
-
-  .blob-3d-pink {
-    background: linear-gradient(135deg, hsla(330, 80%, 60%, 0.85) 0%, hsla(340, 60%, 45%, 0.8) 50%, hsla(320, 50%, 30%, 0.7) 100%);
-    box-shadow:
-      inset -8px -8px 20px rgba(0, 0, 0, 0.3),
-      inset 8px 8px 20px rgba(255, 255, 255, 0.1),
-      0 10px 40px rgba(244, 114, 182, 0.15);
-  }
-
   .section-tint-purple {
     background-color: hsla(263, 40%, 12%, 0.4);
   }

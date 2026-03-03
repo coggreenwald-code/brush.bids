@@ -109,13 +109,6 @@ export default {
           "66%": { transform: "rotate(240deg) scale(0.95)" },
           "100%": { transform: "rotate(360deg) scale(1)" },
         },
-        "blob-morph": {
-          "0%": { borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" },
-          "25%": { borderRadius: "30% 60% 70% 40% / 50% 60% 30% 60%" },
-          "50%": { borderRadius: "50% 60% 30% 60% / 30% 40% 70% 60%" },
-          "75%": { borderRadius: "60% 30% 60% 40% / 70% 50% 40% 60%" },
-          "100%": { borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -123,7 +116,6 @@ export default {
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
         "fade-in": "fade-in 0.5s ease-out forwards",
         "blob-rotate": "blob-rotate 20s ease-in-out infinite",
-        "blob-morph": "blob-morph 15s ease-in-out infinite",
       },
     },
   },
