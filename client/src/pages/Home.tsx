@@ -475,16 +475,9 @@ export default function Home() {
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
               <div className="watermark-text">Process</div>
-              <motion.div
-                className="text-center mb-16 relative z-10"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5 }}
-              >
+              <div className="mb-16 relative z-10">
                 <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Simple Process</span>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">How It Works</h2>
-              </motion.div>
+              </div>
 
               <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto relative z-10">
                 <motion.div
@@ -569,16 +562,9 @@ export default function Home() {
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
               <div className="watermark-text">Impact</div>
-              <motion.div
-                className="mb-12 relative z-10"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <div className="mb-12 relative z-10">
                 <span className="text-xs font-medium text-[#60A5FA] uppercase tracking-[0.3em] mb-3 block">By The Numbers</span>
-                <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">Our<br />Impact</h2>
-              </motion.div>
+              </div>
               <div className="divider-line mb-12 relative z-10" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative z-10">
                 {stats.map((stat, i) => {
@@ -615,17 +601,10 @@ export default function Home() {
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
-              <div className="watermark-text">Voices</div>
-              <motion.div
-                className="text-center mb-12 relative z-10"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <div className="watermark-text">Testimonials</div>
+              <div className="mb-12 relative z-10">
                 <span className="text-xs font-medium text-[#F472B6] uppercase tracking-[0.3em] mb-3 block">Community</span>
-                <h2 className="text-4xl md:text-5xl font-bold tracking-tight">What People Say</h2>
-              </motion.div>
+              </div>
               <div className="relative z-10">
                 <TestimonialSlider />
               </div>
