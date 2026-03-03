@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useRef, useCallback } from "react";
@@ -171,7 +170,7 @@ export default function SubmitArtwork() {
     return (
       <Layout>
         <div className="flex items-center justify-center h-[50vh]">
-          <p>Please log in to submit artwork.</p>
+          <p className="text-white/50">Please log in to submit artwork.</p>
         </div>
       </Layout>
     );
@@ -211,12 +210,12 @@ export default function SubmitArtwork() {
     <Layout>
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
-          <span className="text-sm font-medium text-[#B8965A] uppercase tracking-wider">Create Listing</span>
-          <h1 className="text-3xl font-display font-bold mt-1">Submit Artwork</h1>
-          <p className="text-muted-foreground">Upload your masterpiece for expert review and global auction.</p>
+          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Create Listing</span>
+          <h1 className="text-3xl font-display font-bold text-white mt-1">Submit Artwork</h1>
+          <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
         </div>
 
-        <Card className="p-8">
+        <div className="p-8 rounded-xl bg-white/[0.02] border border-white/5">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -224,9 +223,9 @@ export default function SubmitArtwork() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel className="text-white/70">Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Sunset over the Dorms" {...field} data-testid="input-title" />
+                      <Input placeholder="e.g. Sunset over the Dorms" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-title" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -239,11 +238,12 @@ export default function SubmitArtwork() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between flex-wrap gap-1">
-                      <FormLabel>Description & Backstory</FormLabel>
+                      <FormLabel className="text-white/70">Description & Backstory</FormLabel>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
+                        className="rounded-full border-white/20 text-white hover:bg-white/10"
                         onClick={handleGenerateDescription}
                         disabled={generateDescription.isPending}
                         data-testid="button-ai-generate-description"
@@ -259,12 +259,12 @@ export default function SubmitArtwork() {
                     <FormControl>
                       <Textarea 
                         placeholder="Tell us about your creative process, or click 'Auto Write' to generate a description..." 
-                        className="min-h-[120px]"
+                        className="min-h-[120px] bg-white/5 border-white/10 text-white placeholder:text-white/30"
                         {...field} 
                         data-testid="textarea-description"
                       />
                     </FormControl>
-                    <FormDescription>Good stories increase sales by 25%. Let us help you craft the perfect description!</FormDescription>
+                    <FormDescription className="text-white/30">Good stories increase sales by 25%. Let us help you craft the perfect description!</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -276,9 +276,9 @@ export default function SubmitArtwork() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reserve Price ($)</FormLabel>
+                      <FormLabel className="text-white/70">Reserve Price ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="50.00" {...field} data-testid="input-price" />
+                        <Input type="number" placeholder="50.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -290,10 +290,10 @@ export default function SubmitArtwork() {
                   name="auctionDurationDays"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Auction Duration</FormLabel>
+                      <FormLabel className="text-white/70">Auction Duration</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-auction-duration">
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-auction-duration">
                             <SelectValue placeholder="Select duration" />
                           </SelectTrigger>
                         </FormControl>
@@ -318,9 +318,9 @@ export default function SubmitArtwork() {
                   name="dimensionLength"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Length (inches)</FormLabel>
+                      <FormLabel className="text-white/70">Length (inches)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" placeholder="24" {...field} data-testid="input-dimension-length" />
+                        <Input type="number" step="0.1" placeholder="24" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-dimension-length" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -332,9 +332,9 @@ export default function SubmitArtwork() {
                   name="dimensionWidth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Width (inches)</FormLabel>
+                      <FormLabel className="text-white/70">Width (inches)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.1" placeholder="36" {...field} data-testid="input-dimension-width" />
+                        <Input type="number" step="0.1" placeholder="36" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-dimension-width" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -348,10 +348,10 @@ export default function SubmitArtwork() {
                   name="charityId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Select Charity (Optional)</FormLabel>
+                      <FormLabel className="text-white/70">Select Charity (Optional)</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-charity">
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-charity">
                             <SelectValue placeholder="Choose a cause" />
                           </SelectTrigger>
                         </FormControl>
@@ -370,7 +370,7 @@ export default function SubmitArtwork() {
                             return Object.entries(groups).map(([key, group]) => (
                               group.items.length > 0 ? (
                                 <SelectGroup key={key}>
-                                  <SelectLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{group.label}</SelectLabel>
+                                  <SelectLabel className="text-xs font-semibold uppercase tracking-wider text-white/40">{group.label}</SelectLabel>
                                   {group.items.map(c => (
                                     <SelectItem key={c.id} value={c.id.toString()} data-testid={`charity-option-${c.id}`}>
                                       {c.name}
@@ -382,7 +382,7 @@ export default function SubmitArtwork() {
                           })()}
                         </SelectContent>
                       </Select>
-                      <FormDescription>10% of proceeds go to your chosen charity.</FormDescription>
+                      <FormDescription className="text-white/30">10% of proceeds go to your chosen charity.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -394,11 +394,11 @@ export default function SubmitArtwork() {
                 name="imageUrl"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Artwork Image</FormLabel>
+                    <FormLabel className="text-white/70">Artwork Image</FormLabel>
                     <FormControl>
                       <div className="space-y-4">
                         {imagePreview || form.getValues("imageUrl") ? (
-                          <div className="relative rounded-md overflow-hidden border bg-muted">
+                          <div className="relative rounded-lg overflow-hidden border border-white/10 bg-white/5">
                             <img 
                               src={imagePreview || form.getValues("imageUrl")} 
                               alt="Artwork preview" 
@@ -418,13 +418,13 @@ export default function SubmitArtwork() {
                           </div>
                         ) : (
                           <div 
-                            className="border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors hover:border-primary/50 hover:bg-muted/50"
+                            className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center cursor-pointer transition-colors hover:border-[#E8C874]/30 hover:bg-white/[0.02]"
                             onClick={() => fileInputRef.current?.click()}
                             data-testid="dropzone-image"
                           >
-                            <ImagePlus className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-                            <p className="font-medium text-sm">Click to upload your artwork</p>
-                            <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, WebP up to 10MB</p>
+                            <ImagePlus className="w-10 h-10 mx-auto mb-3 text-white/30" />
+                            <p className="font-medium text-sm text-white/70">Click to upload your artwork</p>
+                            <p className="text-xs text-white/30 mt-1">JPG, PNG, GIF, WebP up to 10MB</p>
                           </div>
                         )}
 
@@ -442,6 +442,7 @@ export default function SubmitArtwork() {
                             type="button"
                             variant="outline"
                             size="sm"
+                            className="rounded-full border-white/20 text-white hover:bg-white/10"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploading}
                             data-testid="button-upload-file"
@@ -457,6 +458,7 @@ export default function SubmitArtwork() {
                             type="button"
                             variant="outline"
                             size="sm"
+                            className="rounded-full border-white/20 text-white hover:bg-white/10"
                             onClick={startCamera}
                             disabled={uploading || showCamera}
                             data-testid="button-scan-artwork"
@@ -467,7 +469,7 @@ export default function SubmitArtwork() {
                         </div>
 
                         {showCamera && (
-                          <div className="relative rounded-md overflow-hidden border bg-black">
+                          <div className="relative rounded-lg overflow-hidden border border-white/10 bg-black">
                             <video ref={videoRef} autoPlay playsInline className="w-full" data-testid="video-camera" />
                             <canvas ref={canvasRef} className="hidden" />
                             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
@@ -495,7 +497,7 @@ export default function SubmitArtwork() {
                         )}
                       </div>
                     </FormControl>
-                    <FormDescription>Upload from your camera roll or scan your artwork directly.</FormDescription>
+                    <FormDescription className="text-white/30">Upload from your camera roll or scan your artwork directly.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -506,47 +508,43 @@ export default function SubmitArtwork() {
                 name="reviewType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Review Type</FormLabel>
-                    <FormDescription className="mb-3">Choose how you'd like your artwork reviewed.</FormDescription>
+                    <FormLabel className="text-white/70">Review Type</FormLabel>
+                    <FormDescription className="mb-3 text-white/30">Choose how you'd like your artwork reviewed.</FormDescription>
                     <FormControl>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Card 
-                          className={`cursor-pointer transition-all hover-elevate ${field.value === "ai_instant" ? "ring-2 ring-[#B8965A] border-[#B8965A]" : ""}`}
+                        <div 
+                          className={`cursor-pointer transition-all rounded-xl p-4 flex flex-col items-center text-center gap-3 border ${field.value === "ai_instant" ? "ring-2 ring-[#E8C874] border-[#E8C874]/30 bg-[#E8C874]/5" : "border-white/5 bg-white/[0.02] hover:border-white/10"}`}
                           onClick={() => field.onChange("ai_instant")}
                           data-testid="card-review-ai"
                         >
-                          <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-[#B8965A] text-white" : "bg-muted"}`}>
-                              <Zap className="w-6 h-6" />
-                            </div>
-                            <div>
-                              <h4 className="font-semibold text-sm">Instant Feedback</h4>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Get immediate feedback from our review tool, trained by experienced curators for accurate, expert-level analysis.
-                              </p>
-                              <span className="inline-block mt-2 text-xs font-medium text-[#B8965A]">Results in seconds</span>
-                            </div>
-                          </CardContent>
-                        </Card>
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "ai_instant" ? "bg-[#E8C874] text-[#0a0a0f]" : "bg-white/5 text-white/50"}`}>
+                            <Zap className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-sm text-white">Instant Feedback</h4>
+                            <p className="text-xs text-white/40 mt-1">
+                              Get immediate feedback from our review tool, trained by experienced curators for accurate, expert-level analysis.
+                            </p>
+                            <span className="inline-block mt-2 text-xs font-medium text-[#E8C874]">Results in seconds</span>
+                          </div>
+                        </div>
 
-                        <Card 
-                          className={`cursor-pointer transition-all hover-elevate ${field.value === "human_curator" ? "ring-2 ring-[#96A0AB] border-[#96A0AB]" : ""}`}
+                        <div 
+                          className={`cursor-pointer transition-all rounded-xl p-4 flex flex-col items-center text-center gap-3 border ${field.value === "human_curator" ? "ring-2 ring-white/40 border-white/20 bg-white/5" : "border-white/5 bg-white/[0.02] hover:border-white/10"}`}
                           onClick={() => field.onChange("human_curator")}
                           data-testid="card-review-human"
                         >
-                          <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "human_curator" ? "bg-[#96A0AB] text-white" : "bg-muted"}`}>
-                              <Clock className="w-6 h-6" />
-                            </div>
-                            <div>
-                              <h4 className="font-semibold text-sm">Human Curator Review</h4>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Receive detailed, personalized feedback from our team of professional art curators.
-                              </p>
-                              <span className="inline-block mt-2 text-xs font-medium text-[#96A0AB]">1-3 business days</span>
-                            </div>
-                          </CardContent>
-                        </Card>
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${field.value === "human_curator" ? "bg-white/20 text-white" : "bg-white/5 text-white/50"}`}>
+                            <Clock className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-sm text-white">Human Curator</h4>
+                            <p className="text-xs text-white/40 mt-1">
+                              Get a personalized review from our team of experienced curators with detailed, written feedback.
+                            </p>
+                            <span className="inline-block mt-2 text-xs font-medium text-white/50">2-3 business days</span>
+                          </div>
+                        </div>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -554,18 +552,19 @@ export default function SubmitArtwork() {
                 )}
               />
 
-              <Button type="submit" size="lg" className="w-full rounded-full" disabled={createArtwork.isPending} data-testid="button-submit-artwork">
-                {createArtwork.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
-                  </>
-                ) : (
-                  `Submit for ${selectedReviewType === "ai_instant" ? "Instant" : "Curator"} Review`
-                )}
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90"
+                disabled={createArtwork.isPending}
+                data-testid="button-submit-artwork"
+              >
+                {createArtwork.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Submit for Review
               </Button>
             </form>
           </Form>
-        </Card>
+        </div>
       </div>
     </Layout>
   );

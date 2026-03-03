@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useSearch } from "wouter";
@@ -51,7 +50,6 @@ export default function MyBids() {
   const paymentStatus = new URLSearchParams(searchString).get('payment');
   const paymentArtworkId = new URLSearchParams(searchString).get('artwork');
 
-  // Invalidate bids query when returning from payment to get fresh data
   useEffect(() => {
     if (paymentStatus === 'success') {
       queryClient.invalidateQueries({ queryKey: ["/api/my-bids"] });
@@ -118,16 +116,16 @@ export default function MyBids() {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Card className="p-8 text-center max-w-md">
-            <Gavel className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Sign In Required</h2>
-            <p className="text-muted-foreground mb-6">
+          <div className="p-8 text-center max-w-md rounded-xl bg-white/[0.02] border border-white/5">
+            <Gavel className="w-12 h-12 mx-auto text-white/30 mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">Sign In Required</h2>
+            <p className="text-white/50 mb-6">
               Please sign in to view your bids and watchlist.
             </p>
-            <Button onClick={() => window.location.href = "/api/login"} data-testid="button-login-bids">
+            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid="button-login-bids">
               Sign In
             </Button>
-          </Card>
+          </div>
         </div>
         <Footer />
       </Layout>
@@ -135,51 +133,42 @@ export default function MyBids() {
   }
 
   const stats = [
-    { label: "Active Bids", value: activeBids.length, icon: Gavel, color: "text-primary" },
-    { label: "Auctions Won", value: wonBids.length, icon: TrendingUp, color: "text-green-600" },
-    { label: "Outbid", value: outbidBids.length, icon: AlertCircle, color: "text-[#9E8472]" },
+    { label: "Active Bids", value: activeBids.length, icon: Gavel, color: "text-[#E8C874]" },
+    { label: "Auctions Won", value: wonBids.length, icon: TrendingUp, color: "text-emerald-400" },
+    { label: "Outbid", value: outbidBids.length, icon: AlertCircle, color: "text-orange-400" },
   ];
 
   return (
     <Layout>
       <div className="space-y-8 pb-16">
-        {/* Header */}
         <div>
-          <h1 className="text-3xl font-display font-bold">My Bids</h1>
-          <p className="text-muted-foreground">Track your active bids and auction history</p>
+          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Activity</span>
+          <h1 className="text-3xl font-display font-bold text-white mt-1">My Bids</h1>
+          <p className="text-white/50">Track your active bids and auction history</p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {stats.map((stat) => (
-            <Card key={stat.label}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2 gap-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
+            <div key={stat.label} className="p-5 rounded-xl bg-white/[0.02] border border-white/5">
+              <div className="flex items-center justify-between gap-2 pb-2">
+                <span className="text-sm font-medium text-white/50">{stat.label}</span>
                 <stat.icon className={`w-4 h-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{isLoading ? "-" : stat.value}</div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="text-2xl font-bold text-white">{isLoading ? "-" : stat.value}</div>
+            </div>
           ))}
         </div>
 
-        {/* Outbid Alert */}
         {outbidBids.filter(b => !b.auctionEnded).length > 0 && (
-          <Card className="border-[#9E8472]/20 dark:border-[#9E8472]/30 bg-[#9E8472]/5 dark:bg-[#9E8472]/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-[#9E8472] dark:text-[#C9A84C] text-base">
-                <AlertCircle className="w-5 h-5" />
-                You've Been Outbid on {outbidBids.filter(b => !b.auctionEnded).length} Active Auction{outbidBids.filter(b => !b.auctionEnded).length > 1 ? 's' : ''}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              <p>Someone has placed a higher bid. Place a new bid to stay in the running!</p>
-            </CardContent>
-          </Card>
+          <div className="p-5 rounded-xl bg-orange-500/5 border border-orange-500/10">
+            <div className="flex items-center gap-2 text-orange-400 font-semibold text-base pb-2">
+              <AlertCircle className="w-5 h-5" />
+              You've Been Outbid on {outbidBids.filter(b => !b.auctionEnded).length} Active Auction{outbidBids.filter(b => !b.auctionEnded).length > 1 ? 's' : ''}
+            </div>
+            <p className="text-sm text-white/50">Someone has placed a higher bid. Place a new bid to stay in the running!</p>
+          </div>
         )}
 
-        {/* Tabs */}
         <Tabs defaultValue="active">
           <TabsList>
             <TabsTrigger value="active" data-testid="tab-active-bids">
@@ -196,29 +185,28 @@ export default function MyBids() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Active Bids Tab */}
           <TabsContent value="active" className="mt-6">
             {isLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                <Loader2 className="w-8 h-8 animate-spin text-white/30" />
               </div>
             ) : activeBids.length === 0 ? (
-              <Card className="p-12 text-center">
-                <Gavel className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Active Bids</h3>
-                <p className="text-muted-foreground mb-4">
+              <div className="p-12 text-center rounded-xl bg-white/[0.02] border border-white/5">
+                <Gavel className="w-12 h-12 mx-auto text-white/20 mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">No Active Bids</h3>
+                <p className="text-white/50 mb-4">
                   You're not currently the highest bidder on any active auction.
                 </p>
                 <Link href="/gallery">
-                  <Button data-testid="button-browse-gallery-bids">Browse Gallery</Button>
+                  <Button className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid="button-browse-gallery-bids">Browse Gallery</Button>
                 </Link>
-              </Card>
+              </div>
             ) : (
               <div className="space-y-4">
                 {activeBids.map((bid) => (
-                  <Card key={bid.artworkId} className="p-4" data-testid={`card-bid-${bid.artworkId}`}>
+                  <div key={bid.artworkId} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors" data-testid={`card-bid-${bid.artworkId}`}>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-white/5">
                         <img 
                           src={bid.artwork?.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                           alt={bid.artwork?.title || "Artwork"} 
@@ -227,47 +215,46 @@ export default function MyBids() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <h3 className="font-semibold hover:text-primary truncate" data-testid={`link-bid-artwork-${bid.artworkId}`}>
+                          <h3 className="font-semibold text-white hover:text-[#E8C874] truncate transition-colors" data-testid={`link-bid-artwork-${bid.artworkId}`}>
                             {bid.artwork?.title || `Artwork #${bid.artworkId}`}
                           </h3>
                         </Link>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm text-white/40">
                           <Clock className="w-3 h-3" />
                           <span>Ends in {getTimeRemaining(bid.artwork?.createdAt || null)}</span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Your Bid</p>
-                        <p className="text-lg font-mono font-bold">${bid.userHighestBid.toLocaleString()}</p>
-                        <Badge className="mt-1 bg-green-600">Highest Bidder</Badge>
+                        <p className="text-sm text-white/40">Your Bid</p>
+                        <p className="text-lg font-mono font-bold text-white">${bid.userHighestBid.toLocaleString()}</p>
+                        <Badge className="mt-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">Highest Bidder</Badge>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 ))}
               </div>
             )}
           </TabsContent>
 
-          {/* Outbid Tab */}
           <TabsContent value="outbid" className="mt-6">
             {isLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                <Loader2 className="w-8 h-8 animate-spin text-white/30" />
               </div>
             ) : outbidBids.length === 0 ? (
-              <Card className="p-12 text-center">
-                <TrendingUp className="w-12 h-12 mx-auto text-green-500 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Outbid Items</h3>
-                <p className="text-muted-foreground">
+              <div className="p-12 text-center rounded-xl bg-white/[0.02] border border-white/5">
+                <TrendingUp className="w-12 h-12 mx-auto text-emerald-400/50 mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">No Outbid Items</h3>
+                <p className="text-white/50">
                   You haven't been outbid on any artwork. Keep bidding!
                 </p>
-              </Card>
+              </div>
             ) : (
               <div className="space-y-4">
                 {outbidBids.map((bid) => (
-                  <Card key={bid.artworkId} className="p-4 border-[#9E8472]/20 dark:border-[#9E8472]/30" data-testid={`card-outbid-${bid.artworkId}`}>
+                  <div key={bid.artworkId} className="p-4 rounded-xl bg-white/[0.02] border border-orange-500/10 hover:border-orange-500/20 transition-colors" data-testid={`card-outbid-${bid.artworkId}`}>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-white/5">
                         <img 
                           src={bid.artwork?.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                           alt={bid.artwork?.title || "Artwork"} 
@@ -276,81 +263,72 @@ export default function MyBids() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <h3 className="font-semibold hover:text-primary truncate">
+                          <h3 className="font-semibold text-white hover:text-[#E8C874] truncate transition-colors">
                             {bid.artwork?.title || `Artwork #${bid.artworkId}`}
                           </h3>
                         </Link>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm text-white/40">
                           <Clock className="w-3 h-3" />
                           <span>{bid.auctionEnded ? 'Auction Ended' : `Ends in ${getTimeRemaining(bid.artwork?.createdAt || null)}`}</span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Your Bid</p>
-                        <p className="text-lg font-mono font-bold text-[#9E8472]">${bid.userHighestBid.toLocaleString()}</p>
-                        <p className="text-xs text-muted-foreground">Current: ${bid.artworkHighestBid.toLocaleString()}</p>
-                        <Badge variant="outline" className="mt-1 border-[#9E8472] text-[#9E8472]">Outbid</Badge>
+                        <p className="text-sm text-white/40">Your Bid</p>
+                        <p className="text-lg font-mono font-bold text-orange-400">${bid.userHighestBid.toLocaleString()}</p>
+                        <p className="text-xs text-white/40">Current: ${bid.artworkHighestBid.toLocaleString()}</p>
+                        <Badge variant="outline" className="mt-1 border-orange-500/30 text-orange-400 bg-orange-500/10">Outbid</Badge>
                       </div>
                       {!bid.auctionEnded && (
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <Button size="sm" data-testid={`button-rebid-${bid.artworkId}`}>Bid Again</Button>
+                          <Button size="sm" className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid={`button-rebid-${bid.artworkId}`}>Bid Again</Button>
                         </Link>
                       )}
                     </div>
-                  </Card>
+                  </div>
                 ))}
               </div>
             )}
           </TabsContent>
 
-          {/* Won Tab */}
           <TabsContent value="won" className="mt-6">
             {paymentStatus === 'success' && paymentArtworkId && 
              wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
-              <Card className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400 text-base">
-                    <CheckCircle className="w-5 h-5" />
-                    Payment Successful!
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                  <p>Your payment has been processed. The artwork will be delivered to you soon.</p>
-                </CardContent>
-              </Card>
+              <div className="mb-6 p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                <div className="flex items-center gap-2 text-emerald-400 font-semibold text-base pb-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Payment Successful!
+                </div>
+                <p className="text-sm text-white/50">Your payment has been processed. The artwork will be delivered to you soon.</p>
+              </div>
             )}
             {paymentStatus === 'success' && paymentArtworkId && 
              !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
-              <Card className="mb-6 border-[#B8965A]/20 dark:border-[#B8965A]/30 bg-[#B8965A]/5 dark:bg-[#B8965A]/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-[#9E8472] dark:text-[#C9A84C] text-base">
-                    <Clock className="w-5 h-5" />
-                    Payment Processing
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                  <p>Your payment is being confirmed. This page will update once complete.</p>
-                </CardContent>
-              </Card>
+              <div className="mb-6 p-5 rounded-xl bg-[#E8C874]/5 border border-[#E8C874]/10">
+                <div className="flex items-center gap-2 text-[#E8C874] font-semibold text-base pb-2">
+                  <Clock className="w-5 h-5" />
+                  Payment Processing
+                </div>
+                <p className="text-sm text-white/50">Your payment is being confirmed. This page will update once complete.</p>
+              </div>
             )}
             {isLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                <Loader2 className="w-8 h-8 animate-spin text-white/30" />
               </div>
             ) : wonBids.length === 0 ? (
-              <Card className="p-12 text-center">
-                <TrendingUp className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Won Auctions Yet</h3>
-                <p className="text-muted-foreground">
+              <div className="p-12 text-center rounded-xl bg-white/[0.02] border border-white/5">
+                <TrendingUp className="w-12 h-12 mx-auto text-white/20 mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">No Won Auctions Yet</h3>
+                <p className="text-white/50">
                   Auctions you win will appear here.
                 </p>
-              </Card>
+              </div>
             ) : (
               <div className="space-y-4">
                 {wonBids.map((bid) => (
-                  <Card key={bid.artworkId} className="p-4 border-green-200 dark:border-green-800" data-testid={`card-won-${bid.artworkId}`}>
+                  <div key={bid.artworkId} className="p-4 rounded-xl bg-white/[0.02] border border-emerald-500/10 hover:border-emerald-500/20 transition-colors" data-testid={`card-won-${bid.artworkId}`}>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-white/5">
                         <img 
                           src={bid.artwork?.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                           alt={bid.artwork?.title || "Artwork"} 
@@ -359,21 +337,22 @@ export default function MyBids() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <h3 className="font-semibold hover:text-primary truncate">
+                          <h3 className="font-semibold text-white hover:text-[#E8C874] truncate transition-colors">
                             {bid.artwork?.title || `Artwork #${bid.artworkId}`}
                           </h3>
                         </Link>
-                        <p className="text-sm text-green-600">Auction Ended - You Won!</p>
+                        <p className="text-sm text-emerald-400">Auction Ended - You Won!</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Winning Bid</p>
-                        <p className="text-lg font-mono font-bold text-green-600">${bid.userHighestBid.toLocaleString()}</p>
-                        <Badge className="mt-1 bg-green-600">{bid.isPaid ? 'Paid' : 'Won'}</Badge>
+                        <p className="text-sm text-white/40">Winning Bid</p>
+                        <p className="text-lg font-mono font-bold text-emerald-400">${bid.userHighestBid.toLocaleString()}</p>
+                        <Badge className={`mt-1 ${bid.isPaid ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-[#E8C874]/20 text-[#E8C874] border border-[#E8C874]/20'}`}>{bid.isPaid ? 'Paid' : 'Won'}</Badge>
                       </div>
                       {!bid.isPaid && (
                         <Button 
                           onClick={() => handlePayNow(bid.artworkId)}
                           disabled={processingPayment === bid.artworkId}
+                          className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90"
                           data-testid={`button-pay-${bid.artworkId}`}
                         >
                           {processingPayment === bid.artworkId ? (
@@ -385,24 +364,23 @@ export default function MyBids() {
                         </Button>
                       )}
                     </div>
-                  </Card>
+                  </div>
                 ))}
               </div>
             )}
           </TabsContent>
 
-          {/* Watchlist Tab */}
           <TabsContent value="watchlist" className="mt-6">
-            <Card className="p-12 text-center">
-              <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Your Watchlist is Empty</h3>
-              <p className="text-muted-foreground mb-4">
+            <div className="p-12 text-center rounded-xl bg-white/[0.02] border border-white/5">
+              <Heart className="w-12 h-12 mx-auto text-white/20 mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">Your Watchlist is Empty</h3>
+              <p className="text-white/50 mb-4">
                 Save artworks you love to keep track of their auctions.
               </p>
               <Link href="/gallery">
-                <Button variant="outline" data-testid="button-explore-watchlist">Explore Artworks</Button>
+                <Button variant="outline" className="rounded-full border-white/20 text-white hover:bg-white/10" data-testid="button-explore-watchlist">Explore Artworks</Button>
               </Link>
-            </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

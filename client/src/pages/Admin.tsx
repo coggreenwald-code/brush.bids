@@ -3,7 +3,6 @@ import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtworks, useUpdateArtworkStatus, useAiReview, useDeleteArtwork } from "@/hooks/use-artworks";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -76,11 +75,11 @@ export default function Admin() {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Card className="p-8 text-center max-w-md">
-            <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
-            <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">You don't have permission to access the admin panel.</p>
-          </Card>
+          <div className="p-8 text-center max-w-md rounded-xl bg-white/[0.02] border border-white/5">
+            <AlertCircle className="w-12 h-12 mx-auto text-red-400 mb-4" />
+            <h2 className="text-xl font-bold text-white mb-2">Access Denied</h2>
+            <p className="text-white/50">You don't have permission to access the admin panel.</p>
+          </div>
         </div>
         <Footer />
       </Layout>
@@ -126,12 +125,13 @@ export default function Admin() {
       <div className="space-y-6 pb-16">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-display font-bold" data-testid="text-admin-title">Admin Curation Portal</h1>
-            <p className="text-muted-foreground">Review, approve, reject, or remove artwork submissions</p>
+            <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Administration</span>
+            <h1 className="text-3xl font-display font-bold text-white mt-1" data-testid="text-admin-title">Admin Curation Portal</h1>
+            <p className="text-white/50">Review, approve, reject, or remove artwork submissions</p>
           </div>
           
           {pendingCount > 0 && (
-            <Badge variant="outline" className="bg-[#B8965A]/10 text-[#4C392D] border-[#B8965A]/20 dark:bg-[#B8965A]/20 dark:text-[#C9A84C]">
+            <Badge variant="outline" className="bg-[#E8C874]/10 text-[#E8C874] border-[#E8C874]/20">
               <AlertCircle className="w-3 h-3 mr-1" />
               {pendingCount} pending review
             </Badge>
@@ -139,33 +139,33 @@ export default function Admin() {
         </div>
 
         <div className="grid grid-cols-3 gap-4">
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-[#B8965A]" data-testid="text-pending-count">{pendingCount}</div>
-            <div className="text-sm text-muted-foreground">Pending</div>
-          </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600" data-testid="text-approved-count">{approvedCount}</div>
-            <div className="text-sm text-muted-foreground">Approved</div>
-          </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600" data-testid="text-rejected-count">{rejectedCount}</div>
-            <div className="text-sm text-muted-foreground">Rejected</div>
-          </Card>
+          <div className="p-4 text-center rounded-xl bg-white/[0.02] border border-white/5">
+            <div className="text-2xl font-bold text-[#E8C874]" data-testid="text-pending-count">{pendingCount}</div>
+            <div className="text-sm text-white/40">Pending</div>
+          </div>
+          <div className="p-4 text-center rounded-xl bg-white/[0.02] border border-white/5">
+            <div className="text-2xl font-bold text-emerald-400" data-testid="text-approved-count">{approvedCount}</div>
+            <div className="text-sm text-white/40">Approved</div>
+          </div>
+          <div className="p-4 text-center rounded-xl bg-white/[0.02] border border-white/5">
+            <div className="text-2xl font-bold text-red-400" data-testid="text-rejected-count">{rejectedCount}</div>
+            <div className="text-sm text-white/40">Rejected</div>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
             <Input 
               placeholder="Search by title, description, or artist ID..." 
-              className="pl-9"
+              className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/30"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="input-admin-search"
             />
           </div>
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-48" data-testid="select-admin-sort">
+            <SelectTrigger className="w-48 bg-white/5 border-white/10 text-white" data-testid="select-admin-sort">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -194,68 +194,69 @@ export default function Admin() {
             {isLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-48 bg-muted animate-pulse rounded-xl" />
+                  <div key={i} className="h-48 bg-white/5 animate-pulse rounded-xl" />
                 ))}
               </div>
             ) : filteredArtworks.length === 0 ? (
-              <Card className="p-12 text-center">
-                <Check className="w-12 h-12 mx-auto text-green-500 mb-4" />
-                <h3 className="text-xl font-bold">
+              <div className="p-12 text-center rounded-xl bg-white/[0.02] border border-white/5">
+                <Check className="w-12 h-12 mx-auto text-emerald-400 mb-4" />
+                <h3 className="text-xl font-bold text-white">
                   {activeTab === "pending" ? "All caught up!" : `No ${activeTab} artworks`}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-white/50">
                   {activeTab === "pending" 
                     ? "No pending artworks to review." 
                     : `There are no ${activeTab} artworks${searchQuery ? " matching your search" : ""}.`}
                 </p>
-              </Card>
+              </div>
             ) : (
               <div className="grid gap-6">
                 {filteredArtworks.map((artwork) => (
-                  <Card key={artwork.id} className="p-6 flex flex-col md:flex-row gap-6 overflow-hidden" data-testid={`card-artwork-${artwork.id}`}>
-                    <div className="w-full md:w-48 aspect-square bg-muted rounded-lg overflow-hidden shrink-0">
+                  <div key={artwork.id} className="p-6 flex flex-col md:flex-row gap-6 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors" data-testid={`card-artwork-${artwork.id}`}>
+                    <div className="w-full md:w-48 aspect-square bg-white/5 rounded-lg overflow-hidden shrink-0">
                       <img src={artwork.imageUrl} alt={artwork.title} className="w-full h-full object-cover" />
                     </div>
                     
                     <div className="flex-1 space-y-4">
                       <div className="flex justify-between items-start gap-4 flex-wrap">
                         <div>
-                          <h3 className="text-xl font-bold">{artwork.title}</h3>
-                          <p className="text-sm text-muted-foreground">by Artist #{artwork.artistId}</p>
+                          <h3 className="text-xl font-bold text-white">{artwork.title}</h3>
+                          <p className="text-sm text-white/40">by Artist #{artwork.artistId}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge 
                             variant="outline" 
                             className={
                               artwork.status === 'pending' 
-                                ? "bg-[#B8965A]/10 text-[#4C392D] border-[#B8965A]/20" 
+                                ? "bg-[#E8C874]/10 text-[#E8C874] border-[#E8C874]/20" 
                                 : artwork.status === 'approved'
-                                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800"
-                                : "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : "bg-red-500/10 text-red-400 border-red-500/20"
                             }
                           >
                             {artwork.status.charAt(0).toUpperCase() + artwork.status.slice(1)}
                           </Badge>
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <span className="text-sm text-white/30 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {new Date(artwork.createdAt || '').toLocaleDateString()}
                           </span>
                         </div>
                       </div>
 
-                      <p className="text-sm line-clamp-2">{artwork.description}</p>
+                      <p className="text-sm text-white/60 line-clamp-2">{artwork.description}</p>
                       
                       {artwork.aiScore ? (
-                        <div className="bg-primary/5 border border-primary/10 p-4 rounded-lg">
+                        <div className="bg-[#E8C874]/5 border border-[#E8C874]/10 p-4 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            <span className="font-bold text-primary">AI Score: {artwork.aiScore}/100</span>
+                            <Sparkles className="w-4 h-4 text-[#E8C874]" />
+                            <span className="font-bold text-[#E8C874]">AI Score: {artwork.aiScore}/100</span>
                           </div>
-                          <p className="text-sm italic text-muted-foreground">"{artwork.aiFeedback}"</p>
+                          <p className="text-sm italic text-white/50">"{artwork.aiFeedback}"</p>
                         </div>
                       ) : (
                         <Button 
-                          variant="secondary" 
+                          variant="outline" 
+                          className="rounded-full border-white/20 text-white hover:bg-white/10"
                           onClick={() => handleReview(artwork.id)}
                           disabled={aiReview.isPending}
                           data-testid={`button-ai-review-${artwork.id}`}
@@ -265,10 +266,10 @@ export default function Admin() {
                         </Button>
                       )}
                       
-                      <div className="flex gap-3 pt-4 border-t flex-wrap">
+                      <div className="flex gap-3 pt-4 border-t border-white/5 flex-wrap">
                         {artwork.status !== "approved" && (
                           <Button 
-                            className="bg-green-600 text-white" 
+                            className="rounded-full bg-emerald-500 text-white hover:bg-emerald-500/90" 
                             onClick={() => handleDecision(artwork.id, "approved")}
                             disabled={updateStatus.isPending}
                             data-testid={`button-approve-${artwork.id}`}
@@ -279,6 +280,7 @@ export default function Admin() {
                         {artwork.status !== "rejected" && (
                           <Button 
                             variant="destructive"
+                            className="rounded-full"
                             onClick={() => handleDecision(artwork.id, "rejected")}
                             disabled={updateStatus.isPending}
                             data-testid={`button-reject-${artwork.id}`}
@@ -291,7 +293,7 @@ export default function Admin() {
                           <AlertDialogTrigger asChild>
                             <Button 
                               variant="outline" 
-                              className="text-destructive border-destructive/30"
+                              className="rounded-full border-red-500/20 text-red-400 hover:bg-red-500/10"
                               disabled={deleteArtwork.isPending}
                               data-testid={`button-delete-${artwork.id}`}
                             >
@@ -319,7 +321,7 @@ export default function Admin() {
                         </AlertDialog>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 ))}
               </div>
             )}

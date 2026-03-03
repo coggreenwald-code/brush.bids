@@ -3,7 +3,6 @@ import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useArtworks } from "@/hooks/use-artworks";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -27,13 +26,13 @@ function SaleCountdown({ listedAt }: { listedAt: string }) {
   const now = new Date();
   const diff = endDate.getTime() - now.getTime();
 
-  if (diff <= 0) return <span className="text-red-600 text-xs font-medium">Listing expired</span>;
+  if (diff <= 0) return <span className="text-red-400 text-xs font-medium">Listing expired</span>;
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
   return (
-    <span className="text-xs text-[#B8965A] font-medium flex items-center gap-1" data-testid="text-sale-countdown">
+    <span className="text-xs text-[#E8C874] font-medium flex items-center gap-1" data-testid="text-sale-countdown">
       <Clock className="w-3 h-3" /> {days}d {hours}h left to sell
     </span>
   );
@@ -212,19 +211,16 @@ export default function Dashboard() {
 
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
-  // Calculate real stats based on user's actual activity
   const soldArtworks = myArtworks.filter(a => a.paidAt);
   const totalEarnings = soldArtworks.reduce((sum, a) => {
     const price = Number(a.price) || 0;
     const boost = a.promotionPercentage || 0;
-    // Artist gets 75% minus boost percentage
     return sum + (price * (0.75 - boost / 100));
   }, 0);
   const totalSold = soldArtworks.length;
   const activeListings = myArtworks.filter(a => a.status === "approved" && !a.paidAt).length;
   const pendingReview = myArtworks.filter(a => a.status === "pending").length;
 
-  // Only show chart data if there are actual earnings
   const chartData = totalSold > 0 ? [
     { name: 'Jan', earnings: 0 },
     { name: 'Feb', earnings: 0 },
@@ -237,9 +233,9 @@ export default function Dashboard() {
       <Layout>
         <div className="flex items-center justify-center h-full min-h-[50vh]">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold">Please Sign In</h2>
-            <p>You need to be logged in to view your dashboard.</p>
-            <Button onClick={() => window.location.href = "/api/login"}>Login</Button>
+            <h2 className="text-2xl font-bold text-white">Please Sign In</h2>
+            <p className="text-white/60">You need to be logged in to view your dashboard.</p>
+            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b563]">Login</Button>
           </div>
         </div>
       </Layout>
@@ -249,92 +245,84 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="space-y-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
-            <span className="text-sm font-medium text-primary uppercase tracking-wider">Your Studio</span>
-            <h1 className="text-3xl font-display font-bold mt-1">
+            <span className="text-sm font-medium text-[#E8C874] uppercase tracking-widest">Your Studio</span>
+            <h1 className="text-3xl font-display font-bold mt-1 text-white">
               {user.role === "buyer" ? "Collector Dashboard" : user.role === "both" ? "Artist & Collector Dashboard" : "Artist Dashboard"}
             </h1>
-            <p className="text-muted-foreground">Welcome back, {user.firstName || user.username}</p>
+            <p className="text-white/50">Welcome back, {user.firstName || user.username}</p>
           </div>
           {(user.role === "artist" || user.role === "both") && (
             <Link href="/submit-artwork">
-              <Button size="lg" className="rounded-full shadow-lg">
+              <Button className="rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold px-6">
                 <Plus className="mr-2 h-5 w-5" /> Submit New Art
               </Button>
             </Link>
           )}
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Earnings</CardTitle>
-              <DollarSign className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${Math.round(totalEarnings).toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">{totalSold > 0 ? `From ${totalSold} sale${totalSold > 1 ? 's' : ''}` : 'No sales yet'}</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="text-sm font-medium text-white/50">Total Earnings</span>
+              <DollarSign className="h-4 w-4 text-[#E8C874]" />
+            </div>
+            <div className="text-2xl font-bold text-white">${Math.round(totalEarnings).toLocaleString()}</div>
+            <p className="text-xs text-white/40 mt-1">{totalSold > 0 ? `From ${totalSold} sale${totalSold > 1 ? 's' : ''}` : 'No sales yet'}</p>
+          </div>
           
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Listings</CardTitle>
-              <Palette className="h-4 w-4 text-[#9E8472]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{activeListings}</div>
-              <p className="text-xs text-muted-foreground">{pendingReview > 0 ? `${pendingReview} pending review` : 'None pending review'}</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="text-sm font-medium text-white/50">Active Listings</span>
+              <Palette className="h-4 w-4 text-[#E8C874]" />
+            </div>
+            <div className="text-2xl font-bold text-white">{activeListings}</div>
+            <p className="text-xs text-white/40 mt-1">{pendingReview > 0 ? `${pendingReview} pending review` : 'None pending review'}</p>
+          </div>
           
-          <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Items Sold</CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalSold}</div>
-              <p className="text-xs text-muted-foreground">Across 5 different buyers</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="text-sm font-medium text-white/50">Items Sold</span>
+              <TrendingUp className="h-4 w-4 text-emerald-400" />
+            </div>
+            <div className="text-2xl font-bold text-white">{totalSold}</div>
+            <p className="text-xs text-white/40 mt-1">Across 5 different buyers</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="artworks">
-              <div className="flex justify-between items-center mb-4">
-                <TabsList>
-                  <TabsTrigger value="artworks">My Artworks</TabsTrigger>
-                  <TabsTrigger value="portfolio" data-testid="tab-portfolio">
+              <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
+                <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1">
+                  <TabsTrigger value="artworks" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">My Artworks</TabsTrigger>
+                  <TabsTrigger value="portfolio" data-testid="tab-portfolio" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">
                     <FolderOpen className="w-4 h-4 mr-1" /> Portfolio
                   </TabsTrigger>
-                  <TabsTrigger value="sold">Sold History</TabsTrigger>
+                  <TabsTrigger value="sold" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">Sold History</TabsTrigger>
                 </TabsList>
               </div>
               
               <TabsContent value="artworks" className="space-y-6">
                 {isLoading ? (
-                  <div>Loading...</div>
+                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#E8C874]" /></div>
                 ) : myArtworks.length === 0 ? (
-                  <div className="text-center py-16 border-2 border-dashed rounded-2xl bg-muted/10 watercolor-bg">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Palette className="w-8 h-8 text-primary" />
+                  <div className="text-center py-16 border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#E8C874]/10 flex items-center justify-center">
+                      <Palette className="w-8 h-8 text-[#E8C874]" />
                     </div>
-                    <h3 className="text-lg font-semibold">No artworks yet</h3>
-                    <p className="text-muted-foreground mb-4">Start your journey by submitting your first piece.</p>
+                    <h3 className="text-lg font-semibold text-white">No artworks yet</h3>
+                    <p className="text-white/50 mb-4">Start your journey by submitting your first piece.</p>
                     <Link href="/submit-artwork">
-                      <Button>Submit Art</Button>
+                      <Button className="rounded-full bg-[#E8C874] text-[#0a0a0f]">Submit Art</Button>
                     </Link>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {myArtworks.map(artwork => (
-                      <Card key={artwork.id} className="overflow-hidden" data-testid={`card-dashboard-artwork-${artwork.id}`}>
-                        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      <div key={artwork.id} className="bg-[#0d0d14] border border-white/5 rounded-lg overflow-visible" data-testid={`card-dashboard-artwork-${artwork.id}`}>
+                        <div className="relative aspect-[4/3] overflow-hidden bg-white/[0.02] rounded-t-lg">
                           <Link href={`/artwork/${artwork.id}`}>
                             <img 
                               src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800"} 
@@ -348,11 +336,12 @@ export default function Dashboard() {
                                 artwork.status === 'approved' ? 'default' : 
                                 artwork.status === 'rejected' ? 'destructive' : 'secondary'
                               }
+                              className={artwork.status === 'approved' ? 'bg-emerald-500/80 text-white border-emerald-400/30' : ''}
                             >
                               {artwork.status}
                             </Badge>
                             {(artwork.promotionPercentage ?? 0) > 0 && (
-                              <Badge variant="outline" className="bg-[#B8965A]/90 text-white border-[#C9A84C]">
+                              <Badge variant="outline" className="bg-[#E8C874]/90 text-[#0a0a0f] border-[#E8C874]/50">
                                 <Rocket className="w-3 h-3 mr-1" />
                                 {artwork.promotionPercentage}% Boost
                               </Badge>
@@ -367,25 +356,26 @@ export default function Dashboard() {
                             </div>
                           )}
                         </div>
-                        <CardContent className="p-4 space-y-3">
+                        <div className="p-4 space-y-3">
                           <div>
-                            <h3 className="font-semibold line-clamp-1">{artwork.title}</h3>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <h3 className="font-semibold text-white line-clamp-1">{artwork.title}</h3>
+                            <div className="flex items-center gap-2 text-xs text-white/40 mt-1">
                               <Clock className="w-3 h-3" />
                               <span>Auction active</span>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between pt-2 border-t">
+                          <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
                             <div>
-                              <div className="text-xs text-muted-foreground">Current Bid</div>
-                              <div className="font-bold text-primary">${Number(artwork.price).toLocaleString()}</div>
+                              <div className="text-xs text-white/40">Current Bid</div>
+                              <div className="font-bold text-[#E8C874]">${Number(artwork.price).toLocaleString()}</div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-wrap">
                               {artwork.status === 'approved' && !artwork.paidAt && (
                                 <>
                                   <Button 
                                     size="sm" 
                                     variant="outline"
+                                    className="border-white/10 text-white/70 hover:text-white rounded-full"
                                     onClick={(e) => {
                                       e.preventDefault();
                                       setQrArtwork(artwork);
@@ -396,7 +386,7 @@ export default function Dashboard() {
                                   </Button>
                                   <Button 
                                     size="sm" 
-                                    variant={(artwork.promotionPercentage ?? 0) > 0 ? "outline" : "default"}
+                                    className={`rounded-full ${(artwork.promotionPercentage ?? 0) > 0 ? 'border-white/10 text-white/70 bg-transparent border' : 'bg-[#E8C874] text-[#0a0a0f]'}`}
                                     onClick={(e) => {
                                       e.preventDefault();
                                       setBoostArtwork(artwork);
@@ -410,55 +400,55 @@ export default function Dashboard() {
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
               </TabsContent>
               
               <TabsContent value="portfolio" className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-muted-foreground">Showcase your artwork. List pieces for sale or submit them to auction.</p>
-                  <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full gap-1" data-testid="button-add-portfolio">
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <p className="text-sm text-white/50">Showcase your artwork. List pieces for sale or submit them to auction.</p>
+                  <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full bg-[#E8C874] text-[#0a0a0f] gap-1" data-testid="button-add-portfolio">
                     <Plus className="w-4 h-4" /> Add Artwork
                   </Button>
                 </div>
                 {portfolioLoading ? (
-                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8" /></div>
+                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#E8C874]" /></div>
                 ) : !portfolioItems || portfolioItems.length === 0 ? (
-                  <div className="text-center py-16 border-2 border-dashed rounded-2xl bg-muted/10">
-                    <Palette className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold">Your portfolio is empty</h3>
-                    <p className="text-muted-foreground mb-4">Start building your portfolio by adding your artwork.</p>
-                    <Button onClick={() => setShowAddForm(true)} className="rounded-full gap-2" data-testid="button-add-portfolio-empty">
+                  <div className="text-center py-16 border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+                    <Palette className="w-12 h-12 mx-auto mb-4 text-white/30" />
+                    <h3 className="text-lg font-semibold text-white">Your portfolio is empty</h3>
+                    <p className="text-white/50 mb-4">Start building your portfolio by adding your artwork.</p>
+                    <Button onClick={() => setShowAddForm(true)} className="rounded-full bg-[#E8C874] text-[#0a0a0f] gap-2" data-testid="button-add-portfolio-empty">
                       <Plus className="w-4 h-4" /> Add Your First Piece
                     </Button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {portfolioItems.map((item) => (
-                      <Card key={item.id} className="overflow-hidden group" data-testid={`portfolio-item-${item.id}`}>
-                        <div className="aspect-square overflow-hidden bg-muted relative">
+                      <div key={item.id} className="bg-[#0d0d14] border border-white/5 rounded-lg overflow-visible group" data-testid={`portfolio-item-${item.id}`}>
+                        <div className="aspect-square overflow-hidden bg-white/[0.02] relative rounded-t-lg">
                           <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                           {item.listedForSale && (
-                            <Badge className="absolute top-2 right-2 bg-[#B8965A]" data-testid={`badge-listed-${item.id}`}>
+                            <Badge className="absolute top-2 right-2 bg-[#E8C874] text-[#0a0a0f]" data-testid={`badge-listed-${item.id}`}>
                               <DollarSign className="w-3 h-3 mr-1" /> Listed
                             </Badge>
                           )}
                         </div>
-                        <CardContent className="p-4 space-y-3">
+                        <div className="p-4 space-y-3">
                           <div>
-                            <h3 className="font-semibold text-lg line-clamp-1" data-testid={`text-portfolio-title-${item.id}`}>{item.title}</h3>
-                            {item.dimensions && <p className="text-xs text-muted-foreground">{item.dimensions}</p>}
-                            {item.description && <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{item.description}</p>}
+                            <h3 className="font-semibold text-lg text-white line-clamp-1" data-testid={`text-portfolio-title-${item.id}`}>{item.title}</h3>
+                            {item.dimensions && <p className="text-xs text-white/40">{item.dimensions}</p>}
+                            {item.description && <p className="text-sm text-white/50 line-clamp-2 mt-1">{item.description}</p>}
                           </div>
 
                           {item.listedForSale && item.listedAt && (
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono font-semibold">${Number(item.price).toLocaleString()}</span>
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-mono font-semibold text-white">${Number(item.price).toLocaleString()}</span>
                               {(item as any).expired ? (
-                                <span className="text-xs text-red-600 font-medium">Listing expired</span>
+                                <span className="text-xs text-red-400 font-medium">Listing expired</span>
                               ) : (
                                 <SaleCountdown listedAt={item.listedAt.toString()} />
                               )}
@@ -468,85 +458,82 @@ export default function Dashboard() {
                           <div className="flex gap-2 flex-wrap">
                             {!item.listedForSale && !(item as any).expired && (
                               <>
-                                <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs" onClick={() => setShowSellDialog(item)} data-testid={`button-list-sale-${item.id}`}>
+                                <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs rounded-full border-white/10 text-white/70" onClick={() => setShowSellDialog(item)} data-testid={`button-list-sale-${item.id}`}>
                                   <DollarSign className="w-3 h-3" /> List for Sale
                                 </Button>
-                                <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs" onClick={() => setShowConvertDialog(item)} data-testid={`button-convert-auction-${item.id}`}>
+                                <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs rounded-full border-white/10 text-white/70" onClick={() => setShowConvertDialog(item)} data-testid={`button-convert-auction-${item.id}`}>
                                   <ArrowRight className="w-3 h-3" /> Submit to Auction
                                 </Button>
                               </>
                             )}
                             {item.listedForSale && !(item as any).expired && (
-                              <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs" onClick={() => setShowConvertDialog(item)} data-testid={`button-convert-auction-listed-${item.id}`}>
+                              <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs rounded-full border-white/10 text-white/70" onClick={() => setShowConvertDialog(item)} data-testid={`button-convert-auction-listed-${item.id}`}>
                                 <ArrowRight className="w-3 h-3" /> Submit to Auction
                               </Button>
                             )}
-                            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => deletePortfolioItem.mutate(item.id)} data-testid={`button-delete-portfolio-${item.id}`}>
+                            <Button size="sm" variant="ghost" className="text-red-400" onClick={() => deletePortfolioItem.mutate(item.id)} data-testid={`button-delete-portfolio-${item.id}`}>
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
               </TabsContent>
 
               <TabsContent value="sold">
-                <div className="text-center py-12 text-muted-foreground">
+                <div className="text-center py-12 text-white/40">
                   Transaction history will appear here.
                 </div>
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* Sidebar Area */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Earnings Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {chartData.length > 0 ? (
-                  <div className="h-[200px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} />
-                        <YAxis axisLine={false} tickLine={false} fontSize={12} tickFormatter={(value) => `$${value}`} />
-                        <Tooltip />
-                        <Bar dataKey="earnings" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
+            <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
+              <h3 className="text-white font-semibold mb-4">Earnings Overview</h3>
+              {chartData.length > 0 ? (
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} tick={{ fill: 'rgba(255,255,255,0.4)' }} />
+                      <YAxis axisLine={false} tickLine={false} fontSize={12} tickFormatter={(value) => `$${value}`} tick={{ fill: 'rgba(255,255,255,0.4)' }} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#0d0d14', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                        labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
+                      />
+                      <Bar dataKey="earnings" fill="#E8C874" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center text-center">
+                  <div>
+                    <DollarSign className="w-8 h-8 mx-auto mb-2 text-white/20" />
+                    <p className="text-sm text-white/40">No earnings yet</p>
+                    <p className="text-xs text-white/30">Your earnings will appear here once you make a sale</p>
                   </div>
-                ) : (
-                  <div className="h-[200px] flex items-center justify-center text-center">
-                    <div className="text-muted-foreground">
-                      <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No earnings yet</p>
-                      <p className="text-xs">Your earnings will appear here once you make a sale</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </div>
+              )}
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5" /> Your Profile
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Name Section */}
+            <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <h3 className="text-white font-semibold flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#E8C874]" /> Your Profile
+                </h3>
+              </div>
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm text-muted-foreground">Name</Label>
+                    <Label className="text-sm text-white/50">Name</Label>
                     {!editingName && (
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-6 px-2 text-xs"
+                        className="text-xs text-white/50"
                         onClick={() => {
                           setFirstName(user?.firstName || "");
                           setLastName(user?.lastName || "");
@@ -565,12 +552,14 @@ export default function Dashboard() {
                           placeholder="First name"
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
                           data-testid="input-edit-first-name"
                         />
                         <Input
                           placeholder="Last name"
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
+                          className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
                           data-testid="input-edit-last-name"
                         />
                       </div>
@@ -578,6 +567,7 @@ export default function Dashboard() {
                         <Button 
                           variant="outline" 
                           size="sm" 
+                          className="rounded-full border-white/10 text-white/60"
                           onClick={() => setEditingName(false)}
                           data-testid="button-cancel-name"
                         >
@@ -585,6 +575,7 @@ export default function Dashboard() {
                         </Button>
                         <Button 
                           size="sm" 
+                          className="rounded-full bg-[#E8C874] text-[#0a0a0f]"
                           onClick={() => updateNameMutation.mutate({ firstName: firstName.trim(), lastName: lastName.trim() })}
                           disabled={updateNameMutation.isPending || !firstName.trim() || !lastName.trim()}
                           data-testid="button-save-name"
@@ -599,23 +590,22 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-white">
                       {user?.firstName && user?.lastName 
                         ? `${user.firstName} ${user.lastName}` 
-                        : <span className="text-muted-foreground italic">Add your name</span>}
+                        : <span className="text-white/30 italic">Add your name</span>}
                     </p>
                   )}
                 </div>
 
-                {/* Bio Section */}
-                <div className="space-y-2 pt-2 border-t">
+                <div className="space-y-2 pt-2 border-t border-white/5">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm text-muted-foreground">Bio</Label>
+                    <Label className="text-sm text-white/50">Bio</Label>
                     {!editingBio && (
                       <Button 
                         variant="ghost" 
                         size="sm"
-                        className="h-6 px-2 text-xs"
+                        className="text-xs text-white/50"
                         onClick={() => {
                           setBioText(user?.bio || "");
                           setEditingBio(true);
@@ -632,16 +622,17 @@ export default function Dashboard() {
                       placeholder="Tell buyers about yourself, your artistic style, and what inspires you..."
                       value={bioText}
                       onChange={(e) => setBioText(e.target.value)}
-                      className="min-h-[100px]"
+                      className="min-h-[100px] bg-white/5 border-white/10 text-white placeholder:text-white/30"
                       maxLength={500}
                       data-testid="textarea-bio"
                     />
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">{bioText.length}/500</span>
+                    <div className="flex justify-between items-center flex-wrap gap-2">
+                      <span className="text-xs text-white/40">{bioText.length}/500</span>
                       <div className="flex gap-2">
                         <Button 
                           variant="outline" 
                           size="sm" 
+                          className="rounded-full border-white/10 text-white/60"
                           onClick={() => setEditingBio(false)}
                           data-testid="button-cancel-bio"
                         >
@@ -649,6 +640,7 @@ export default function Dashboard() {
                         </Button>
                         <Button 
                           size="sm" 
+                          className="rounded-full bg-[#E8C874] text-[#0a0a0f]"
                           onClick={() => updateBioMutation.mutate(bioText)}
                           disabled={updateBioMutation.isPending}
                           data-testid="button-save-bio"
@@ -666,37 +658,36 @@ export default function Dashboard() {
                 ) : (
                   <div>
                     {user?.bio ? (
-                      <p className="text-sm text-muted-foreground">{user.bio}</p>
+                      <p className="text-sm text-white/50">{user.bio}</p>
                     ) : (
-                      <p className="text-sm text-muted-foreground italic">
+                      <p className="text-sm text-white/30 italic">
                         Add a bio to tell buyers about yourself and your art.
                       </p>
                     )}
                     <Link href={`/artist/${user?.id}`}>
-                      <Button variant="outline" size="sm" className="mt-3 w-full" data-testid="link-view-my-profile">
+                      <Button variant="outline" size="sm" className="mt-3 w-full rounded-full border-white/10 text-white/60" data-testid="link-view-my-profile">
                         View Public Profile
                       </Button>
                     </Link>
                   </div>
                 )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" /> Account Type
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Current: <span className="font-medium text-foreground capitalize">{user?.role === "both" ? "Artist & Collector" : user?.role}</span>
+            <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
+              <h3 className="text-white font-semibold flex items-center gap-2 mb-3">
+                <Settings className="w-5 h-5 text-[#E8C874]" /> Account Type
+              </h3>
+              <div className="space-y-3">
+                <p className="text-sm text-white/50">
+                  Current: <span className="font-medium text-white capitalize">{user?.role === "both" ? "Artist & Collector" : user?.role}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button 
                     variant={user?.role === "artist" ? "default" : "outline"} 
                     size="sm"
+                    className={`rounded-full ${user?.role === "artist" ? "bg-[#E8C874] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("artist")}
                     disabled={updateRoleMutation.isPending || user?.role === "artist"}
                     data-testid="button-role-artist"
@@ -706,6 +697,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "buyer" ? "default" : "outline"} 
                     size="sm"
+                    className={`rounded-full ${user?.role === "buyer" ? "bg-[#E8C874] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("buyer")}
                     disabled={updateRoleMutation.isPending || user?.role === "buyer"}
                     data-testid="button-role-collector"
@@ -715,6 +707,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "both" ? "default" : "outline"} 
                     size="sm"
+                    className={`rounded-full ${user?.role === "both" ? "bg-[#E8C874] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("both")}
                     disabled={updateRoleMutation.isPending || user?.role === "both"}
                     data-testid="button-role-both"
@@ -723,23 +716,19 @@ export default function Dashboard() {
                   </Button>
                 </div>
                 {updateRoleMutation.isPending && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-white/40">
                     <Loader2 className="w-4 h-4 animate-spin" /> Updating...
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="bg-gradient-to-br from-primary to-accent text-white border-0">
-              <CardHeader>
-                <CardTitle className="text-white">Pro Tip</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/90">
-                  Boost your listings to get more visibility! Promoted artworks appear first in the gallery and attract more bidders.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="rounded-lg p-5 border border-[#E8C874]/20 bg-gradient-to-br from-[#E8C874]/10 to-transparent">
+              <h3 className="text-[#E8C874] font-semibold mb-2">Pro Tip</h3>
+              <p className="text-white/60 text-sm">
+                Boost your listings to get more visibility! Promoted artworks appear first in the gallery and attract more bidders.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -762,44 +751,44 @@ export default function Dashboard() {
       )}
 
       <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-        <DialogContent className="sm:max-w-md" data-testid="dialog-add-portfolio">
+        <DialogContent className="sm:max-w-md bg-[#0d0d14] border-white/10" data-testid="dialog-add-portfolio">
           <DialogHeader>
-            <DialogTitle className="font-display">Add to Portfolio</DialogTitle>
-            <DialogDescription>Add a new artwork to your personal portfolio.</DialogDescription>
+            <DialogTitle className="font-display text-white">Add to Portfolio</DialogTitle>
+            <DialogDescription className="text-white/50">Add a new artwork to your personal portfolio.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Title</Label>
-              <Input value={newItem.title} onChange={(e) => setNewItem(p => ({ ...p, title: e.target.value }))} placeholder="Artwork title" data-testid="input-portfolio-title" />
+              <Label className="text-white/60">Title</Label>
+              <Input value={newItem.title} onChange={(e) => setNewItem(p => ({ ...p, title: e.target.value }))} placeholder="Artwork title" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-portfolio-title" />
             </div>
             <div>
-              <Label>Description (optional)</Label>
-              <Textarea value={newItem.description} onChange={(e) => setNewItem(p => ({ ...p, description: e.target.value }))} placeholder="Brief description..." data-testid="input-portfolio-description" />
+              <Label className="text-white/60">Description (optional)</Label>
+              <Textarea value={newItem.description} onChange={(e) => setNewItem(p => ({ ...p, description: e.target.value }))} placeholder="Brief description..." className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-portfolio-description" />
             </div>
             <div>
-              <Label>Dimensions (L x W in inches)</Label>
+              <Label className="text-white/60">Dimensions (L x W in inches)</Label>
               <div className="flex gap-2 items-center">
-                <Input type="number" placeholder="Length" onChange={(e) => { const l = e.target.value; const w = newItem.dimensions.split(" x ")[1]?.replace(" inches", "") || ""; setNewItem(p => ({ ...p, dimensions: l && w ? `${l} x ${w} inches` : "" })); }} data-testid="input-portfolio-length" />
-                <span className="text-muted-foreground">x</span>
-                <Input type="number" placeholder="Width" onChange={(e) => { const w = e.target.value; const l = newItem.dimensions.split(" x ")[0] || ""; setNewItem(p => ({ ...p, dimensions: l && w ? `${l} x ${w} inches` : "" })); }} data-testid="input-portfolio-width" />
-                <span className="text-muted-foreground text-sm whitespace-nowrap">inches</span>
+                <Input type="number" placeholder="Length" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" onChange={(e) => { const l = e.target.value; const w = newItem.dimensions.split(" x ")[1]?.replace(" inches", "") || ""; setNewItem(p => ({ ...p, dimensions: l && w ? `${l} x ${w} inches` : "" })); }} data-testid="input-portfolio-length" />
+                <span className="text-white/40">x</span>
+                <Input type="number" placeholder="Width" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" onChange={(e) => { const w = e.target.value; const l = newItem.dimensions.split(" x ")[0] || ""; setNewItem(p => ({ ...p, dimensions: l && w ? `${l} x ${w} inches` : "" })); }} data-testid="input-portfolio-width" />
+                <span className="text-white/40 text-sm whitespace-nowrap">inches</span>
               </div>
             </div>
             <div>
-              <Label>Image</Label>
+              <Label className="text-white/60">Image</Label>
               {imagePreview ? (
-                <div className="relative rounded-md overflow-hidden border bg-muted">
+                <div className="relative rounded-md overflow-hidden border border-white/10 bg-white/[0.02]">
                   <img src={imagePreview} alt="Preview" className="w-full max-h-48 object-contain" />
                 </div>
               ) : (
-                <div className="border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors" onClick={() => fileInputRef.current?.click()} data-testid="dropzone-portfolio-image">
-                  <ImagePlus className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Click to upload</p>
+                <div className="border border-dashed border-white/10 rounded-md p-6 text-center cursor-pointer hover:border-[#E8C874]/30 hover:bg-white/[0.02] transition-colors" onClick={() => fileInputRef.current?.click()} data-testid="dropzone-portfolio-image">
+                  <ImagePlus className="w-8 h-8 mx-auto mb-2 text-white/30" />
+                  <p className="text-sm text-white/40">Click to upload</p>
                 </div>
               )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} data-testid="input-portfolio-file" />
             </div>
-            <Button className="w-full rounded-full" disabled={!newItem.title || !newItem.imageUrl || createItem.isPending} onClick={() => createItem.mutate(newItem)} data-testid="button-save-portfolio">
+            <Button className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold" disabled={!newItem.title || !newItem.imageUrl || createItem.isPending} onClick={() => createItem.mutate(newItem)} data-testid="button-save-portfolio">
               {createItem.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Add to Portfolio
             </Button>
@@ -808,17 +797,17 @@ export default function Dashboard() {
       </Dialog>
 
       <Dialog open={!!showSellDialog} onOpenChange={(open) => { if (!open) setShowSellDialog(null); }}>
-        <DialogContent className="sm:max-w-sm" data-testid="dialog-list-sale">
+        <DialogContent className="sm:max-w-sm bg-[#0d0d14] border-white/10" data-testid="dialog-list-sale">
           <DialogHeader>
-            <DialogTitle className="font-display">List for Sale</DialogTitle>
-            <DialogDescription>Set a price for "{showSellDialog?.title}". Once listed, you have 2 weeks to complete the sale.</DialogDescription>
+            <DialogTitle className="font-display text-white">List for Sale</DialogTitle>
+            <DialogDescription className="text-white/50">Set a price for "{showSellDialog?.title}". Once listed, you have 2 weeks to complete the sale.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Price ($)</Label>
-              <Input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} placeholder="100" data-testid="input-sell-price" />
+              <Label className="text-white/60">Price ($)</Label>
+              <Input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} placeholder="100" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-sell-price" />
             </div>
-            <Button className="w-full rounded-full" disabled={!sellPrice || Number(sellPrice) <= 0 || listForSale.isPending} onClick={() => showSellDialog && listForSale.mutate({ id: showSellDialog.id, price: Number(sellPrice) })} data-testid="button-confirm-list">
+            <Button className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold" disabled={!sellPrice || Number(sellPrice) <= 0 || listForSale.isPending} onClick={() => showSellDialog && listForSale.mutate({ id: showSellDialog.id, price: Number(sellPrice) })} data-testid="button-confirm-list">
               {listForSale.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               List for Sale (2-Week Window)
             </Button>
@@ -827,17 +816,17 @@ export default function Dashboard() {
       </Dialog>
 
       <Dialog open={!!showConvertDialog} onOpenChange={(open) => { if (!open) setShowConvertDialog(null); }}>
-        <DialogContent className="sm:max-w-md" data-testid="dialog-convert-auction">
+        <DialogContent className="sm:max-w-md bg-[#0d0d14] border-white/10" data-testid="dialog-convert-auction">
           <DialogHeader>
-            <DialogTitle className="font-display">Submit to Auction</DialogTitle>
-            <DialogDescription>Convert "{showConvertDialog?.title}" into an auction listing. It will go through curation review first.</DialogDescription>
+            <DialogTitle className="font-display text-white">Submit to Auction</DialogTitle>
+            <DialogDescription className="text-white/50">Convert "{showConvertDialog?.title}" into an auction listing. It will go through curation review first.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Auction Duration</Label>
+              <Label className="text-white/60">Auction Duration</Label>
               <Select value={convertOpts.auctionDurationDays} onValueChange={(v) => setConvertOpts(p => ({ ...p, auctionDurationDays: v }))}>
-                <SelectTrigger data-testid="select-convert-duration"><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-convert-duration"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-[#0d0d14] border-white/10">
                   <SelectItem value="1">1 Day</SelectItem>
                   <SelectItem value="3">3 Days</SelectItem>
                   <SelectItem value="7">7 Days</SelectItem>
@@ -847,10 +836,10 @@ export default function Dashboard() {
               </Select>
             </div>
             <div>
-              <Label>Charity (Optional)</Label>
+              <Label className="text-white/60">Charity (Optional)</Label>
               <Select value={convertOpts.charityId} onValueChange={(v) => setConvertOpts(p => ({ ...p, charityId: v }))}>
-                <SelectTrigger data-testid="select-convert-charity"><SelectValue placeholder="Choose a cause" /></SelectTrigger>
-                <SelectContent className="max-h-60">
+                <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-convert-charity"><SelectValue placeholder="Choose a cause" /></SelectTrigger>
+                <SelectContent className="bg-[#0d0d14] border-white/10 max-h-60">
                   {charities?.map(c => (
                     <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                   ))}
@@ -858,16 +847,16 @@ export default function Dashboard() {
               </Select>
             </div>
             <div>
-              <Label>Review Type</Label>
+              <Label className="text-white/60">Review Type</Label>
               <Select value={convertOpts.reviewType} onValueChange={(v: "ai_instant" | "human_curator") => setConvertOpts(p => ({ ...p, reviewType: v }))}>
-                <SelectTrigger data-testid="select-convert-review"><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-convert-review"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-[#0d0d14] border-white/10">
                   <SelectItem value="ai_instant">Instant Feedback</SelectItem>
                   <SelectItem value="human_curator">Human Curator</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full rounded-full" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
+            <Button className="w-full rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
               {convertToAuction.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Submit for Review
             </Button>

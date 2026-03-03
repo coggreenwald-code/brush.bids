@@ -3,13 +3,10 @@ import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtworks } from "@/hooks/use-artworks";
 import { ArtworkCard } from "@/components/ArtworkCard";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, SlidersHorizontal, X, Palette } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const categories = [
   "All Categories",
@@ -96,156 +93,198 @@ export default function Gallery() {
 
   return (
     <Layout>
-      <div className="space-y-8 pb-16">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <span className="text-sm font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-wider">Curated Collection</span>
-            <h1 className="text-4xl font-sans font-semibold mt-1">Gallery</h1>
-            <p className="text-muted-foreground mt-2">Browse unique artworks from emerging student talent</p>
-          </div>
-          
-          <div className="flex gap-2 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search artworks..." 
-                className="pl-9 bg-card" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                data-testid="input-gallery-search"
-              />
-            </div>
-            
-            <Sheet open={showFilters} onOpenChange={setShowFilters}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="md:hidden" data-testid="button-mobile-filters">
-                  <SlidersHorizontal className="w-4 h-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-80">
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                </SheetHeader>
-                <div className="space-y-6 mt-6">
-                  <div className="space-y-2">
-                    <Label>Category</Label>
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger data-testid="select-category-mobile">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label>Sort By</Label>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger data-testid="select-sort-mobile">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {sortOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <Button variant="outline" className="w-full" onClick={clearFilters} data-testid="button-clear-filters-mobile">
-                    Clear All Filters
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
+      <div className="pb-24">
+        <div
+          style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
+          className="border-b border-white/5 mb-12"
+        >
+          <div className="max-w-7xl mx-auto px-6 py-16">
+            <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">
+              Curated Collection
+            </span>
+            <h1 className="text-5xl md:text-6xl font-display font-bold mt-4 text-white">
+              Gallery
+            </h1>
+            <p className="text-white/50 mt-4 text-lg max-w-xl">
+              Browse unique artworks from emerging student talent
+            </p>
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-4 flex-wrap">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-48" data-testid="select-category">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-48" data-testid="select-sort">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              {sortOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-sm text-muted-foreground">
-              {filteredArtworks.length} {filteredArtworks.length === 1 ? "artwork" : "artworks"}
-            </span>
+        <div
+          style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
+          className="sticky top-0 z-30 border-b border-white/5 backdrop-blur-xl"
+        >
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="relative flex-1 min-w-[200px] max-w-sm">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <input
+                  placeholder="Search artworks..."
+                  className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-white/20 focus:bg-white/[0.07] transition-colors"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  data-testid="input-gallery-search"
+                />
+              </div>
+
+              <div className="hidden md:flex items-center gap-2">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-full text-sm transition-all duration-200 ${
+                      selectedCategory === cat
+                        ? "bg-[#E8C874] text-[#0a0a0f] font-medium"
+                        : "border border-white/10 text-white/60 hover:bg-white/5 hover:text-white hover:border-white/20"
+                    }`}
+                    data-testid={`filter-category-${cat.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    {cat === "All Categories" ? "All" : cat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="hidden md:block ml-auto">
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger
+                    className="w-44 rounded-full bg-white/5 border-white/10 text-white/70 text-sm focus:ring-0 focus:border-white/20"
+                    data-testid="select-sort"
+                  >
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sortOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="hidden md:flex items-center">
+                <span className="text-sm text-white/40">
+                  {filteredArtworks.length} {filteredArtworks.length === 1 ? "artwork" : "artworks"}
+                </span>
+              </div>
+
+              <Sheet open={showFilters} onOpenChange={setShowFilters}>
+                <SheetTrigger asChild>
+                  <button
+                    className="md:hidden p-2.5 rounded-full border border-white/10 text-white/60 hover:bg-white/5 transition-colors"
+                    data-testid="button-mobile-filters"
+                  >
+                    <SlidersHorizontal className="w-4 h-4" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80 bg-[#0a0a0f] border-white/10">
+                  <SheetHeader>
+                    <SheetTitle className="text-white">Filters</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-6 mt-6">
+                    <div className="space-y-2">
+                      <Label className="text-white/60">Category</Label>
+                      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                        <SelectTrigger data-testid="select-category-mobile" className="bg-white/5 border-white/10 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-white/60">Sort By</Label>
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger data-testid="select-sort-mobile" className="bg-white/5 border-white/10 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sortOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <button
+                      className="w-full py-2.5 rounded-full border border-white/20 text-white text-sm hover:bg-white/10 transition-colors"
+                      onClick={clearFilters}
+                      data-testid="button-clear-filters-mobile"
+                    >
+                      Clear All Filters
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
 
         {(activeFilters.length > 0 || searchQuery) && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-muted-foreground">Active filters:</span>
+          <div className="flex items-center gap-2 flex-wrap mt-6 px-1">
+            <span className="text-sm text-white/40">Active filters:</span>
             {searchQuery && (
-              <Badge variant="secondary" className="gap-1">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm">
                 Search: {searchQuery}
-                <button onClick={() => setSearchQuery("")} className="ml-1">
+                <button onClick={() => setSearchQuery("")} className="ml-1 text-white/40 hover:text-white transition-colors">
                   <X className="w-3 h-3" />
                 </button>
-              </Badge>
+              </span>
             )}
             {activeFilters.map((filter) => (
-              <Badge key={filter as string} variant="secondary" className="gap-1">
+              <span key={filter as string} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm">
                 {filter}
-              </Badge>
+              </span>
             ))}
-            <Button variant="ghost" size="sm" onClick={clearFilters} data-testid="button-clear-all">
+            <button
+              onClick={clearFilters}
+              className="text-sm text-[#E8C874] hover:text-[#E8C874]/80 transition-colors"
+              data-testid="button-clear-all"
+            >
               Clear all
-            </Button>
+            </button>
           </div>
         )}
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="h-[350px] bg-muted animate-pulse rounded-md" />
-            ))}
-          </div>
-        ) : filteredArtworks.length === 0 ? (
-          <div className="py-20 text-center border-2 border-dashed rounded-md bg-muted/10">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#B8965A]/10 flex items-center justify-center">
-              <Palette className="w-10 h-10 text-[#B8965A]" />
+        <div className="mt-10">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="aspect-[4/5] bg-white/[0.02] animate-pulse rounded-md border border-white/5" />
+              ))}
             </div>
-            <h3 className="text-xl font-bold mb-2">No Artworks Found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchQuery || activeFilters.length > 0 
-                ? "Try adjusting your filters or search query."
-                : "Be the first to submit your artwork!"}
-            </p>
-            {(searchQuery || activeFilters.length > 0) && (
-              <Button variant="outline" onClick={clearFilters} data-testid="button-clear-filters-empty">
-                Clear Filters
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredArtworks.map((artwork) => (
-              <ArtworkCard key={artwork.id} artwork={artwork} />
-            ))}
-          </div>
-        )}
+          ) : filteredArtworks.length === 0 ? (
+            <div className="py-24 text-center border border-white/5 rounded-md bg-white/[0.02]">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#E8C874]/10 flex items-center justify-center">
+                <Palette className="w-10 h-10 text-[#E8C874]" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">No Artworks Found</h3>
+              <p className="text-white/50 mb-6">
+                {searchQuery || activeFilters.length > 0 
+                  ? "Try adjusting your filters or search query."
+                  : "Be the first to submit your artwork!"}
+              </p>
+              {(searchQuery || activeFilters.length > 0) && (
+                <button
+                  onClick={clearFilters}
+                  className="px-6 py-2.5 rounded-full border border-white/20 text-white text-sm hover:bg-white/10 transition-colors"
+                  data-testid="button-clear-filters-empty"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredArtworks.map((artwork) => (
+                <ArtworkCard key={artwork.id} artwork={artwork} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <Footer />

@@ -4,7 +4,6 @@ import { useArtworks } from "@/hooks/use-artworks";
 import { ArrowRight, Sparkles, Upload, Palette, Eye, DollarSign, Heart, GraduationCap, Award, Users, Frame, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "@/components/ui/card";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
@@ -19,10 +18,6 @@ import artGeometric from "@assets/art-geometric-abstract.png";
 import artFloral from "@assets/art-floral-still-life.png";
 import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
-import bgHowItWorks from "@assets/Screenshot_2026-02-17_at_22.57.39_1771387077163.png";
-import bgBrushstrokes from "@assets/bg-brushstrokes-gold.png";
-import bgImpact from "@assets/the-persistence-of-memory-1931-1140x867_1771437317248.jpg";
-import bgPaintSplatter from "@assets/bg-paint-splatter.png";
 import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
 
 const placeholderArtworks = [
@@ -77,6 +72,59 @@ function CountUpNumber({ value, duration = 2000 }: { value: string; duration?: n
 
   const formatted = count >= 1000 ? count.toLocaleString() : count.toString();
   return <span ref={ref}>{prefix}{formatted}{suffix}</span>;
+}
+
+function TestimonialSlider() {
+  const testimonials = [
+    { quote: "BrushBids gave me my first real audience. I sold three pieces in my first week!", name: "Maya R.", role: "Student Artist, NYU" },
+    { quote: "The curation process is incredible. Every piece in the gallery feels handpicked.", name: "James L.", role: "Art Collector" },
+    { quote: "I love that a portion goes to charity. It makes collecting feel even more meaningful.", name: "Sarah K.", role: "Collector & Patron" },
+    { quote: "As a student, having a professional platform to showcase my work has been life-changing.", name: "David C.", role: "Student Artist, RISD" },
+  ];
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((p) => (p + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+  return (
+    <div className="max-w-3xl mx-auto text-center">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-6"
+        >
+          <p className="text-2xl md:text-3xl font-display italic text-white/90 leading-relaxed" data-testid={`text-testimonial-${current}`}>
+            "{testimonials[current].quote}"
+          </p>
+          <div>
+            <p className="text-[#E8C874] font-semibold">{testimonials[current].name}</p>
+            <p className="text-white/40 text-sm">{testimonials[current].role}</p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      <div className="flex justify-center gap-2 mt-8">
+        {testimonials.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={cn(
+              "rounded-full transition-all duration-300",
+              i === current ? "w-8 h-2 bg-[#E8C874]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
+            )}
+            data-testid={`testimonial-dot-${i}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -134,10 +182,10 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: "500+", label: "Student Artists", icon: GraduationCap, color: "text-[#B8965A]", bg: "bg-[#B8965A]/10" },
-    { value: "$125K", label: "Earned by Artists", icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { value: "$18K", label: "Donated to Charity", icon: Heart, color: "text-[#C9A84C]", bg: "bg-[#C9A84C]/10" },
-    { value: "2,000+", label: "Artworks Sold", icon: Frame, color: "text-[#96A0AB]", bg: "bg-[#96A0AB]/10" },
+    { value: "500+", label: "Student Artists", icon: GraduationCap },
+    { value: "$125K", label: "Earned by Artists", icon: DollarSign },
+    { value: "$18K", label: "Donated to Charity", icon: Heart },
+    { value: "2,000+", label: "Artworks Sold", icon: Frame },
   ];
 
   const currentArt = coverFlowArtworks[currentIndex];
@@ -156,76 +204,66 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="pb-16">
+      <div>
         {/* Hero Section */}
-        <section className="relative -mt-4 md:-mt-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
-          <div className="relative w-full min-h-[520px] md:min-h-[600px] lg:min-h-[680px] overflow-hidden">
+        <section className="relative -mt-16" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
+          <div className="relative w-full min-h-[600px] md:min-h-[700px] lg:min-h-[800px] overflow-hidden">
             <img
               src={heroImage}
               alt="David Hockney - Portrait of an Artist (Pool with Two Figures)"
               className="absolute inset-0 w-full h-full object-cover"
               data-testid="img-hero-background"
             />
-            <div
-              className="absolute inset-0 dark:opacity-90"
-              style={{
-                background: "linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
-              }}
-            />
-            <div
-              className="absolute inset-0 dark:opacity-90"
-              style={{
-                background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%)",
-              }}
-            />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(10,10,15,0.85) 0%, rgba(10,10,15,0.5) 40%, rgba(10,10,15,0.2) 70%, transparent 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,10,15,1) 0%, rgba(10,10,15,0.3) 30%, transparent 60%)" }} />
 
-            <div className="relative z-10 h-full min-h-[520px] md:min-h-[600px] lg:min-h-[680px] flex items-end">
-              <div className="max-w-2xl px-6 md:px-12 lg:px-16 pb-12 md:pb-16 space-y-6">
+            <div className="relative z-10 h-full min-h-[600px] md:min-h-[700px] lg:min-h-[800px] flex items-end">
+              <div className="max-w-3xl px-6 md:px-12 lg:px-16 pb-20 md:pb-28 space-y-6">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7 }}
                 >
-                  <span className="inline-flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full bg-white/15 text-white/90 backdrop-blur-sm">
-                    <img src={brushBidsLogo} alt="BrushBids" className="w-5 h-5 object-contain" style={{ filter: "invert(1) brightness(2)", mixBlendMode: "screen" }} />
-                    Turning Student Creativity Into Opportunity
+                  <span className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-white/10 text-white/80 backdrop-blur-sm border border-white/10 uppercase tracking-widest">
+                    <img src={brushBidsLogo} alt="BrushBids" className="w-4 h-4 object-contain" style={{ filter: "invert(1) brightness(2)" }} />
+                    Student Art Marketplace
                   </span>
                 </motion.div>
 
                 <motion.h1
-                  className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white leading-[1.05] tracking-tight drop-shadow-lg"
+                  className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.0] tracking-tight"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.1 }}
                   data-testid="text-hero-title"
                 >
                   Your Art.{" "}
-                  <span className="text-[#E8C874]">Your Future.</span>
+                  <span className="gradient-text" style={{ backgroundImage: "linear-gradient(135deg, #E8C874, #F5DFA0, #E8C874)" }}>Your Future.</span>
                 </motion.h1>
 
                 <motion.p
-                  className="text-base md:text-lg text-white/80 leading-relaxed max-w-xl drop-shadow-md"
+                  className="text-lg md:text-xl text-white/60 leading-relaxed max-w-xl"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.2 }}
                   data-testid="text-mission-statement"
                 >
-                  BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience, allowing them to make their artistic dreams a reality.
+                  BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience.
                 </motion.p>
 
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-3 pt-2"
+                  className="flex flex-col sm:flex-row gap-3 pt-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.3 }}
                 >
                   <Link href="/gallery">
-                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-md bg-white text-[#4C392D] gap-2 px-8 border-white">
+                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] gap-2 px-8 font-semibold">
                       Explore Gallery <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
                   <Link href="/submit-artwork">
-                    <Button data-testid="button-submit-art-hero" size="lg" variant="outline" className="rounded-md gap-2 border-white/40 text-white px-8 backdrop-blur-sm bg-white/10">
+                    <Button data-testid="button-submit-art-hero" size="lg" variant="outline" className="rounded-full gap-2 border-white/20 text-white px-8 hover:bg-white/10 bg-transparent">
                       Submit Artwork <Upload className="w-4 h-4" />
                     </Button>
                   </Link>
@@ -235,18 +273,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Cover Flow Featured Works — Full Width, seamless continuation from hero */}
-        <section className="relative -mt-4 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <img
-              src={heroImage}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: "center top", transform: "scaleY(-1)", filter: "blur(6px)", opacity: 0.45 }}
-            />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 0%, transparent 60%, hsl(var(--background)) 100%)" }} />
-            <div className="absolute top-0 left-0 right-0 h-[15%]" style={{ background: "linear-gradient(to bottom, hsl(var(--background)) 0%, transparent 100%)" }} />
-          </div>
+        {/* Cover Flow Featured Works */}
+        <section className="relative" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
           <div className="relative z-10 pt-16 md:pt-24 pb-0">
             <motion.div
               className="text-left px-6 md:px-12 lg:px-16 mb-8"
@@ -255,7 +283,8 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-semibold tracking-tight leading-[1.05]">Featured<br />Works</h2>
+              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Curated Collection</span>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">Featured<br />Works</h2>
             </motion.div>
 
             <div className="relative select-none">
@@ -268,13 +297,6 @@ export default function Home() {
                 }}
                 data-testid="cover-flow-container"
               >
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-[35%] pointer-events-none"
-                  style={{
-                    background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.01) 50%, rgba(0,0,0,0.035) 100%)",
-                  }}
-                />
-
                 <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "10px" }}>
                   {flowItems.map(({ artwork, offset, arrayIdx }) => {
                     const isCenter = offset === 0;
@@ -314,8 +336,8 @@ export default function Home() {
                             height: `${coverSize}px`,
                             borderRadius: "4px",
                             boxShadow: isCenter
-                              ? "0 12px 40px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.15)"
-                              : `${side * -4}px 4px 16px rgba(0,0,0,0.2)`,
+                              ? "0 12px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3)"
+                              : `${side * -4}px 4px 16px rgba(0,0,0,0.4)`,
                           }}
                         >
                           <img
@@ -373,10 +395,10 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="space-y-0.5"
                   >
-                    <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight italic" data-testid="text-coverflow-title">
+                    <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight italic text-white" data-testid="text-coverflow-title">
                       {currentArt.title}
                     </h3>
-                    <p className="text-muted-foreground tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
+                    <p className="text-white/50 tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
                       By {currentArt.artistName}
                     </p>
                   </motion.div>
@@ -393,10 +415,10 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="space-y-0.5 mt-6"
                   >
-                    <h3 className="text-base font-display font-bold tracking-tight italic" data-testid="text-coverflow-title-mobile">
+                    <h3 className="text-base font-display font-bold tracking-tight italic text-white" data-testid="text-coverflow-title-mobile">
                       {currentArt.title}
                     </h3>
-                    <p className="text-muted-foreground tracking-wide text-sm font-semibold" data-testid="text-coverflow-artist-mobile">
+                    <p className="text-white/50 tracking-wide text-sm font-semibold" data-testid="text-coverflow-artist-mobile">
                       {currentArt.artistName}
                     </p>
                   </motion.div>
@@ -408,7 +430,7 @@ export default function Home() {
                   size="icon"
                   variant="outline"
                   onClick={goPrev}
-                  className="rounded-full border-[#9E8472]/30"
+                  className="rounded-full border-white/20 text-white hover:bg-white/10 bg-transparent"
                   data-testid="button-coverflow-prev"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -422,8 +444,8 @@ export default function Home() {
                       className={cn(
                         "rounded-full transition-all duration-300",
                         i === currentIndex
-                          ? "w-6 h-2 bg-[#B8965A]"
-                          : "w-2 h-2 bg-[#DDDAD3] dark:bg-[#3a3530]"
+                          ? "w-6 h-2 bg-[#E8C874]"
+                          : "w-2 h-2 bg-white/20"
                       )}
                       data-testid={`coverflow-dot-${i}`}
                     />
@@ -434,7 +456,7 @@ export default function Home() {
                   size="icon"
                   variant="outline"
                   onClick={goNext}
-                  className="rounded-full border-[#9E8472]/30"
+                  className="rounded-full border-white/20 text-white hover:bg-white/10 bg-transparent"
                   data-testid="button-coverflow-next"
                 >
                   <ChevronRight className="w-5 h-5" />
@@ -444,21 +466,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works — Centered with decorative background */}
-        <section className="relative -mt-2 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
-          <div className="absolute inset-0 pointer-events-none">
-            <img src={bgHowItWorks} alt="" className="w-full h-full object-cover opacity-[0.19] dark:opacity-[0.10]" style={{ filter: "blur(2px)" }} />
-          </div>
-          <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
+        {/* How It Works */}
+        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
+          <div className="absolute inset-0 hero-gradient" />
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <motion.div
-              className="text-center mb-12 md:mb-16"
+              className="text-center mb-16"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.5 }}
             >
-              <span className="text-sm md:text-base font-medium text-muted-foreground uppercase tracking-[0.25em]">Simple Process</span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-sans font-semibold tracking-tight mt-2">How It Works</h2>
+              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Simple Process</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">How It Works</h2>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-16 md:gap-20 max-w-5xl mx-auto">
@@ -469,32 +489,31 @@ export default function Home() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
-                  <span className="text-xs font-medium text-[#B8965A] dark:text-[#C9A84C] uppercase tracking-[0.2em]">Artists</span>
-                  <h3 className="text-xl md:text-2xl font-sans font-semibold mt-2">Start selling your work</h3>
+                <div className="mb-8 border-b border-white/10 pb-4">
+                  <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.2em]">Artists</span>
+                  <h3 className="text-xl md:text-2xl font-semibold mt-2 text-white">Start selling your work</h3>
                 </div>
-                <div className="space-y-4 flex-1">
+                <div className="space-y-2 flex-1">
                   {howItWorksArtist.map((step, i) => (
                     <motion.div
                       key={step.title}
-                      className="flex gap-5 items-start rounded-md p-4 -mx-4 transition-colors md:hover:bg-[#B8965A]/[0.06] md:dark:hover:bg-[#C9A84C]/[0.08] cursor-default"
-                      whileHover={hasPointer ? { scale: 1.03, y: -2 } : undefined}
+                      className="flex gap-5 items-start rounded-lg p-4 -mx-4 transition-colors hover:bg-white/5 cursor-default"
+                      whileHover={hasPointer ? { x: 4 } : undefined}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      style={{ transformOrigin: "left center" }}
                       data-testid={`step-artist-${i}`}
                     >
-                      <span className="flex-shrink-0 text-2xl font-sans font-bold text-[#B8965A]/50 dark:text-[#C9A84C]/50 leading-none pt-0.5 tabular-nums">
+                      <span className="flex-shrink-0 text-2xl font-bold text-[#E8C874]/30 leading-none pt-0.5 tabular-nums">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div>
-                        <h4 className="font-sans font-semibold text-base uppercase tracking-wide">{step.title}</h4>
-                        <p className="text-base text-foreground/70 mt-1 leading-relaxed font-medium">{step.description}</p>
+                        <h4 className="font-semibold text-base text-white uppercase tracking-wide">{step.title}</h4>
+                        <p className="text-sm text-white/50 mt-1 leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
                 <Link href="/submit-artwork">
-                  <Button data-testid="button-start-selling" className="mt-10 rounded-md bg-[#4C392D] text-white px-8 uppercase tracking-wider text-xs" size="lg">Start Selling</Button>
+                  <Button data-testid="button-start-selling" className="mt-10 rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] px-8 font-semibold" size="lg">Start Selling</Button>
                 </Link>
               </motion.div>
 
@@ -505,109 +524,148 @@ export default function Home() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <div className="mb-8 border-b border-[#e0d6cd] dark:border-border pb-4">
-                  <span className="text-xs font-medium text-[#96A0AB] dark:text-[#A8AEB5] uppercase tracking-[0.2em]">Collectors</span>
-                  <h3 className="text-xl md:text-2xl font-sans font-semibold mt-2">Discover emerging talent</h3>
+                <div className="mb-8 border-b border-white/10 pb-4">
+                  <span className="text-xs font-medium text-white/40 uppercase tracking-[0.2em]">Collectors</span>
+                  <h3 className="text-xl md:text-2xl font-semibold mt-2 text-white">Discover emerging talent</h3>
                 </div>
-                <div className="space-y-4 flex-1">
+                <div className="space-y-2 flex-1">
                   {howItWorksBuyer.map((step, i) => (
                     <motion.div
                       key={step.title}
-                      className="flex gap-5 items-start rounded-md p-4 -mx-4 transition-colors md:hover:bg-[#96A0AB]/[0.06] md:dark:hover:bg-[#A8AEB5]/[0.08] cursor-default"
-                      whileHover={hasPointer ? { scale: 1.03, y: -2 } : undefined}
+                      className="flex gap-5 items-start rounded-lg p-4 -mx-4 transition-colors hover:bg-white/5 cursor-default"
+                      whileHover={hasPointer ? { x: 4 } : undefined}
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      style={{ transformOrigin: "left center" }}
                       data-testid={`step-collector-${i}`}
                     >
-                      <span className="flex-shrink-0 text-2xl font-sans font-bold text-[#96A0AB]/50 dark:text-[#A8AEB5]/50 leading-none pt-0.5 tabular-nums">
+                      <span className="flex-shrink-0 text-2xl font-bold text-white/15 leading-none pt-0.5 tabular-nums">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                       <div>
-                        <h4 className="font-sans font-semibold text-base uppercase tracking-wide">{step.title}</h4>
-                        <p className="text-base text-foreground/70 mt-1 leading-relaxed font-medium">{step.description}</p>
+                        <h4 className="font-semibold text-base text-white uppercase tracking-wide">{step.title}</h4>
+                        <p className="text-sm text-white/50 mt-1 leading-relaxed">{step.description}</p>
                       </div>
                     </motion.div>
                   ))}
                 </div>
                 <Link href="/gallery">
-                  <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-md px-8 uppercase tracking-wider text-xs" size="lg">Browse Gallery</Button>
+                  <Button data-testid="button-browse-gallery" variant="outline" className="mt-10 rounded-full px-8 border-white/20 text-white hover:bg-white/10 bg-transparent font-semibold" size="lg">Browse Gallery</Button>
                 </Link>
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Stats — with decorative background */}
-        <section className="relative mt-0 -mx-4 md:-mx-8 overflow-hidden" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
-          <div className="absolute inset-0 pointer-events-none">
-            <img src={bgImpact} alt="" className="w-full h-full object-cover opacity-[0.19] dark:opacity-[0.10]" style={{ filter: "blur(2px)" }} />
-          </div>
-          <div className="relative z-10 px-6 md:px-12 lg:px-16 py-20 md:py-28">
+        {/* Stats */}
+        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
+          <div className="absolute inset-0 bg-[#0d0d14]" />
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <motion.div
-              className="mb-10"
+              className="mb-12"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-sans font-semibold tracking-tight leading-[0.95]">Our<br />Impact</h2>
+              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">By The Numbers</span>
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">Our<br />Impact</h2>
             </motion.div>
-            <div className="border-t border-[#e0d6cd] dark:border-border pt-10 md:pt-14">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                {stats.map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ delay: 0.08 * i, duration: 0.4 }}
-                    whileHover={hasPointer ? {
-                      scale: 1.03,
-                      y: -2,
-                    } : undefined}
-                    style={{ transformOrigin: "center center" }}
-                    className="rounded-md p-5 md:p-6 transition-colors md:hover:bg-foreground/[0.04] md:dark:hover:bg-foreground/[0.06] cursor-default"
-                  >
-                    <div className={cn("w-10 h-10 rounded-md flex items-center justify-center mb-4", stat.bg)}>
-                      <stat.icon className={cn("w-5 h-5", stat.color)} />
-                    </div>
-                    <p className="text-3xl md:text-4xl font-display font-bold tabular-nums" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                      <CountUpNumber value={stat.value} />
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2 tracking-wide uppercase">{stat.label}</p>
-                  </motion.div>
-                ))}
-              </div>
+            <div className="divider-line mb-12" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              {stats.map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: 0.08 * i, duration: 0.4 }}
+                  className="rounded-xl p-6 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-default"
+                >
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4 bg-[#E8C874]/10 border border-[#E8C874]/20">
+                    <stat.icon className="w-5 h-5 text-[#E8C874]" />
+                  </div>
+                  <p className="text-3xl md:text-4xl font-bold tabular-nums text-white" data-testid={`text-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <CountUpNumber value={stat.value} />
+                  </p>
+                  <p className="text-sm text-white/40 mt-2 tracking-wide uppercase">{stat.label}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* CTA — with decorative background */}
-        <section className="relative mt-0 mb-8" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
-          <div className="relative w-full min-h-[420px] md:min-h-[480px] lg:min-h-[520px] overflow-hidden">
+        {/* Testimonials */}
+        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-testimonials">
+          <div className="absolute inset-0 hero-gradient" />
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
+            <motion.div
+              className="text-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Community</span>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">What People Say</h2>
+            </motion.div>
+            <TestimonialSlider />
+          </div>
+        </section>
+
+        {/* Revenue Split */}
+        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-revenue-split">
+          <div className="absolute inset-0 bg-[#0d0d14]" />
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em] mb-3 block">Transparent Pricing</span>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Where Your Money Goes</h2>
+              <p className="text-white/50 mt-4 max-w-xl mx-auto">Every sale is split transparently between the artist, the platform, and a charity of the artist's choice.</p>
+            </motion.div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { pct: "75%", label: "Artist", desc: "Goes directly to the student artist", color: "#E8C874" },
+                { pct: "15%", label: "Platform", desc: "Supports BrushBids operations", color: "#6B7280" },
+                { pct: "10%", label: "Charity", desc: "Donated to a cause the artist chooses", color: "#34D399" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 * i, duration: 0.4 }}
+                  className="rounded-xl border border-white/5 bg-white/[0.02] p-8 text-center hover:border-white/10 transition-colors"
+                  data-testid={`revenue-split-${item.label.toLowerCase()}`}
+                >
+                  <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: item.color }}>{item.pct}</p>
+                  <p className="text-white font-semibold text-lg mb-1">{item.label}</p>
+                  <p className="text-white/40 text-sm">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="relative" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+          <div className="relative w-full min-h-[420px] md:min-h-[500px] lg:min-h-[560px] overflow-hidden">
             <img
               src={ctaJourneyImage}
               alt="Artist painting on an easel"
               className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
               data-testid="img-cta-journey"
             />
-            <div
-              className="absolute inset-0 dark:opacity-90"
-              style={{
-                background: "linear-gradient(to left, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
-              }}
-            />
-            <div
-              className="absolute inset-0 dark:opacity-90"
-              style={{
-                background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%)",
-              }}
-            />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to left, rgba(10,10,15,0.85) 0%, rgba(10,10,15,0.5) 40%, rgba(10,10,15,0.2) 70%, transparent 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,10,15,0.8) 0%, transparent 40%)" }} />
 
-            <div className="relative z-10 h-full min-h-[420px] md:min-h-[480px] lg:min-h-[520px] flex items-end justify-end">
-              <div className="max-w-2xl px-6 md:px-12 lg:px-16 pb-12 md:pb-16 space-y-6 text-right">
+            <div className="relative z-10 h-full min-h-[420px] md:min-h-[500px] lg:min-h-[560px] flex items-end justify-end">
+              <div className="max-w-2xl px-6 md:px-12 lg:px-16 pb-16 md:pb-20 space-y-6 text-right">
                 <motion.h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-[1.05] tracking-tight drop-shadow-lg"
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -618,7 +676,7 @@ export default function Home() {
                 </motion.h2>
 
                 <motion.p
-                  className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg ml-auto"
+                  className="text-white/60 text-base md:text-lg leading-relaxed max-w-lg ml-auto"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -635,12 +693,12 @@ export default function Home() {
                   transition={{ duration: 0.7, delay: 0.2 }}
                 >
                   <Link href="/submit-artwork">
-                    <Button size="lg" className="rounded-md bg-white/95 text-[#4C392D] gap-2 px-8 uppercase tracking-wider text-xs" data-testid="button-cta-submit">
+                    <Button size="lg" className="rounded-full bg-[#E8C874] text-[#0a0a0f] hover:bg-[#d4b665] gap-2 px-8 font-semibold" data-testid="button-cta-submit">
                       Submit Your Art <Upload className="w-4 h-4" />
                     </Button>
                   </Link>
                   <Link href="/gallery">
-                    <Button size="lg" variant="outline" className="rounded-md gap-2 px-8 uppercase tracking-wider text-xs border-white/40 text-white backdrop-blur-sm bg-white/10" data-testid="button-cta-browse">
+                    <Button size="lg" variant="outline" className="rounded-full gap-2 px-8 border-white/20 text-white hover:bg-white/10 bg-transparent" data-testid="button-cta-browse">
                       Browse Gallery <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>

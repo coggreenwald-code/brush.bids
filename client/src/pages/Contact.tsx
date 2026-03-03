@@ -3,7 +3,6 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -66,51 +65,49 @@ export default function Contact() {
   return (
     <Layout>
       <div className="space-y-16 pb-16 max-w-5xl mx-auto">
-        {/* Header */}
         <section className="text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-            <MessageSquare className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 rounded-2xl bg-[#E8C874]/10 flex items-center justify-center mx-auto">
+            <MessageSquare className="w-8 h-8 text-[#E8C874]" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-display font-bold">Contact Us</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <span className="text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]">Get in Touch</span>
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-white">Contact Us</h1>
+          <p className="text-xl text-white/50 max-w-2xl mx-auto">
             Have a question or feedback? We'd love to hear from you.
           </p>
         </section>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Contact Info */}
           <div className="space-y-6">
             {contactInfo.map((info) => (
-              <Card key={info.title} className="p-6">
+              <div key={info.title} className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <info.icon className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-[#E8C874]/10 flex items-center justify-center flex-shrink-0">
+                    <info.icon className="w-5 h-5 text-[#E8C874]" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">{info.title}</h3>
-                    <p className="text-foreground">{info.description}</p>
-                    <p className="text-sm text-muted-foreground">{info.note}</p>
+                    <h3 className="font-semibold text-white">{info.title}</h3>
+                    <p className="text-white/80">{info.description}</p>
+                    <p className="text-sm text-white/40">{info.note}</p>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
 
-            <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5">
+            <div className="p-6 rounded-xl bg-[#E8C874]/5 border border-[#E8C874]/10">
               <div className="flex items-start gap-4">
-                <HelpCircle className="w-5 h-5 text-primary mt-1" />
+                <HelpCircle className="w-5 h-5 text-[#E8C874] mt-1" />
                 <div>
-                  <h3 className="font-semibold mb-2">Need Quick Help?</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Check our <a href="/faq" className="text-primary hover:underline" data-testid="link-contact-faq">FAQ page</a> for instant answers to common questions.
+                  <h3 className="font-semibold text-white mb-2">Need Quick Help?</h3>
+                  <p className="text-sm text-white/50">
+                    Check our <a href="/faq" className="text-[#E8C874] hover:underline" data-testid="link-contact-faq">FAQ page</a> for instant answers to common questions.
                   </p>
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
 
-          {/* Contact Form */}
-          <Card className="md:col-span-2 p-8">
-            <h2 className="text-2xl font-display font-bold mb-6">Send a Message</h2>
+          <div className="md:col-span-2 p-8 rounded-xl bg-white/[0.02] border border-white/5">
+            <h2 className="text-2xl font-display font-bold text-white mb-6">Send a Message</h2>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -119,9 +116,9 @@ export default function Contact() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Your Name</FormLabel>
+                        <FormLabel className="text-white/70">Your Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" data-testid="input-contact-name" {...field} />
+                          <Input placeholder="John Doe" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-contact-name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,9 +129,9 @@ export default function Contact() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel className="text-white/70">Email Address</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="john@example.com" data-testid="input-contact-email" {...field} />
+                          <Input type="email" placeholder="john@example.com" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-contact-email" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -147,10 +144,10 @@ export default function Contact() {
                   name="subject"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Subject</FormLabel>
+                      <FormLabel className="text-white/70">Subject</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-contact-subject">
+                          <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-contact-subject">
                             <SelectValue placeholder="Select a topic" />
                           </SelectTrigger>
                         </FormControl>
@@ -173,11 +170,11 @@ export default function Contact() {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Message</FormLabel>
+                      <FormLabel className="text-white/70">Message</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Tell us how we can help..." 
-                          className="min-h-[150px] resize-none"
+                          className="min-h-[150px] resize-none bg-white/5 border-white/10 text-white placeholder:text-white/30"
                           data-testid="textarea-contact-message"
                           {...field} 
                         />
@@ -187,12 +184,12 @@ export default function Contact() {
                   )}
                 />
 
-                <Button type="submit" size="lg" className="w-full sm:w-auto" data-testid="button-contact-submit">
+                <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full bg-[#E8C874] text-[#0a0a0f] font-semibold hover:bg-[#E8C874]/90" data-testid="button-contact-submit">
                   Send Message
                 </Button>
               </form>
             </Form>
-          </Card>
+          </div>
         </div>
       </div>
 

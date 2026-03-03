@@ -29,14 +29,14 @@ const boostTiers = [
     name: "No Boost",
     description: "Standard listing visibility",
     icon: null,
-    color: "text-muted-foreground",
+    color: "text-white/40",
   },
   {
     percentage: 5,
     name: "Starter Boost",
     description: "Slight visibility increase in gallery",
     icon: TrendingUp,
-    color: "text-[#9E8472]",
+    color: "text-white/60",
   },
   {
     percentage: 10,
@@ -50,14 +50,14 @@ const boostTiers = [
     name: "Premium Boost",
     description: "Top placement + featured badge",
     icon: Zap,
-    color: "text-[#B8965A]",
+    color: "text-[#E8C874]",
   },
   {
     percentage: 20,
     name: "Elite Boost",
     description: "Maximum visibility + special highlighting",
     icon: Crown,
-    color: "text-primary",
+    color: "text-[#E8C874]",
   },
 ];
 
@@ -100,19 +100,19 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]" data-testid="dialog-boost-artwork">
+      <DialogContent className="sm:max-w-[500px] bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10" data-testid="dialog-boost-artwork">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Rocket className="w-5 h-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2 text-[#E8C874]">
+            <Rocket className="w-5 h-5 text-[#E8C874]" />
             Boost Your Listing
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-white/50">
             Increase your artwork's visibility by paying an additional percentage of the final sale price. This fee goes to BrushBids to help promote your work.
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4 space-y-4">
-          <div className="bg-muted/50 rounded-lg p-4">
+          <div className="bg-[#12121e] rounded-lg p-4 border border-white/10">
             <div className="flex items-center gap-3">
               <img 
                 src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
@@ -120,8 +120,8 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
                 className="w-16 h-16 rounded-lg object-cover"
               />
               <div>
-                <h4 className="font-semibold">{artwork.title}</h4>
-                <p className="text-sm text-muted-foreground">Current bid: ${currentPrice.toLocaleString()}</p>
+                <h4 className="font-semibold text-white">{artwork.title}</h4>
+                <p className="text-sm text-white/50">Current bid: ${currentPrice.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -141,29 +141,29 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
                 />
                 <Label
                   htmlFor={`boost-${tier.percentage}`}
-                  className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 hover:bg-muted/50"
+                  className="flex items-center gap-4 p-4 border border-white/10 rounded-lg cursor-pointer transition-all peer-data-[state=checked]:border-[#E8C874]/50 peer-data-[state=checked]:bg-[#E8C874]/5 hover:bg-white/5"
                   data-testid={`option-boost-${tier.percentage}`}
                 >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tier.icon ? 'bg-primary/10' : 'bg-muted'}`}>
-                    {tier.icon ? <tier.icon className={`w-5 h-5 ${tier.color}`} /> : <span className="text-muted-foreground">-</span>}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tier.icon ? 'bg-[#E8C874]/10' : 'bg-white/5'}`}>
+                    {tier.icon ? <tier.icon className={`w-5 h-5 ${tier.color}`} /> : <span className="text-white/40">-</span>}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{tier.name}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-white">{tier.name}</span>
                       {tier.percentage > 0 && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs border-white/10 text-white/60">
                           {tier.percentage}%
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{tier.description}</p>
+                    <p className="text-sm text-white/50">{tier.description}</p>
                   </div>
                   {tier.percentage > 0 && (
                     <div className="text-right">
-                      <div className="text-sm font-medium">
+                      <div className="text-sm font-medium text-white">
                         ~${((currentPrice * tier.percentage) / 100).toFixed(2)}
                       </div>
-                      <div className="text-xs text-muted-foreground">est. fee</div>
+                      <div className="text-xs text-white/40">est. fee</div>
                     </div>
                   )}
                 </Label>
@@ -172,26 +172,26 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
           </RadioGroup>
 
           {parseInt(selectedPercentage) > 0 && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
-              <h5 className="font-medium flex items-center gap-2">
+            <div className="bg-[#E8C874]/5 border border-[#E8C874]/20 rounded-lg p-4 space-y-2">
+              <h5 className="font-medium flex items-center gap-2 text-[#E8C874]">
                 {selectedTier?.icon && <selectedTier.icon className={`w-4 h-4 ${selectedTier.color}`} />}
                 Fee Breakdown
               </h5>
               <div className="text-sm space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Boost fee ({selectedPercentage}% of sale)</span>
-                  <span className="font-medium">~${estimatedFee.toFixed(2)}</span>
+                <div className="flex justify-between gap-2 flex-wrap">
+                  <span className="text-white/50">Boost fee ({selectedPercentage}% of sale)</span>
+                  <span className="font-medium text-white">~${estimatedFee.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Your earnings (75% - {selectedPercentage}%)</span>
-                  <span className="font-medium">~${((currentPrice * (75 - parseInt(selectedPercentage))) / 100).toFixed(2)}</span>
+                <div className="flex justify-between gap-2 flex-wrap">
+                  <span className="text-white/50">Your earnings (75% - {selectedPercentage}%)</span>
+                  <span className="font-medium text-white">~${((currentPrice * (75 - parseInt(selectedPercentage))) / 100).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between pt-2 border-t">
-                  <span className="text-muted-foreground">Charity (10%)</span>
-                  <span>~${(currentPrice * 0.10).toFixed(2)}</span>
+                <div className="flex justify-between gap-2 flex-wrap pt-2 border-t border-white/10">
+                  <span className="text-white/50">Charity (10%)</span>
+                  <span className="text-white">~${(currentPrice * 0.10).toFixed(2)}</span>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-white/40 mt-2">
                 Fee is only charged when your artwork sells. No upfront cost.
               </p>
             </div>
@@ -199,12 +199,13 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} data-testid="button-cancel-boost">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/10 text-white/60 hover:text-white" data-testid="button-cancel-boost">
             Cancel
           </Button>
           <Button 
             onClick={handleSave} 
             disabled={mutation.isPending}
+            className="rounded-full bg-[#E8C874] hover:bg-[#d4b563] text-[#0a0a0f] font-semibold"
             data-testid="button-save-boost"
           >
             {mutation.isPending ? "Saving..." : "Save Boost Settings"}

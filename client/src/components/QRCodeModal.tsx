@@ -24,8 +24,8 @@ export function QRCodeModal({ isOpen, onClose, artworkTitle, artworkId }: QRCode
       width: 280,
       margin: 2,
       color: {
-        dark: "#4C392D",
-        light: "#FFFFFF",
+        dark: "#FFFFFF",
+        light: "#12121e",
       },
     }).then(() => {
       if (canvasRef.current) {
@@ -48,11 +48,11 @@ export function QRCodeModal({ isOpen, onClose, artworkTitle, artworkId }: QRCode
     printWindow.document.write(`
       <html>
         <head><title>QR Code - ${artworkTitle}</title></head>
-        <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:serif;margin:0;">
-          <h2 style="color:#4C392D;margin-bottom:8px;">${artworkTitle}</h2>
-          <p style="color:#9E8472;margin-bottom:24px;">Scan to bid on BrushBids</p>
+        <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:serif;margin:0;background:#0a0a0f;">
+          <h2 style="color:#E8C874;margin-bottom:8px;">${artworkTitle}</h2>
+          <p style="color:rgba(255,255,255,0.5);margin-bottom:24px;">Scan to bid on BrushBids</p>
           <img src="${qrDataUrl}" width="280" height="280" />
-          <p style="color:#9E8472;margin-top:16px;font-size:12px;">${artworkUrl}</p>
+          <p style="color:rgba(255,255,255,0.4);margin-top:16px;font-size:12px;">${artworkUrl}</p>
         </body>
       </html>
     `);
@@ -62,27 +62,27 @@ export function QRCodeModal({ isOpen, onClose, artworkTitle, artworkId }: QRCode
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="sm:max-w-sm" data-testid="qr-code-modal">
+      <DialogContent className="sm:max-w-sm bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10" data-testid="qr-code-modal">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display">
-            <QrCode className="w-5 h-5 text-[#B8965A]" /> QR Code
+          <DialogTitle className="flex items-center gap-2 font-display text-[#E8C874]">
+            <QrCode className="w-5 h-5 text-[#E8C874]" /> QR Code
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-white/50">
             Display this QR code at your art show. Visitors can scan it to view and bid on "{artworkTitle}".
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center py-4">
-          <div className="bg-white p-4 rounded-xl shadow-sm border">
+          <div className="bg-[#12121e] p-4 rounded-xl border border-white/10">
             <canvas ref={canvasRef} data-testid="qr-canvas" />
           </div>
-          <p className="text-xs text-muted-foreground mt-3 text-center break-all max-w-[280px]">{artworkUrl}</p>
+          <p className="text-xs text-white/40 mt-3 text-center break-all max-w-[280px]">{artworkUrl}</p>
         </div>
 
         <div className="flex gap-2">
           <Button
             variant="outline"
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 border-white/10 text-white/60 hover:text-white hover:border-white/20"
             onClick={handleDownload}
             data-testid="button-qr-download"
           >
@@ -90,7 +90,7 @@ export function QRCodeModal({ isOpen, onClose, artworkTitle, artworkId }: QRCode
           </Button>
           <Button
             variant="outline"
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 border-white/10 text-white/60 hover:text-white hover:border-white/20"
             onClick={handlePrint}
             data-testid="button-qr-print"
           >

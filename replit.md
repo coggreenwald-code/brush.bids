@@ -49,32 +49,37 @@ Key features:
 
 Preferred communication style: Simple, everyday language.
 
-## Design System
+## Design System (Artie.com-inspired redesign)
 
 ### Color Palette
-- **Primary**: #4C392D (dark chocolate brown) - Main brand color, used in sidebar, footer, hero sections
-- **Accent**: #9E8472 (warm taupe) - Secondary accent for highlights
-- **Warm Gray**: #A89D92 - Subtle UI elements
-- **Light Gray**: #DDDAD3 - Borders, secondary backgrounds
-- **Background**: #F9F0EA (warm cream) - Page background
-- **Gold Accent**: #B8965A / #C9A84C - Used for artist-related elements, highlights, badges
-- **Silver Accent**: #96A0AB / #A8AEB5 - Used for collector elements, secondary highlights
-- **Foreground**: Dark brown tones for text hierarchy
+- **Background**: #0a0a0f (deep navy/charcoal) - hsl(240 10% 6%)
+- **Card Background**: bg-white/[0.02] with border-white/5
+- **Gold Accent**: #E8C874 - Primary brand accent, CTAs, highlights, badges
+- **Text Primary**: White (#f2f2f2)
+- **Text Secondary**: white/60, white/50, white/40 opacity levels
+- **Section backgrounds**: Alternate between bg-background and bg-[#0d0d14]
+- **Glass effects**: backdrop-blur-xl with bg-white/5 or bg-[#0a0a0f]/80
 
 ### Typography
-- **Display Font**: Playfair Display (serif) - Used for headings, elegant artistic feel
-- **Body Font**: Inter (sans-serif) - Clean, modern readability
+- **Body Font**: Inter (sans-serif) - Clean geometric, used for headings and body
+- **Display Font**: Playfair Display (serif) - Used sparingly for artistic display moments (carousel titles, testimonials)
+- **Section Labels**: text-xs font-medium text-[#E8C874] uppercase tracking-[0.3em]
 
 ### Design Elements
-- **Artistic Utilities**: blob-shape animations, watercolor-bg gradients, hover-artistic effects
-- **Cards**: Clean with subtle shadows, hover elevation effects
-- **Buttons**: Rounded (rounded-full) for CTAs, standard rounded for secondary
-- **Sidebar**: Dark brown background with white text, matches footer
+- **Lenis smooth scroll**: Premium slow scroll feel via Lenis library, initialized in App.tsx
+- **Cards**: Dark glass cards (bg-white/[0.02] border-white/5), hover:border-white/10
+- **Buttons**: Pill-shaped (rounded-full), gold CTA (bg-[#E8C874] text-[#0a0a0f]), outline (border-white/20 text-white)
+- **Navbar**: Glass-morphic (glass-nav), scroll-aware (hides on scroll down, shows on scroll up)
+- **Footer**: 3 link columns + large outlined SVG BrushBids wordmark (stroke-only, no fill)
+- **Animations**: Framer Motion fade-ins, CSS transitions, hover elevation effects
+- **Dividers**: Gradient divider lines (divider-line utility class)
+- **Hero sections**: Full-width with overlay gradients on images, animated gradient backgrounds (hero-gradient)
 
 ### Component Patterns
-- Page headers include small uppercase label above title (e.g., "Curated Collection")
-- Empty states use watercolor backgrounds with centered icons
-- Hero sections use blob shape backgrounds with SVG brush stroke decorations
+- Page headers include gold uppercase section labels above bold titles
+- Full-width sections: width: 100vw, marginLeft: calc(-50vw + 50%)
+- Testimonial slider with progress bullet indicators
+- Stats counters with Intersection Observer count-up animations
 
 ## System Architecture
 
@@ -147,6 +152,7 @@ shared/           # Shared types, schemas, and route definitions
 ### Frontend Libraries
 - **shadcn/ui**: Component library built on Radix UI primitives
 - **Framer Motion**: Animation library
+- **Lenis**: Smooth scroll library for premium scroll feel
 - **Recharts**: Dashboard charts
 - **Lucide React**: Icon library
 
