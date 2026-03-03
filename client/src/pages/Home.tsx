@@ -599,7 +599,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
           <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
-          <div className="watermark-text">Testimonials</div>
+          <div className="watermark-text" style={{ left: "50%", transform: "translateX(-50%)" }}>Testimonials</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
               <div className="mb-12 relative z-10">
