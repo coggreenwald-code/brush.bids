@@ -679,9 +679,14 @@ export default function Home() {
 
         {/* CTA */}
         <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
-          <div className="relative w-full overflow-hidden">
-            <div className="relative z-10 flex items-center justify-center">
-              <div className="max-w-2xl px-6 md:px-12 lg:px-16 space-y-6 text-center">
+          <div className="absolute inset-0 bg-mesh-mixed" />
+          <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
+          <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />
+          <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
+            <div className="section-outlined p-8 md:p-12 lg:p-16">
+              <div className="watermark-text">Journey</div>
+              <div className="relative z-10 flex items-center justify-center">
+                <div className="max-w-2xl space-y-6 text-center">
                 <motion.h2
                   className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight"
                   initial={{ opacity: 0, y: 30 }}
@@ -721,6 +726,7 @@ export default function Home() {
                     </Button>
                   </Link>
                 </motion.div>
+                </div>
               </div>
             </div>
           </div>
