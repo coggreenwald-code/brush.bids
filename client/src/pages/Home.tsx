@@ -472,9 +472,9 @@ export default function Home() {
           <div className="geometric-lines" />
           <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
           <div className="floating-orb gradient-orb-blue w-[250px] h-[250px] -bottom-16 -left-16 animate-float-reverse opacity-30" />
+          <div className="watermark-text">Process</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
-              <div className="watermark-text">Process</div>
               <div className="mb-16 relative z-10">
                 <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Simple Process</span>
               </div>
@@ -559,9 +559,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-blue section-tint-blue bg-dots" />
           <div className="floating-orb gradient-orb-blue w-[280px] h-[280px] -top-16 -left-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-pink w-[220px] h-[220px] -bottom-12 -right-16 animate-float-reverse opacity-30" />
+          <div className="watermark-text">Impact</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
-              <div className="watermark-text">Impact</div>
               <div className="mb-12 relative z-10">
                 <span className="text-xs font-medium text-[#60A5FA] uppercase tracking-[0.3em] mb-3 block">By The Numbers</span>
               </div>
@@ -599,9 +599,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
           <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
+          <div className="watermark-text">Testimonials</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
-              <div className="watermark-text">Testimonials</div>
               <div className="mb-12 relative z-10">
                 <span className="text-xs font-medium text-[#F472B6] uppercase tracking-[0.3em] mb-3 block">Community</span>
               </div>
@@ -617,9 +617,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-purple bg-grid-fine" />
           <div className="floating-orb gradient-orb-emerald w-[240px] h-[240px] -top-16 -right-16 animate-float-slow opacity-30" />
           <div className="floating-orb gradient-orb-purple w-[200px] h-[200px] -bottom-12 -left-12 animate-float-reverse opacity-25" />
+          <div className="watermark-text">Transparency</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
-              <div className="watermark-text">Transparency</div>
               <motion.div
                 className="text-center mb-16 relative z-10"
                 initial={{ opacity: 0, y: 20 }}
@@ -661,9 +661,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed" />
           <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />
+          <div className="watermark-text">Journey</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
-              <div className="watermark-text">Journey</div>
               <div className="relative z-10 flex items-center justify-center">
                 <div className="max-w-2xl space-y-6 text-center">
                 <motion.h2
