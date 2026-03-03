@@ -243,7 +243,7 @@
     position: absolute;
     top: -0.5em;
     left: 25px;
-    font-size: clamp(6rem, 15vw, 14rem);
+    font-size: clamp(3rem, 15vw, 14rem);
     font-family: var(--font-sans);
     font-weight: 800;
     letter-spacing: -0.02em;
@@ -254,6 +254,8 @@
     white-space: nowrap;
     line-height: 1;
     z-index: 0;
+    overflow: hidden;
+    max-width: calc(100vw - 50px);
   }
 
   .bg-mesh-purple {
