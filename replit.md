@@ -88,11 +88,6 @@ Preferred communication style: Simple, everyday language.
   - Multi-layered gradients with inset box-shadows for 3D depth effect
   - `animate-blob-morph` for organic shape-shifting border-radius animation
   - `animate-blob-rotate` for slow rotation
-- **Geometric shapes**: Subtle decorative elements filling side space
-  - `.shape-ring` + `.shape-ring-sm` / `.shape-ring-md` / `.shape-ring-lg` — Circle outlines
-  - `.shape-diamond` — Rotated square outline
-  - `.shape-cross` — Small plus/cross shape using pseudo-elements
-  - `animate-ring-spin` for slow ring rotation
 - **Section tints**: `.section-tint-purple`, `.section-tint-blue`, `.section-tint-mixed`
 
 ### Design Elements

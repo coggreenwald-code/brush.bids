@@ -116,10 +116,6 @@ export default {
           "75%": { borderRadius: "60% 30% 60% 40% / 70% 50% 40% 60%" },
           "100%": { borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" },
         },
-        "ring-spin": {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -128,7 +124,6 @@ export default {
         "fade-in": "fade-in 0.5s ease-out forwards",
         "blob-rotate": "blob-rotate 20s ease-in-out infinite",
         "blob-morph": "blob-morph 15s ease-in-out infinite",
-        "ring-spin": "ring-spin 30s linear infinite",
       },
     },
   },

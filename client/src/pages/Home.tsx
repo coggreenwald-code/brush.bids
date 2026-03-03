@@ -472,11 +472,7 @@ export default function Home() {
           <div className="geometric-lines" />
           <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
           <div className="floating-orb gradient-orb-blue w-[250px] h-[250px] -bottom-16 -left-16 animate-float-reverse opacity-30" />
-          <div className="blob-3d blob-3d-teal w-[100px] h-[100px] -bottom-8 -right-4 animate-blob-morph z-[1]" />
-          <div className="shape-ring shape-ring-lg top-[15%] -left-8 opacity-40 animate-ring-spin" />
-          <div className="shape-ring shape-ring-sm bottom-[20%] right-[3%] opacity-30" />
-          <div className="shape-diamond top-[30%] -right-2 opacity-40" />
-          <div className="shape-cross top-[60%] left-[2%] opacity-50" />
+          <div className="blob-3d blob-3d-teal w-[130px] h-[130px] -bottom-10 -right-8 animate-blob-morph z-[1]" />
           <div className="watermark-text" style={{ top: "-30px" }}>Process</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -564,11 +560,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-blue section-tint-blue bg-dots" />
           <div className="floating-orb gradient-orb-blue w-[280px] h-[280px] -top-16 -left-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-pink w-[220px] h-[220px] -bottom-12 -right-16 animate-float-reverse opacity-30" />
-          <div className="blob-3d blob-3d-purple w-[90px] h-[90px] top-[10%] -right-6 animate-blob-morph z-[1]" />
-          <div className="shape-ring shape-ring-md bottom-[15%] -left-6 opacity-35" />
-          <div className="shape-diamond top-[50%] left-[2%] opacity-40" />
-          <div className="shape-diamond bottom-[25%] right-[1.5%] opacity-30" />
-          <div className="shape-cross top-[20%] right-[3%] opacity-40" />
+          <div className="blob-3d blob-3d-purple w-[120px] h-[120px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
           <div className="watermark-text">Impact</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -609,11 +601,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
           <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
-          <div className="blob-3d blob-3d-pink w-[85px] h-[85px] -bottom-6 -left-4 animate-blob-morph z-[1]" />
-          <div className="shape-ring shape-ring-md top-[12%] -right-6 opacity-35 animate-ring-spin" />
-          <div className="shape-ring shape-ring-sm bottom-[30%] right-[2%] opacity-25" />
-          <div className="shape-cross bottom-[40%] left-[1.5%] opacity-40" />
-          <div className="shape-cross top-[25%] right-[4%] opacity-30" />
+          <div className="blob-3d blob-3d-pink w-[110px] h-[110px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
           <div className="watermark-text" style={{ left: "50%", transform: "translateX(-50%)" }}>Testimonials</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -632,11 +620,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-purple bg-grid-fine" />
           <div className="floating-orb gradient-orb-emerald w-[240px] h-[240px] -top-16 -right-16 animate-float-slow opacity-30" />
           <div className="floating-orb gradient-orb-purple w-[200px] h-[200px] -bottom-12 -left-12 animate-float-reverse opacity-25" />
-          <div className="blob-3d blob-3d-blue w-[80px] h-[80px] top-[8%] -right-3 animate-blob-morph z-[1]" />
-          <div className="shape-ring shape-ring-lg -bottom-10 -left-10 opacity-30" />
-          <div className="shape-cross top-[40%] left-[1.5%] opacity-45" />
-          <div className="shape-cross bottom-[15%] right-[2%] opacity-35" />
-          <div className="shape-diamond top-[20%] left-[3%] opacity-35" />
+          <div className="blob-3d blob-3d-blue w-[120px] h-[120px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
           <div className="watermark-text">Transparency</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -681,10 +665,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed" />
           <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />
-          <div className="blob-3d blob-3d-teal w-[70px] h-[70px] top-[15%] -left-3 animate-blob-morph z-[1]" />
-          <div className="shape-ring shape-ring-sm top-[20%] right-[2%] opacity-30" />
-          <div className="shape-ring shape-ring-sm bottom-[25%] left-[3%] opacity-25" />
-          <div className="shape-diamond bottom-[20%] -right-1 opacity-35" />
+          <div className="blob-3d blob-3d-teal w-[110px] h-[110px] -bottom-8 -right-6 animate-blob-morph z-[1]" />
 
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
