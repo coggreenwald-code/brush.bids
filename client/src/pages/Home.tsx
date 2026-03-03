@@ -18,7 +18,7 @@ import artGeometric from "@assets/art-geometric-abstract.png";
 import artFloral from "@assets/art-floral-still-life.png";
 import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
-import ctaJourneyImage from "@assets/pexels-zeynep-30682160_1771376027489.jpg";
+
 
 const placeholderArtworks = [
   { id: 0, title: "Ethereal Horizons", artistName: "Maya Rodriguez", imageUrl: artSunset },
@@ -678,19 +678,10 @@ export default function Home() {
         </section>
 
         {/* CTA */}
-        <section className="relative" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
-          <div className="relative w-full min-h-[420px] md:min-h-[500px] lg:min-h-[560px] overflow-hidden">
-            <img
-              src={ctaJourneyImage}
-              alt="Artist painting on an easel"
-              className="absolute inset-0 w-full h-full object-cover object-[center_25%]"
-              data-testid="img-cta-journey"
-            />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to left, rgba(10,10,15,0.85) 0%, rgba(10,10,15,0.5) 40%, rgba(10,10,15,0.2) 70%, transparent 100%)" }} />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,10,15,0.8) 0%, transparent 40%)" }} />
-
-            <div className="relative z-10 h-full min-h-[420px] md:min-h-[500px] lg:min-h-[560px] flex items-end justify-end">
-              <div className="max-w-2xl px-6 md:px-12 lg:px-16 pb-16 md:pb-20 space-y-6 text-right">
+        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+          <div className="relative w-full overflow-hidden">
+            <div className="relative z-10 flex items-center justify-center">
+              <div className="max-w-2xl px-6 md:px-12 lg:px-16 space-y-6 text-center">
                 <motion.h2
                   className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight"
                   initial={{ opacity: 0, y: 30 }}
@@ -703,7 +694,7 @@ export default function Home() {
                 </motion.h2>
 
                 <motion.p
-                  className="text-white/60 text-base md:text-lg leading-relaxed max-w-lg ml-auto"
+                  className="text-white/60 text-base md:text-lg leading-relaxed max-w-lg mx-auto"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -713,7 +704,7 @@ export default function Home() {
                 </motion.p>
 
                 <motion.div
-                  className="flex flex-wrap gap-4 justify-end"
+                  className="flex flex-wrap gap-4 justify-center"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
