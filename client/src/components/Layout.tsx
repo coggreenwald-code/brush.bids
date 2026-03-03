@@ -12,7 +12,7 @@ import {
   ChevronDown,
   Users
 } from "lucide-react";
-import logoImage from "@/assets/logo.png";
+import logoImage from "@assets/BrushBids_Logo_1772561349423.png";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

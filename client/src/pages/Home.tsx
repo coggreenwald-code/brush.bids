@@ -226,7 +226,7 @@ export default function Home() {
                 >
                   <span className="inline-flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full bg-white/10 text-white/80 backdrop-blur-sm border border-white/10 uppercase tracking-widest">
                     <img src={brushBidsLogo} alt="BrushBids" className="w-4 h-4 object-contain" style={{ filter: "invert(1) brightness(2)" }} />
-                    Student Art Marketplace
+                    Turning Student Creativity Into Opportunity
                   </span>
                 </motion.div>
 
@@ -238,7 +238,7 @@ export default function Home() {
                   data-testid="text-hero-title"
                 >
                   Your Art.{" "}
-                  <span className="gradient-text">Your Future.</span>
+                  <span className="text-[#60A5FA]">Your Future.</span>
                 </motion.h1>
 
                 <motion.p
