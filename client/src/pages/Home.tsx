@@ -238,7 +238,7 @@ export default function Home() {
                   data-testid="text-hero-title"
                 >
                   Your Art.{" "}
-                  <span className="text-[#60A5FA]">Your Future.</span>
+                  <span className="text-[#A78BFA]">Your Future.</span>
                 </motion.h1>
 
                 <motion.p
