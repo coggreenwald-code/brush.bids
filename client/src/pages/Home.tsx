@@ -467,12 +467,12 @@ export default function Home() {
         </section>
 
         {/* How It Works */}
-        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-how-it-works">
+        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)", marginTop: "10px" }} data-testid="section-how-it-works">
           <div className="absolute inset-0 bg-mesh-purple section-tint-purple" />
           <div className="geometric-lines" />
           <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
           <div className="floating-orb gradient-orb-blue w-[250px] h-[250px] -bottom-16 -left-16 animate-float-reverse opacity-30" />
-          <div className="watermark-text" style={{ top: "-40px" }}>Process</div>
+          <div className="watermark-text" style={{ top: "-30px" }}>Process</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
               <div className="mb-16 relative z-10">
