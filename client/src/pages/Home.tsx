@@ -661,7 +661,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-mesh-mixed" />
           <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />
-          <div className="watermark-text">Journey</div>
+
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
               <div className="relative z-10 flex items-center justify-center">
