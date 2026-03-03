@@ -86,8 +86,17 @@ Preferred communication style: Simple, everyday language.
 - **3D shape images**: Artie.com-style pre-rendered 3D geometric objects placed at section edges
   - AI-generated PNG images with transparent backgrounds: torus rings (teal, purple, blue), spheres (teal, blue), rounded cube (pink), thin ring (purple), gem (green)
   - Imported via `@assets/3d-*.png` and rendered as `<img>` elements with absolute positioning
-  - Animated with existing float utilities (animate-float, animate-float-slow, animate-float-reverse)
-  - Each section has 2 shapes: one large at bottom-right corner, one smaller accent at opposite corner
+  - Shapes placed in intentional groups (2-3 per section) that interact with each other and structural elements
+  - Threading lines (`.threading-line`) — thin vertical lines that torus shapes slide up and down through
+  - `.perspective-section` on parent sections enables 3D perspective transforms
+  - Animation classes for real 3D movement:
+    - `.animate-spin-slide` / `.animate-spin-slide-alt` — torus shapes spinning while sliding up/down a threading line (staggered)
+    - `.animate-spin-float` / `.animate-spin-float-reverse` — continuous Y-axis 3D rotation with gentle float
+    - `.animate-tilt-float` — X-axis rotation for flat ring shapes (rocking/tilting)
+    - `.animate-rock-orbit` — small orbital path with gentle rocking for accent shapes
+    - `.animate-shape-rock` — gentle Z-axis rocking oscillation
+    - `.animate-shape-pulse` — subtle scale pulsing with slight rotation
+  - Shapes hidden on mobile (`hidden md:block`) for clean mobile experience
 - **Section tints**: `.section-tint-purple`, `.section-tint-blue`, `.section-tint-mixed`
 
 ### Design Elements

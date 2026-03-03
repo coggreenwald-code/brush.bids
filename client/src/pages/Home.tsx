@@ -476,13 +476,17 @@ export default function Home() {
         </section>
 
         {/* How It Works */}
-        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)", marginTop: "10px" }} data-testid="section-how-it-works">
+        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)", marginTop: "10px" }} data-testid="section-how-it-works">
           <div className="absolute inset-0 bg-mesh-purple section-tint-purple" />
           <div className="geometric-lines" />
           <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
           <div className="floating-orb gradient-orb-blue w-[250px] h-[250px] -bottom-16 -left-16 animate-float-reverse opacity-30" />
-          <img src={shape3dTorusTeal} alt="" className="absolute -bottom-10 -right-8 w-[140px] h-[140px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
-          <img src={shape3dSphereTeal} alt="" className="absolute -top-6 right-20 w-[50px] h-[50px] pointer-events-none z-[1] animate-float" draggable={false} />
+          <div className="absolute right-[8%] top-[15%] bottom-[10%] pointer-events-none z-[1] hidden md:block">
+            <div className="threading-line h-full" style={{ left: "50%" }} />
+            <img src={shape3dTorusTeal} alt="" className="absolute w-[100px] h-[100px] -left-[50px] top-[10%] animate-spin-slide" draggable={false} />
+            <img src={shape3dTorusPurple} alt="" className="absolute w-[80px] h-[80px] -left-[40px] bottom-[15%] animate-spin-slide-alt" draggable={false} />
+            <img src={shape3dSphereTeal} alt="" className="absolute w-[40px] h-[40px] -left-[20px] top-[0%] animate-rock-orbit" draggable={false} />
+          </div>
           <div className="watermark-text" style={{ top: "-30px" }}>Process</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -566,12 +570,15 @@ export default function Home() {
         </section>
 
         {/* Stats */}
-        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
+        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
           <div className="absolute inset-0 bg-mesh-blue section-tint-blue bg-dots" />
           <div className="floating-orb gradient-orb-blue w-[280px] h-[280px] -top-16 -left-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-pink w-[220px] h-[220px] -bottom-12 -right-16 animate-float-reverse opacity-30" />
-          <img src={shape3dTorusPurple} alt="" className="absolute -bottom-10 -right-8 w-[130px] h-[130px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
-          <img src={shape3dGemGreen} alt="" className="absolute top-8 -left-6 w-[60px] h-[60px] pointer-events-none z-[1] animate-float-reverse" draggable={false} />
+          <div className="absolute left-[5%] top-[8%] pointer-events-none z-[1] hidden md:block">
+            <img src={shape3dTorusPurple} alt="" className="w-[110px] h-[110px] animate-spin-float" draggable={false} />
+            <img src={shape3dGemGreen} alt="" className="w-[45px] h-[45px] ml-16 -mt-2 animate-rock-orbit" draggable={false} />
+          </div>
+          <img src={shape3dSphereBlue} alt="" className="absolute bottom-[10%] right-[6%] w-[55px] h-[55px] pointer-events-none z-[1] animate-spin-float-reverse hidden md:block" draggable={false} />
           <div className="watermark-text">Impact</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -608,12 +615,18 @@ export default function Home() {
         </section>
 
         {/* Testimonials */}
-        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-testimonials">
+        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-testimonials">
           <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
           <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
-          <img src={shape3dSphereBlue} alt="" className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[100px] h-[100px] pointer-events-none z-[1] animate-float" draggable={false} />
-          <img src={shape3dRingPurple} alt="" className="absolute -top-8 left-16 w-[80px] h-[80px] pointer-events-none z-[1] animate-float-reverse opacity-80" draggable={false} />
+          <div className="absolute top-[18%] left-1/2 -translate-x-1/2 pointer-events-none z-[1] hidden md:block">
+            <img src={shape3dSphereBlue} alt="" className="w-[90px] h-[90px] animate-shape-pulse" draggable={false} />
+            <img src={shape3dRingPurple} alt="" className="absolute w-[120px] h-[120px] -top-4 -left-4 animate-tilt-float opacity-70" draggable={false} />
+          </div>
+          <div className="absolute top-[12%] left-[6%] pointer-events-none z-[1] hidden md:block">
+            <img src={shape3dRingPurple} alt="" className="w-[65px] h-[65px] animate-shape-rock" draggable={false} />
+            <img src={shape3dSphereTeal} alt="" className="w-[30px] h-[30px] ml-8 -mt-1 animate-rock-orbit" draggable={false} />
+          </div>
           <div className="watermark-text" style={{ left: "50%", transform: "translateX(-50%)" }}>Testimonials</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -628,12 +641,16 @@ export default function Home() {
         </section>
 
         {/* Revenue Split */}
-        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-revenue-split">
+        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-revenue-split">
           <div className="absolute inset-0 bg-mesh-purple bg-grid-fine" />
           <div className="floating-orb gradient-orb-emerald w-[240px] h-[240px] -top-16 -right-16 animate-float-slow opacity-30" />
           <div className="floating-orb gradient-orb-purple w-[200px] h-[200px] -bottom-12 -left-12 animate-float-reverse opacity-25" />
-          <img src={shape3dTorusBlue} alt="" className="absolute -bottom-10 -right-8 w-[130px] h-[130px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
-          <img src={shape3dCubePink} alt="" className="absolute -top-8 left-12 w-[70px] h-[70px] pointer-events-none z-[1] animate-float" draggable={false} />
+          <div className="absolute right-[6%] top-[12%] bottom-[15%] pointer-events-none z-[1] hidden md:block">
+            <div className="threading-line h-full" style={{ left: "50%" }} />
+            <img src={shape3dTorusBlue} alt="" className="absolute w-[110px] h-[110px] -left-[55px] top-[5%] animate-spin-slide" draggable={false} />
+            <img src={shape3dCubePink} alt="" className="absolute w-[50px] h-[50px] left-[20px] top-[50%] animate-rock-orbit" draggable={false} />
+          </div>
+          <img src={shape3dSphereTeal} alt="" className="absolute bottom-[12%] left-[5%] w-[35px] h-[35px] pointer-events-none z-[1] animate-spin-float-reverse hidden md:block" draggable={false} />
           <div className="watermark-text">Transparency</div>
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
@@ -674,12 +691,15 @@ export default function Home() {
         </section>
 
         {/* CTA */}
-        <section className="relative py-24 md:py-32" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
           <div className="absolute inset-0 bg-mesh-mixed" />
           <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />
-          <img src={shape3dGemGreen} alt="" className="absolute -bottom-8 -right-6 w-[90px] h-[90px] pointer-events-none z-[1] animate-float-slow" draggable={false} />
-          <img src={shape3dSphereTeal} alt="" className="absolute top-10 -left-4 w-[45px] h-[45px] pointer-events-none z-[1] animate-float" draggable={false} />
+          <div className="absolute bottom-[5%] right-[12%] pointer-events-none z-[1] hidden md:block">
+            <img src={shape3dTorusTeal} alt="" className="w-[90px] h-[90px] animate-spin-float" draggable={false} />
+            <img src={shape3dGemGreen} alt="" className="w-[40px] h-[40px] -mt-4 ml-12 animate-rock-orbit" draggable={false} />
+          </div>
+          <img src={shape3dRingPurple} alt="" className="absolute top-[15%] left-[5%] w-[55px] h-[55px] pointer-events-none z-[1] animate-tilt-float hidden md:block" draggable={false} />
 
           <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-5xl mx-auto">
             <div className="section-outlined p-8 md:p-12 lg:p-16">
