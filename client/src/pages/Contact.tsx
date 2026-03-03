@@ -184,7 +184,7 @@ export default function Contact() {
                   )}
                 />
 
-                <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid="button-contact-submit">
+                <Button type="submit" size="lg" className="w-full sm:w-auto rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" data-testid="button-contact-submit">
                   Send Message
                 </Button>
               </form>

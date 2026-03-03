@@ -555,7 +555,7 @@ export default function SubmitArtwork() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90"
+                className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90"
                 disabled={createArtwork.isPending}
                 data-testid="button-submit-artwork"
               >

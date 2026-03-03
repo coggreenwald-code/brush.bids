@@ -205,7 +205,7 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
           <Button 
             onClick={handleSave} 
             disabled={mutation.isPending}
-            className="rounded-full bg-[#A78BFA] text-white font-semibold"
+            className="rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90"
             data-testid="button-save-boost"
           >
             {mutation.isPending ? "Saving..." : "Save Boost Settings"}

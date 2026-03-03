@@ -88,7 +88,7 @@ Preferred communication style: Simple, everyday language.
 ### Design Elements
 - **Lenis smooth scroll**: Premium slow scroll feel via Lenis library, initialized in App.tsx
 - **Cards**: Dark glass cards (bg-white/[0.02] border-white/5), hover:border-white/10
-- **Buttons**: Pill-shaped (rounded-full), violet CTA (bg-[#A78BFA] text-white), outline (border-white/20 text-white)
+- **Buttons**: Pill-shaped (rounded-full), white CTA (bg-white text-[#0a0a0f]), outline (border-white/20 text-white)
 - **Navbar**: Glass-morphic (glass-nav), scroll-aware (hides on scroll down, shows on scroll up)
 - **Footer**: 3 link columns + large outlined SVG BrushBids wordmark (stroke-only, no fill) + bg-mesh-purple
 - **Animations**: Framer Motion fade-ins, CSS transitions, hover elevation, floating orbs (animate-float, animate-float-slow, animate-float-reverse, animate-orb-drift)

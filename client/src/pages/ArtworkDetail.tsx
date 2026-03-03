@@ -346,7 +346,7 @@ export default function ArtworkDetail() {
                             </div>
                             <Button 
                               type="submit" 
-                              className="h-12 px-8 rounded-full bg-violet-500 text-white font-semibold" 
+                              className="h-12 px-8 rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" 
                               disabled={placeBid.isPending} 
                               data-testid="button-place-bid"
                             >

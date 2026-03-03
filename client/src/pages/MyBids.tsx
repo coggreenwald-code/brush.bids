@@ -122,7 +122,7 @@ export default function MyBids() {
             <p className="text-white/50 mb-6">
               Please sign in to view your bids and watchlist.
             </p>
-            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid="button-login-bids">
+            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" data-testid="button-login-bids">
               Sign In
             </Button>
           </div>
@@ -198,7 +198,7 @@ export default function MyBids() {
                   You're not currently the highest bidder on any active auction.
                 </p>
                 <Link href="/gallery">
-                  <Button className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid="button-browse-gallery-bids">Browse Gallery</Button>
+                  <Button className="rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" data-testid="button-browse-gallery-bids">Browse Gallery</Button>
                 </Link>
               </div>
             ) : (
@@ -280,7 +280,7 @@ export default function MyBids() {
                       </div>
                       {!bid.auctionEnded && (
                         <Link href={`/artwork/${bid.artworkId}`}>
-                          <Button size="sm" className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90" data-testid={`button-rebid-${bid.artworkId}`}>Bid Again</Button>
+                          <Button size="sm" className="rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" data-testid={`button-rebid-${bid.artworkId}`}>Bid Again</Button>
                         </Link>
                       )}
                     </div>
@@ -352,7 +352,7 @@ export default function MyBids() {
                         <Button 
                           onClick={() => handlePayNow(bid.artworkId)}
                           disabled={processingPayment === bid.artworkId}
-                          className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold hover:bg-[#A78BFA]/90"
+                          className="rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90"
                           data-testid={`button-pay-${bid.artworkId}`}
                         >
                           {processingPayment === bid.artworkId ? (

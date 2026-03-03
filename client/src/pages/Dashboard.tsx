@@ -235,7 +235,7 @@ export default function Dashboard() {
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-bold text-white">Please Sign In</h2>
             <p className="text-white/60">You need to be logged in to view your dashboard.</p>
-            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-[#A78BFA] text-[#0a0a0f]">Login</Button>
+            <Button onClick={() => window.location.href = "/api/login"} className="rounded-full bg-white text-[#0a0a0f] hover:bg-white/90">Login</Button>
           </div>
         </div>
       </Layout>
@@ -255,7 +255,7 @@ export default function Dashboard() {
           </div>
           {(user.role === "artist" || user.role === "both") && (
             <Link href="/submit-artwork">
-              <Button className="rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold px-6">
+              <Button className="rounded-full bg-white text-[#0a0a0f] font-semibold px-6 hover:bg-white/90">
                 <Plus className="mr-2 h-5 w-5" /> Submit New Art
               </Button>
             </Link>
@@ -315,7 +315,7 @@ export default function Dashboard() {
                     <h3 className="text-lg font-semibold text-white">No artworks yet</h3>
                     <p className="text-white/50 mb-4">Start your journey by submitting your first piece.</p>
                     <Link href="/submit-artwork">
-                      <Button className="rounded-full bg-[#A78BFA] text-[#0a0a0f]">Submit Art</Button>
+                      <Button className="rounded-full bg-white text-[#0a0a0f] hover:bg-white/90">Submit Art</Button>
                     </Link>
                   </div>
                 ) : (
@@ -386,7 +386,7 @@ export default function Dashboard() {
                                   </Button>
                                   <Button 
                                     size="sm" 
-                                    className={`rounded-full ${(artwork.promotionPercentage ?? 0) > 0 ? 'border-white/10 text-white/70 bg-transparent border' : 'bg-[#A78BFA] text-[#0a0a0f]'}`}
+                                    className={`rounded-full ${(artwork.promotionPercentage ?? 0) > 0 ? 'border-white/10 text-white/70 bg-transparent border' : 'bg-white text-[#0a0a0f] hover:bg-white/90'}`}
                                     onClick={(e) => {
                                       e.preventDefault();
                                       setBoostArtwork(artwork);
@@ -410,7 +410,7 @@ export default function Dashboard() {
               <TabsContent value="portfolio" className="space-y-6">
                 <div className="flex justify-between items-center flex-wrap gap-2">
                   <p className="text-sm text-white/50">Showcase your artwork. List pieces for sale or submit them to auction.</p>
-                  <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full bg-[#A78BFA] text-[#0a0a0f] gap-1" data-testid="button-add-portfolio">
+                  <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full bg-white text-[#0a0a0f] gap-1 hover:bg-white/90" data-testid="button-add-portfolio">
                     <Plus className="w-4 h-4" /> Add Artwork
                   </Button>
                 </div>
@@ -421,7 +421,7 @@ export default function Dashboard() {
                     <Palette className="w-12 h-12 mx-auto mb-4 text-white/30" />
                     <h3 className="text-lg font-semibold text-white">Your portfolio is empty</h3>
                     <p className="text-white/50 mb-4">Start building your portfolio by adding your artwork.</p>
-                    <Button onClick={() => setShowAddForm(true)} className="rounded-full bg-[#A78BFA] text-[#0a0a0f] gap-2" data-testid="button-add-portfolio-empty">
+                    <Button onClick={() => setShowAddForm(true)} className="rounded-full bg-white text-[#0a0a0f] gap-2 hover:bg-white/90" data-testid="button-add-portfolio-empty">
                       <Plus className="w-4 h-4" /> Add Your First Piece
                     </Button>
                   </div>
@@ -575,7 +575,7 @@ export default function Dashboard() {
                         </Button>
                         <Button 
                           size="sm" 
-                          className="rounded-full bg-[#A78BFA] text-[#0a0a0f]"
+                          className="rounded-full bg-white text-[#0a0a0f] hover:bg-white/90"
                           onClick={() => updateNameMutation.mutate({ firstName: firstName.trim(), lastName: lastName.trim() })}
                           disabled={updateNameMutation.isPending || !firstName.trim() || !lastName.trim()}
                           data-testid="button-save-name"
@@ -640,7 +640,7 @@ export default function Dashboard() {
                         </Button>
                         <Button 
                           size="sm" 
-                          className="rounded-full bg-[#A78BFA] text-[#0a0a0f]"
+                          className="rounded-full bg-white text-[#0a0a0f] hover:bg-white/90"
                           onClick={() => updateBioMutation.mutate(bioText)}
                           disabled={updateBioMutation.isPending}
                           data-testid="button-save-bio"
@@ -687,7 +687,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "artist" ? "default" : "outline"} 
                     size="sm"
-                    className={`rounded-full ${user?.role === "artist" ? "bg-[#A78BFA] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
+                    className={`rounded-full ${user?.role === "artist" ? "bg-white text-[#0a0a0f] hover:bg-white/90" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("artist")}
                     disabled={updateRoleMutation.isPending || user?.role === "artist"}
                     data-testid="button-role-artist"
@@ -697,7 +697,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "buyer" ? "default" : "outline"} 
                     size="sm"
-                    className={`rounded-full ${user?.role === "buyer" ? "bg-[#A78BFA] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
+                    className={`rounded-full ${user?.role === "buyer" ? "bg-white text-[#0a0a0f] hover:bg-white/90" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("buyer")}
                     disabled={updateRoleMutation.isPending || user?.role === "buyer"}
                     data-testid="button-role-collector"
@@ -707,7 +707,7 @@ export default function Dashboard() {
                   <Button 
                     variant={user?.role === "both" ? "default" : "outline"} 
                     size="sm"
-                    className={`rounded-full ${user?.role === "both" ? "bg-[#A78BFA] text-[#0a0a0f]" : "border-white/10 text-white/60"}`}
+                    className={`rounded-full ${user?.role === "both" ? "bg-white text-[#0a0a0f] hover:bg-white/90" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("both")}
                     disabled={updateRoleMutation.isPending || user?.role === "both"}
                     data-testid="button-role-both"
@@ -788,7 +788,7 @@ export default function Dashboard() {
               )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} data-testid="input-portfolio-file" />
             </div>
-            <Button className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold" disabled={!newItem.title || !newItem.imageUrl || createItem.isPending} onClick={() => createItem.mutate(newItem)} data-testid="button-save-portfolio">
+            <Button className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" disabled={!newItem.title || !newItem.imageUrl || createItem.isPending} onClick={() => createItem.mutate(newItem)} data-testid="button-save-portfolio">
               {createItem.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Add to Portfolio
             </Button>
@@ -807,7 +807,7 @@ export default function Dashboard() {
               <Label className="text-white/60">Price ($)</Label>
               <Input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} placeholder="100" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" data-testid="input-sell-price" />
             </div>
-            <Button className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold" disabled={!sellPrice || Number(sellPrice) <= 0 || listForSale.isPending} onClick={() => showSellDialog && listForSale.mutate({ id: showSellDialog.id, price: Number(sellPrice) })} data-testid="button-confirm-list">
+            <Button className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" disabled={!sellPrice || Number(sellPrice) <= 0 || listForSale.isPending} onClick={() => showSellDialog && listForSale.mutate({ id: showSellDialog.id, price: Number(sellPrice) })} data-testid="button-confirm-list">
               {listForSale.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               List for Sale (2-Week Window)
             </Button>
@@ -856,7 +856,7 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full rounded-full bg-[#A78BFA] text-[#0a0a0f] font-semibold" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
+            <Button className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
               {convertToAuction.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Submit for Review
             </Button>

@@ -258,7 +258,7 @@ export default function Home() {
                   transition={{ duration: 0.7, delay: 0.3 }}
                 >
                   <Link href="/gallery">
-                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-full bg-[#A78BFA] text-white gap-2 px-8 font-semibold">
+                    <Button data-testid="button-explore-gallery" size="lg" className="rounded-full bg-white text-[#0a0a0f] gap-2 px-8 font-semibold hover:bg-white/90">
                       Explore Gallery <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
@@ -518,7 +518,7 @@ export default function Home() {
                     ))}
                   </div>
                   <Link href="/submit-artwork">
-                    <Button data-testid="button-start-selling" className="mt-10 rounded-full bg-[#A78BFA] text-white px-8 font-semibold" size="lg">Start Selling</Button>
+                    <Button data-testid="button-start-selling" className="mt-10 rounded-full bg-white text-[#0a0a0f] px-8 font-semibold hover:bg-white/90" size="lg">Start Selling</Button>
                   </Link>
                 </motion.div>
 
@@ -720,7 +720,7 @@ export default function Home() {
                   transition={{ duration: 0.7, delay: 0.2 }}
                 >
                   <Link href="/submit-artwork">
-                    <Button size="lg" className="rounded-full bg-[#A78BFA] text-white gap-2 px-8 font-semibold" data-testid="button-cta-submit">
+                    <Button size="lg" className="rounded-full bg-white text-[#0a0a0f] gap-2 px-8 font-semibold hover:bg-white/90" data-testid="button-cta-submit">
                       Submit Your Art <Upload className="w-4 h-4" />
                     </Button>
                   </Link>

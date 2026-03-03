@@ -37,13 +37,13 @@ export function SignupPopup() {
 
   return (
     <Dialog open={show} onOpenChange={(open) => { if (!open) handleDismiss(); }}>
-      <DialogContent className="sm:max-w-md p-8 bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10" data-testid="signup-popup">
+      <DialogContent className="sm:max-w-md p-8 bg-white border border-gray-200 shadow-2xl" data-testid="signup-popup">
         <div className="flex flex-col items-center text-center space-y-4">
-          <h2 className="text-2xl font-display font-bold gradient-text" data-testid="text-popup-title">
+          <h2 className="text-2xl font-display font-bold text-[#0a0a0f]" data-testid="text-popup-title">
             Get 5% Off Your First Purchase
           </h2>
 
-          <p className="text-sm text-white/60" data-testid="text-popup-description">
+          <p className="text-sm text-gray-500" data-testid="text-popup-description">
             Enter your email. Get your 5% off code. Be the first to know about all things BrushBids.
           </p>
 
@@ -52,12 +52,12 @@ export function SignupPopup() {
             placeholder="Your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-[#A78BFA]"
+            className="w-full bg-gray-50 border-gray-200 text-[#0a0a0f] placeholder:text-gray-400 focus-visible:ring-[#A78BFA]"
             data-testid="input-popup-email"
           />
 
           <Button
-            className="w-full rounded-full bg-[#A78BFA] text-white font-semibold text-base py-5"
+            className="w-full rounded-full bg-[#0a0a0f] text-white font-semibold text-base py-5 hover:bg-[#0a0a0f]/90"
             onClick={() => { handleDismiss(true); setLoc("/auth"); }}
             data-testid="button-popup-get-discount"
           >
@@ -65,7 +65,7 @@ export function SignupPopup() {
           </Button>
 
           <button
-            className="text-xs font-bold underline text-white/40 hover:text-white/60 transition-colors cursor-pointer"
+            className="text-xs font-bold underline text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
             onClick={() => handleDismiss(true)}
             data-testid="button-popup-reject"
           >

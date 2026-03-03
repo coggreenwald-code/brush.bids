@@ -156,7 +156,7 @@ export function WelcomeModal({ isOpen, userId, existingFirstName, existingLastNa
         </div>
         
         <Button 
-          className="w-full mt-4 rounded-full bg-[#A78BFA] text-white font-semibold" 
+          className="w-full mt-4 rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" 
           size="lg"
           disabled={!canContinue || completeOnboardingMutation.isPending}
           onClick={handleContinue}

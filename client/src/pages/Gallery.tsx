@@ -135,7 +135,7 @@ export default function Gallery() {
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-4 py-2 rounded-full text-sm transition-all duration-200 ${
                       selectedCategory === cat
-                        ? "bg-[#A78BFA] text-[#0a0a0f] font-medium"
+                        ? "bg-white text-[#0a0a0f] font-medium"
                         : "border border-white/10 text-white/60 hover:bg-white/5 hover:text-white hover:border-white/20"
                     }`}
                     data-testid={`filter-category-${cat.toLowerCase().replace(/\s+/g, "-")}`}

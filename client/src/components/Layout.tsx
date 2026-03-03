@@ -75,7 +75,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto flex h-16 items-center justify-between gap-6 px-4 md:px-8 max-w-7xl">
           <Link href="/" className="flex items-center gap-2.5 flex-shrink-0" data-testid="link-home-logo">
             <div className="w-8 h-8 flex items-center justify-center">
-              <img src={logoImage} alt="BrushBids" className="w-full h-full invert brightness-200" />
+              <img src={logoImage} alt="BrushBids" className="w-full h-full brightness-0 invert" />
             </div>
             <span className="text-lg font-bold text-white tracking-tight">BrushBids</span>
           </Link>
@@ -140,7 +140,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link href="/auth">
                 <Button 
-                  className="rounded-full text-sm bg-[#A78BFA] text-[#0a0a0f] font-medium px-6"
+                  className="rounded-full text-sm bg-white text-[#0a0a0f] font-medium px-6 hover:bg-white/90"
                   data-testid="button-sign-in"
                 >
                   Sign In
