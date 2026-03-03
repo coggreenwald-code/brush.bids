@@ -18,6 +18,11 @@ Key features:
 - Role switching available anytime from Dashboard settings
 - Warm earth tone design with gold and silver accents on a cream background
 - Anti-sniping auction system with configurable duration and 2-minute extension rule
+- Artist portfolio section with 2-week sell pipeline
+- QR code generation for approved artworks (for art shows)
+- 20-second delayed signup popup for new homepage visitors
+- Artwork dimensions (Length x Width in inches) required during submission
+- Mobile-optimized carousel with centered artist name and title below artwork
 
 ### Anti-Sniping Auction System
 - Artworks have a configurable auction duration (1, 3, 5, 7, 14, or 30 days)
@@ -95,9 +100,10 @@ Preferred communication style: Simple, everyday language.
 
 ### Core Data Models
 - **Users**: Role-based (artist, buyer, admin) with Replit Auth integration
-- **Artworks**: Status-based workflow (pending → approved/rejected), includes AI scoring
+- **Artworks**: Status-based workflow (pending → approved/rejected), includes AI scoring, dimensions field
 - **Bids**: Linked to artworks and bidders with timestamp tracking
 - **Charities**: Reference table for artist charity selection
+- **PortfolioItems**: Artist portfolio pieces with 2-week sell pipeline (listedForSale, listedAt tracking)
 - **Conversations/Messages**: Chat functionality with AI integration
 
 ### AI Integration

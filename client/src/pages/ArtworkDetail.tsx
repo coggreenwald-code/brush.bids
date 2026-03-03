@@ -15,11 +15,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Link as LinkIcon, Copy, Check, User } from "lucide-react";
+import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Link as LinkIcon, Copy, Check, User, QrCode, Ruler } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType } from "@shared/schema";
+import { QRCodeModal } from "@/components/QRCodeModal";
 
 const bidSchema = z.object({
   amount: z.coerce.number().min(1, "Bid must be at least $1"),
@@ -88,6 +89,7 @@ export default function ArtworkDetail() {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showQR, setShowQR] = useState(false);
 
   const { data: artist } = useQuery<UserType>({
     queryKey: ['/api/users', artwork?.artistId],
@@ -238,6 +240,12 @@ export default function ArtworkDetail() {
             <p className="text-lg leading-relaxed text-muted-foreground">
               {artwork.description}
             </p>
+            {(artwork as any).dimensions && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground" data-testid="text-dimensions">
+                <Ruler className="w-4 h-4" />
+                <span>{(artwork as any).dimensions}</span>
+              </div>
+            )}
           </div>
 
           {artist && (
@@ -346,7 +354,7 @@ export default function ArtworkDetail() {
             )}
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <Button 
               variant="outline" 
               className={`flex-1 gap-2 ${saved ? 'text-red-500 border-red-200' : ''}`}
@@ -355,6 +363,17 @@ export default function ArtworkDetail() {
             >
               <Heart className={`w-4 h-4 ${saved ? 'fill-current' : ''}`} /> {saved ? 'Saved' : 'Save'}
             </Button>
+
+            {user && artwork.artistId === user.id && artwork.status === 'approved' && (
+              <Button
+                variant="outline"
+                className="flex-1 gap-2"
+                onClick={() => setShowQR(true)}
+                data-testid="button-qr-code"
+              >
+                <QrCode className="w-4 h-4" /> QR Code
+              </Button>
+            )}
             
             <Popover>
               <PopoverTrigger asChild>
@@ -413,6 +432,15 @@ export default function ArtworkDetail() {
           </div>
         </div>
       </div>
+
+      {artwork && (
+        <QRCodeModal
+          isOpen={showQR}
+          onClose={() => setShowQR(false)}
+          artworkTitle={artwork.title}
+          artworkId={artwork.id}
+        />
+      )}
 
       <Footer />
     </Layout>

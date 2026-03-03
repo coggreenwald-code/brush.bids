@@ -23,6 +23,8 @@ const formSchema = z.object({
   description: z.string().min(10, "Description too short"),
   imageUrl: z.string().min(1, "Please upload an image of your artwork"),
   price: z.coerce.number().min(1, "Price must be positive"),
+  dimensionLength: z.coerce.number().min(0.1, "Length is required"),
+  dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
   auctionDurationDays: z.coerce.number().min(1).max(30).default(7),
   charityId: z.coerce.number().optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
@@ -83,6 +85,8 @@ export default function SubmitArtwork() {
       description: "",
       imageUrl: "",
       price: 0,
+      dimensionLength: 0,
+      dimensionWidth: 0,
       auctionDurationDays: 7,
       reviewType: "ai_instant",
     },
@@ -174,10 +178,13 @@ export default function SubmitArtwork() {
   }
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
+    const { dimensionLength, dimensionWidth, ...rest } = data;
+    const dimensions = `${dimensionLength} x ${dimensionWidth} inches`;
     createArtwork.mutate({
-      ...data,
+      ...rest,
       artistId: user.id,
       price: data.price.toString(),
+      dimensions,
     } as any, {
       onSuccess: () => {
         toast({
@@ -299,6 +306,36 @@ export default function SubmitArtwork() {
                           <SelectItem value="30">30 Days</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="dimensionLength"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Length (inches)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.1" placeholder="24" {...field} data-testid="input-dimension-length" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="dimensionWidth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Width (inches)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.1" placeholder="36" {...field} data-testid="input-dimension-width" />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertArtworkSchema, insertBidSchema, artworks, bids, users, charities } from './schema';
+import { insertArtworkSchema, insertBidSchema, insertPortfolioItemSchema, artworks, bids, users, charities, portfolioItems } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -193,7 +193,61 @@ export const api = {
         200: z.array(z.custom<typeof charities.$inferSelect>()),
       },
     },
-  }
+  },
+  // Portfolio
+  portfolio: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/portfolio/:artistId',
+      responses: {
+        200: z.array(z.custom<typeof portfolioItems.$inferSelect>()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/portfolio',
+      input: insertPortfolioItemSchema,
+      responses: {
+        201: z.custom<typeof portfolioItems.$inferSelect>(),
+        400: errorSchemas.validation,
+      },
+    },
+    listForSale: {
+      method: 'PATCH' as const,
+      path: '/api/portfolio/:id/list-for-sale',
+      input: z.object({
+        price: z.coerce.number().min(1, "Price must be positive"),
+      }),
+      responses: {
+        200: z.custom<typeof portfolioItems.$inferSelect>(),
+        404: errorSchemas.notFound,
+        403: z.object({ message: z.string() }),
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/portfolio/:id',
+      responses: {
+        200: z.object({ message: z.string() }),
+        404: errorSchemas.notFound,
+        403: z.object({ message: z.string() }),
+      },
+    },
+    convertToAuction: {
+      method: 'POST' as const,
+      path: '/api/portfolio/:id/convert-to-auction',
+      input: z.object({
+        auctionDurationDays: z.coerce.number().min(1).max(30).default(7),
+        charityId: z.coerce.number().optional(),
+        reviewType: z.enum(["ai_instant", "human_curator"]).default("ai_instant"),
+      }),
+      responses: {
+        201: z.custom<typeof artworks.$inferSelect>(),
+        404: errorSchemas.notFound,
+        403: z.object({ message: z.string() }),
+      },
+    },
+  },
 };
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {

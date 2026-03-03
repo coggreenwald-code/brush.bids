@@ -1,12 +1,13 @@
 import { db } from "./db";
 import {
-  users, artworks, bids, charities,
+  users, artworks, bids, charities, portfolioItems,
   type User,
   type Artwork, type InsertArtwork,
   type Bid, type InsertBid,
-  type Charity, type InsertCharity
+  type Charity, type InsertCharity,
+  type PortfolioItem, type InsertPortfolioItem
 } from "@shared/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and } from "drizzle-orm";
 
 export interface IStorage {
   // Users (Basic ops, Auth handles most)
@@ -47,6 +48,13 @@ export interface IStorage {
 
   // Charities
   getCharities(): Promise<Charity[]>;
+
+  // Portfolio
+  getPortfolioItems(artistId: string): Promise<PortfolioItem[]>;
+  getPortfolioItem(id: number): Promise<PortfolioItem | undefined>;
+  createPortfolioItem(item: InsertPortfolioItem): Promise<PortfolioItem>;
+  listPortfolioItemForSale(id: number, price: number): Promise<PortfolioItem>;
+  deletePortfolioItem(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -274,6 +282,34 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(artworks)
       .where(eq(artworks.status, "approved"))
       .orderBy(desc(artworks.promotionPercentage), desc(artworks.createdAt));
+  }
+
+  async getPortfolioItems(artistId: string): Promise<PortfolioItem[]> {
+    return await db.select().from(portfolioItems)
+      .where(eq(portfolioItems.artistId, artistId))
+      .orderBy(desc(portfolioItems.createdAt));
+  }
+
+  async getPortfolioItem(id: number): Promise<PortfolioItem | undefined> {
+    const [item] = await db.select().from(portfolioItems).where(eq(portfolioItems.id, id));
+    return item;
+  }
+
+  async createPortfolioItem(item: InsertPortfolioItem): Promise<PortfolioItem> {
+    const [newItem] = await db.insert(portfolioItems).values(item).returning();
+    return newItem;
+  }
+
+  async listPortfolioItemForSale(id: number, price: number): Promise<PortfolioItem> {
+    const [updated] = await db.update(portfolioItems)
+      .set({ listedForSale: true, listedAt: new Date(), price: price.toString() })
+      .where(eq(portfolioItems.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deletePortfolioItem(id: number): Promise<void> {
+    await db.delete(portfolioItems).where(eq(portfolioItems.id, id));
   }
 }
 

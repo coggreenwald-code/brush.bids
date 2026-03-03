@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Palette, DollarSign, ShoppingBag, Calendar } from "lucide-react";
-import type { User, Artwork } from "@shared/schema";
+import { Loader2, Palette, DollarSign, ShoppingBag, Calendar, FolderOpen } from "lucide-react";
+import type { User, Artwork, PortfolioItem } from "@shared/schema";
 
 export default function ArtistProfile() {
   const [, params] = useRoute("/artist/:id");
@@ -19,6 +19,11 @@ export default function ArtistProfile() {
 
   const { data: allArtworks, isLoading: loadingArtworks } = useQuery<Artwork[]>({
     queryKey: ['/api/artworks'],
+  });
+
+  const { data: portfolioItems } = useQuery<PortfolioItem[]>({
+    queryKey: ['/api/portfolio', artistId],
+    enabled: !!artistId,
   });
 
   const artistArtworks = allArtworks?.filter(a => String(a.artistId) === artistId) || [];
@@ -160,7 +165,34 @@ export default function ArtistProfile() {
           </div>
         )}
 
-        {artistArtworks.length === 0 && !loadingArtworks && (
+        {portfolioItems && portfolioItems.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-display font-bold mb-6 flex items-center gap-2">
+              <FolderOpen className="w-6 h-6" /> Portfolio
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {portfolioItems.map((item) => (
+                <Card key={item.id} className="overflow-hidden" data-testid={`card-portfolio-${item.id}`}>
+                  <div className="aspect-square bg-muted relative">
+                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                    {item.listedForSale && (
+                      <Badge className="absolute top-2 right-2 bg-[#B8965A]">For Sale</Badge>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold truncate">{item.title}</h3>
+                    {item.dimensions && <p className="text-xs text-muted-foreground">{item.dimensions}</p>}
+                    {item.listedForSale && item.price && (
+                      <p className="text-lg font-mono font-bold text-primary mt-1">${Number(item.price).toLocaleString()}</p>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {artistArtworks.length === 0 && (!portfolioItems || portfolioItems.length === 0) && !loadingArtworks && (
           <Card className="p-12 text-center">
             <Palette className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
             <h3 className="text-xl font-semibold">No Artworks Yet</h3>

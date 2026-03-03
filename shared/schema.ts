@@ -29,6 +29,20 @@ export const artworks = pgTable("artworks", {
   promotionPercentage: integer("promotion_percentage").default(0),
   reviewType: reviewTypeEnum("review_type").default("ai_instant").notNull(),
   views: integer("views").default(0).notNull(),
+  dimensions: text("dimensions"),
+});
+
+export const portfolioItems = pgTable("portfolio_items", {
+  id: serial("id").primaryKey(),
+  artistId: varchar("artist_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url").notNull(),
+  dimensions: text("dimensions"),
+  price: decimal("price", { precision: 10, scale: 2 }),
+  listedForSale: boolean("listed_for_sale").default(false).notNull(),
+  listedAt: timestamp("listed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const bids = pgTable("bids", {
@@ -53,6 +67,7 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true, createdAt: true, endTime: true, aiScore: true, aiFeedback: true, status: true });
 export const insertBidSchema = createInsertSchema(bids).omit({ id: true, createdAt: true });
 export const insertCharitySchema = createInsertSchema(charities).omit({ id: true });
+export const insertPortfolioItemSchema = createInsertSchema(portfolioItems).omit({ id: true, createdAt: true, listedForSale: true, listedAt: true });
 
 // Types
 export type Artwork = typeof artworks.$inferSelect;
@@ -61,3 +76,5 @@ export type Bid = typeof bids.$inferSelect;
 export type InsertBid = z.infer<typeof insertBidSchema>;
 export type Charity = typeof charities.$inferSelect;
 export type InsertCharity = z.infer<typeof insertCharitySchema>;
+export type PortfolioItem = typeof portfolioItems.$inferSelect;
+export type InsertPortfolioItem = z.infer<typeof insertPortfolioItemSchema>;

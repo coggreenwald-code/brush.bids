@@ -18,7 +18,9 @@ import Contact from "@/pages/Contact";
 import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
+import Portfolio from "@/pages/Portfolio";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { SignupPopup } from "@/components/SignupPopup";
 import { useAuth } from "@/hooks/use-auth";
 
 function Router() {
@@ -36,6 +38,7 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/contact" component={Contact} />
       <Route path="/my-bids" component={MyBids} />
+      <Route path="/portfolio" component={Portfolio} />
       <Route path="/auth" component={Auth} />
       <Route component={NotFound} />
     </Switch>
@@ -76,6 +79,7 @@ function App() {
         <OnboardingWrapper>
           <Router />
         </OnboardingWrapper>
+        <SignupPopup />
       </TooltipProvider>
     </QueryClientProvider>
   );

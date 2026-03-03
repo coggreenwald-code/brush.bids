@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
+import { QRCodeModal } from "@/components/QRCodeModal";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -21,6 +22,7 @@ import type { Artwork } from "@shared/schema";
 export default function Dashboard() {
   const { user } = useAuth();
   const [boostArtwork, setBoostArtwork] = useState<Artwork | null>(null);
+  const [qrArtwork, setQrArtwork] = useState<Artwork | null>(null);
   const [editingBio, setEditingBio] = useState(false);
   const [bioText, setBioText] = useState(user?.bio || "");
   const [editingName, setEditingName] = useState(false);
@@ -267,20 +269,35 @@ export default function Dashboard() {
                               <div className="text-xs text-muted-foreground">Current Bid</div>
                               <div className="font-bold text-primary">${Number(artwork.price).toLocaleString()}</div>
                             </div>
-                            {artwork.status === 'approved' && !artwork.paidAt && (
-                              <Button 
-                                size="sm" 
-                                variant={(artwork.promotionPercentage ?? 0) > 0 ? "outline" : "default"}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setBoostArtwork(artwork);
-                                }}
-                                data-testid={`button-boost-artwork-${artwork.id}`}
-                              >
-                                <Rocket className="w-4 h-4 mr-1" />
-                                {(artwork.promotionPercentage ?? 0) > 0 ? "Edit Boost" : "Boost"}
-                              </Button>
-                            )}
+                            <div className="flex gap-2">
+                              {artwork.status === 'approved' && !artwork.paidAt && (
+                                <>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setQrArtwork(artwork);
+                                    }}
+                                    data-testid={`button-qr-artwork-${artwork.id}`}
+                                  >
+                                    <QrCode className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant={(artwork.promotionPercentage ?? 0) > 0 ? "outline" : "default"}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setBoostArtwork(artwork);
+                                    }}
+                                    data-testid={`button-boost-artwork-${artwork.id}`}
+                                  >
+                                    <Rocket className="w-4 h-4 mr-1" />
+                                    {(artwork.promotionPercentage ?? 0) > 0 ? "Edit Boost" : "Boost"}
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -546,6 +563,15 @@ export default function Dashboard() {
           artwork={boostArtwork} 
           open={!!boostArtwork} 
           onOpenChange={(open) => !open && setBoostArtwork(null)} 
+        />
+      )}
+
+      {qrArtwork && (
+        <QRCodeModal
+          isOpen={!!qrArtwork}
+          onClose={() => setQrArtwork(null)}
+          artworkTitle={qrArtwork.title}
+          artworkId={qrArtwork.id}
         />
       )}
     </Layout>

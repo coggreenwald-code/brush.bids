@@ -363,7 +363,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="absolute bottom-[90px] left-0 z-20 px-6 md:px-12 lg:px-16 text-left" style={{ maxWidth: "calc(50% - 190px)" }}>
+              <div className="absolute bottom-[90px] left-0 z-20 px-6 md:px-12 lg:px-16 text-left hidden md:block" style={{ maxWidth: "calc(50% - 190px)" }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentIndex}
@@ -378,6 +378,26 @@ export default function Home() {
                     </h3>
                     <p className="text-muted-foreground tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
                       By {currentArt.artistName}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <div className="md:hidden absolute bottom-[70px] left-0 right-0 z-20 text-center px-4">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`mobile-${currentIndex}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-0.5 mt-6"
+                  >
+                    <h3 className="text-base font-display font-bold tracking-tight italic" data-testid="text-coverflow-title-mobile">
+                      {currentArt.title}
+                    </h3>
+                    <p className="text-muted-foreground tracking-wide text-sm font-semibold" data-testid="text-coverflow-artist-mobile">
+                      {currentArt.artistName}
                     </p>
                   </motion.div>
                 </AnimatePresence>

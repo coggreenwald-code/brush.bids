@@ -464,6 +464,101 @@ export async function registerRoutes(
     res.json(bids);
   });
 
+  // Portfolio Routes
+  app.get(api.portfolio.list.path, async (req, res) => {
+    const artistId = req.params.artistId;
+    const items = await storage.getPortfolioItems(artistId);
+    const enriched = items.map(item => {
+      let expired = false;
+      if (item.listedForSale && item.listedAt) {
+        const expiresAt = new Date(item.listedAt).getTime() + 14 * 24 * 60 * 60 * 1000;
+        expired = Date.now() > expiresAt;
+      }
+      return { ...item, expired };
+    });
+    res.json(enriched);
+  });
+
+  app.post(api.portfolio.create.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    try {
+      const input = api.portfolio.create.input.parse(req.body);
+      const item = await storage.createPortfolioItem(input);
+      res.status(201).json(item);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      throw err;
+    }
+  });
+
+  app.patch(api.portfolio.listForSale.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const id = Number(req.params.id);
+    const item = await storage.getPortfolioItem(id);
+    if (!item) return res.status(404).json({ message: "Portfolio item not found" });
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (item.artistId !== currentUserId) return res.status(403).json({ message: "Not your portfolio item" });
+    try {
+      const { price } = api.portfolio.listForSale.input.parse(req.body);
+      const updated = await storage.listPortfolioItemForSale(id, price);
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      throw err;
+    }
+  });
+
+  app.delete(api.portfolio.delete.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const id = Number(req.params.id);
+    const item = await storage.getPortfolioItem(id);
+    if (!item) return res.status(404).json({ message: "Portfolio item not found" });
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (item.artistId !== currentUserId) return res.status(403).json({ message: "Not your portfolio item" });
+    await storage.deletePortfolioItem(id);
+    res.json({ message: "Portfolio item deleted" });
+  });
+
+  app.post(api.portfolio.convertToAuction.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const id = Number(req.params.id);
+    const item = await storage.getPortfolioItem(id);
+    if (!item) return res.status(404).json({ message: "Portfolio item not found" });
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (item.artistId !== currentUserId) return res.status(403).json({ message: "Not your portfolio item" });
+    if (item.listedForSale && item.listedAt) {
+      const expiresAt = new Date(item.listedAt).getTime() + 14 * 24 * 60 * 60 * 1000;
+      if (Date.now() > expiresAt) {
+        return res.status(400).json({ message: "This listing has expired. Remove it and re-list or add a new portfolio item." });
+      }
+    }
+    try {
+      const { auctionDurationDays, charityId, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
+      const artwork = await storage.createArtwork({
+        title: item.title,
+        description: item.description || "",
+        imageUrl: item.imageUrl,
+        artistId: item.artistId,
+        price: item.price || "0",
+        auctionDurationDays,
+        charityId,
+        reviewType,
+        dimensions: item.dimensions,
+      });
+      await storage.deletePortfolioItem(id);
+      res.status(201).json(artwork);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      throw err;
+    }
+  });
+
   // Stripe Payment Routes
   app.get("/api/stripe/publishable-key", async (req, res) => {
     try {
