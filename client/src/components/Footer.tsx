@@ -20,7 +20,7 @@ function OutlinedBrushBidsLogo() {
         alt=""
         className="brightness-0 invert opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700 flex-shrink-0"
         draggable={false}
-        style={{ width: "clamp(120px, 18vw, 240px)", height: "clamp(120px, 18vw, 240px)" }}
+        style={{ width: "clamp(120px, 18vw, 240px)", height: "clamp(120px, 18vw, 240px)", marginLeft: "-50px" }}
       />
     </div>
   );
