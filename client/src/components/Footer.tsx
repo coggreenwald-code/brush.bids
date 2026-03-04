@@ -5,7 +5,7 @@ import logoImage from "@assets/BrushBids_Logo_1772561349423.png";
 
 function OutlinedBrushBidsLogo() {
   return (
-    <div className="w-full flex items-center justify-center gap-5 py-12 select-none group">
+    <div className="w-full flex items-center justify-center gap-0 py-12 select-none group">
       <span
         className="text-[4rem] md:text-[7rem] lg:text-[9rem] font-extrabold tracking-tight leading-none opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
         style={{
