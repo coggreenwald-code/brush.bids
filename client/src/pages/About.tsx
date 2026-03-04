@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { Heart, Users, Award, TrendingUp, Sparkles, GraduationCap, Palette } from "lucide-react";
 import logoUnicef from "@assets/unicef.png";
 import logoWwf from "@assets/wwf.png";
@@ -83,6 +84,7 @@ const revenueSplits = [
 export default function About() {
   return (
     <Layout>
+      <SEOHead title="About | BrushBids" description="Learn about BrushBids, the student art auction platform founded by Charlie Greenwald at The Dwight School, New York. Our mission is to empower student artists." />
       <div className="pb-0">
         <section
           className="hero-gradient relative py-24 md:py-36 text-center"

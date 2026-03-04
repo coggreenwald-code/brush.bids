@@ -1,10 +1,12 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { FileText } from "lucide-react";
 
 export default function Terms() {
   return (
     <Layout>
+      <SEOHead title="Terms & Conditions | BrushBids" description="Read BrushBids terms of service, privacy policy, and auction rules." />
       <div className="space-y-12 pb-16 max-w-3xl mx-auto">
         <section className="text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">

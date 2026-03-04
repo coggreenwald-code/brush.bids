@@ -20,6 +20,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCharities } from "@/hooks/use-charities";
 import type { Artwork, PortfolioItem } from "@shared/schema";
+import { SEOHead } from "@/components/SEOHead";
 
 function SaleCountdown({ listedAt }: { listedAt: string }) {
   const endDate = new Date(new Date(listedAt).getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -289,6 +290,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      <SEOHead title="Dashboard | BrushBids" description="Manage your artworks, portfolio, earnings, and profile on BrushBids." />
       <div className="space-y-8">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>

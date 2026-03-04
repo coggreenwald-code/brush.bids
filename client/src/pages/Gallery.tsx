@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { useArtworks } from "@/hooks/use-artworks";
 import { ArtworkCard } from "@/components/ArtworkCard";
 import { Search, SlidersHorizontal, X, Palette } from "lucide-react";
@@ -93,6 +94,7 @@ export default function Gallery() {
 
   return (
     <Layout>
+      <SEOHead title="Art Gallery | BrushBids" description="Browse and bid on original student artwork. Discover emerging talent from student artists across the country." />
       <div className="pb-24">
         <div
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}

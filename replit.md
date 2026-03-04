@@ -25,6 +25,7 @@ Key features:
 - Artwork dimensions (Length x Width in inches) required during submission
 - Mobile-optimized carousel with centered artist name and title below artwork
 - Profile picture system: upload custom photo or choose initial-based avatar in 8 colors (violet, pink, blue, emerald, orange, red, sky, lime)
+- Full SEO: meta tags, Open Graph, Twitter cards, JSON-LD (Organization + WebSite schemas), per-page titles via SEOHead component, robots.txt, dynamic sitemap.xml, semantic HTML with aria-labels
 
 ### Anti-Sniping Auction System
 - Artworks have a configurable auction duration (1, 3, 5, 7, 14, or 30 days)

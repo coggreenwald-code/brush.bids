@@ -81,6 +81,8 @@ function CountdownTimer({ endDate }: { endDate: Date }) {
   );
 }
 
+import { SEOHead } from "@/components/SEOHead";
+
 export default function ArtworkDetail() {
   const [match, params] = useRoute("/artwork/:id");
   const id = parseInt(params?.id || "0");
@@ -177,6 +179,7 @@ export default function ArtworkDetail() {
 
   return (
     <Layout>
+      <SEOHead title={`${artwork.title} | BrushBids`} description={artwork.description.slice(0, 160)} />
       <div className="w-full">
         <div className="mb-8">
           <Link href="/gallery">

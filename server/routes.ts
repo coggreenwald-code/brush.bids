@@ -725,5 +725,48 @@ export async function registerRoutes(
     });
   });
 
+  app.get("/robots.txt", (_req, res) => {
+    res.type("text/plain").send(`User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /dashboard
+
+Sitemap: https://brushbids.com/sitemap.xml
+`);
+  });
+
+  app.get("/sitemap.xml", async (_req, res) => {
+    const approvedArtworks = await storage.getArtworks("approved");
+    const staticPages = [
+      { url: "/", priority: "1.0", changefreq: "daily" },
+      { url: "/gallery", priority: "0.9", changefreq: "daily" },
+      { url: "/about", priority: "0.8", changefreq: "monthly" },
+      { url: "/faq", priority: "0.6", changefreq: "monthly" },
+      { url: "/contact", priority: "0.6", changefreq: "monthly" },
+      { url: "/terms", priority: "0.4", changefreq: "yearly" },
+    ];
+
+    const artworkPages = approvedArtworks.map(a => ({
+      url: `/artwork/${a.id}`,
+      priority: "0.7",
+      changefreq: "weekly",
+    }));
+
+    const allPages = [...staticPages, ...artworkPages];
+    const baseUrl = "https://brushbids.com";
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allPages.map(p => `  <url>
+    <loc>${baseUrl}${p.url}</loc>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+
+    res.type("application/xml").send(xml);
+  });
+
   return httpServer;
 }

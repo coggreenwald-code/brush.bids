@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles, Upload, Palette, Eye, DollarSign, Heart, Graduati
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -119,8 +120,8 @@ function TestimonialSlider() {
           </div>
         </motion.div>
       </AnimatePresence>
-      <div className="flex justify-center gap-2 mt-8">
-        {testimonials.map((_, i) => (
+      <div className="flex justify-center gap-2 mt-8" role="tablist" aria-label="Testimonial slides">
+        {testimonials.map((t, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
@@ -128,6 +129,9 @@ function TestimonialSlider() {
               "rounded-full transition-all duration-300",
               i === current ? "w-8 h-2 bg-[#A78BFA]" : "w-2 h-2 bg-white/20 hover:bg-white/40"
             )}
+            role="tab"
+            aria-selected={i === current}
+            aria-label={`Testimonial from ${t.name}`}
             data-testid={`testimonial-dot-${i}`}
           />
         ))}
@@ -213,9 +217,10 @@ export default function Home() {
 
   return (
     <Layout>
+      <SEOHead title="BrushBids — Student Art Auction Platform" description="BrushBids connects emerging student artists with collectors. Discover, bid on, and collect original student artwork with 10% of every sale going to charity." />
       <div>
         {/* Hero Section */}
-        <section className="relative -mt-16" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
+        <section aria-label="Hero" className="relative -mt-16" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
           <div className="relative w-full min-h-[600px] md:min-h-[700px] lg:min-h-[800px] overflow-hidden">
             <img
               src={heroImage}
@@ -284,7 +289,7 @@ export default function Home() {
         </section>
 
         {/* Cover Flow Featured Works */}
-        <section className="relative" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
+        <section aria-label="Featured Works" className="relative" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
           <div className="relative z-10 pt-16 md:pt-24 pb-0">
             <motion.div
               className="text-left px-6 md:px-12 lg:px-16 mb-8"
@@ -442,11 +447,12 @@ export default function Home() {
                   onClick={goPrev}
                   className="rounded-full border-white/20 text-white hover:bg-white/10 bg-transparent"
                   data-testid="button-coverflow-prev"
+                  aria-label="Previous artwork"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </Button>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5" role="tablist" aria-label="Featured artwork slides">
                   {coverFlowArtworks.map((_, i) => (
                     <button
                       key={i}
@@ -457,6 +463,9 @@ export default function Home() {
                           ? "w-6 h-2 bg-[#A78BFA]"
                           : "w-2 h-2 bg-white/20"
                       )}
+                      role="tab"
+                      aria-selected={i === currentIndex}
+                      aria-label={`Go to artwork ${i + 1}`}
                       data-testid={`coverflow-dot-${i}`}
                     />
                   ))}
@@ -468,6 +477,7 @@ export default function Home() {
                   onClick={goNext}
                   className="rounded-full border-white/20 text-white hover:bg-white/10 bg-transparent"
                   data-testid="button-coverflow-next"
+                  aria-label="Next artwork"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </Button>
@@ -477,7 +487,7 @@ export default function Home() {
         </section>
 
         {/* How It Works */}
-        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)", marginTop: "10px" }} data-testid="section-how-it-works">
+        <section aria-label="How It Works" className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)", marginTop: "10px" }} data-testid="section-how-it-works">
           <div className="absolute inset-0 bg-mesh-purple section-tint-purple" />
           <div className="geometric-lines" />
           <div className="floating-orb gradient-orb-purple w-[300px] h-[300px] -top-20 -right-20 animate-float-slow opacity-40" />
@@ -571,7 +581,7 @@ export default function Home() {
         </section>
 
         {/* Stats */}
-        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
+        <section aria-label="Platform Statistics" className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-stats">
           <div className="absolute inset-0 bg-mesh-blue section-tint-blue bg-dots" />
           <div className="floating-orb gradient-orb-blue w-[280px] h-[280px] -top-16 -left-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-pink w-[220px] h-[220px] -bottom-12 -right-16 animate-float-reverse opacity-30" />
@@ -616,7 +626,7 @@ export default function Home() {
         </section>
 
         {/* Testimonials */}
-        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-testimonials">
+        <section aria-label="Testimonials" className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-testimonials">
           <div className="absolute inset-0 bg-mesh-mixed section-tint-mixed" />
           <div className="floating-orb gradient-orb-pink w-[260px] h-[260px] top-0 left-1/2 -translate-x-1/2 animate-float opacity-25" />
           <div className="floating-orb-sm gradient-orb-purple w-[180px] h-[180px] -bottom-10 left-10 animate-float-reverse opacity-25" />
@@ -642,7 +652,7 @@ export default function Home() {
         </section>
 
         {/* Revenue Split */}
-        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-revenue-split">
+        <section aria-label="Revenue Split" className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-revenue-split">
           <div className="absolute inset-0 bg-mesh-purple bg-grid-fine" />
           <div className="floating-orb gradient-orb-emerald w-[240px] h-[240px] -top-16 -right-16 animate-float-slow opacity-30" />
           <div className="floating-orb gradient-orb-purple w-[200px] h-[200px] -bottom-12 -left-12 animate-float-reverse opacity-25" />
@@ -692,7 +702,7 @@ export default function Home() {
         </section>
 
         {/* CTA */}
-        <section className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
+        <section aria-label="Call to Action" className="relative py-24 md:py-32 perspective-section" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-cta">
           <div className="absolute inset-0 bg-mesh-mixed" />
           <div className="floating-orb gradient-orb-purple w-[280px] h-[280px] -top-16 -right-20 animate-float-slow opacity-35" />
           <div className="floating-orb gradient-orb-blue w-[220px] h-[220px] -bottom-12 -left-16 animate-float-reverse opacity-30" />

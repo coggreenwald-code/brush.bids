@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 
@@ -75,6 +76,7 @@ export default function FAQ() {
 
   return (
     <Layout>
+      <SEOHead title="FAQ | BrushBids" description="Frequently asked questions about BrushBids. Learn how to submit artwork, bid on pieces, and understand our revenue split." />
       <div className="space-y-16 pb-16 max-w-3xl mx-auto">
         <section className="text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">

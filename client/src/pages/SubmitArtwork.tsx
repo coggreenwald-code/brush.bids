@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { SEOHead } from "@/components/SEOHead";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -208,6 +209,7 @@ export default function SubmitArtwork() {
 
   return (
     <Layout>
+      <SEOHead title="Submit Artwork | BrushBids" description="Submit your artwork for expert curation and auction on BrushBids." />
       <div className="max-w-2xl mx-auto space-y-8">
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Create Listing</span>
