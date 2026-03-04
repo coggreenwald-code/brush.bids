@@ -1,29 +1,26 @@
 import { Link } from "wouter";
 import { Mail, MapPin } from "lucide-react";
 import { SiInstagram, SiX, SiFacebook } from "react-icons/si";
+import logoImage from "@assets/BrushBids_Logo_1772561349423.png";
 
 function OutlinedBrushBidsLogo() {
   return (
-    <div className="w-full flex justify-center py-12">
-      <svg
-        viewBox="0 0 900 120"
-        className="w-full max-w-4xl h-auto opacity-[0.08] hover:opacity-[0.15] transition-opacity duration-700"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+    <div className="w-full flex items-center justify-center gap-5 py-12 select-none group">
+      <img
+        src={logoImage}
+        alt=""
+        className="w-14 h-14 md:w-20 md:h-20 brightness-0 invert opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
+        draggable={false}
+      />
+      <span
+        className="text-[4rem] md:text-[7rem] lg:text-[9rem] font-extrabold tracking-tight leading-none opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
+        style={{
+          WebkitTextStroke: "1.5px white",
+          color: "transparent",
+        }}
       >
-        <g stroke="white" strokeWidth="1.5">
-          <path d="M30 95V25h30c12 0 20 3 25 8s8 12 8 20-3 15-8 20-13 8-25 8H45v14H30zm15-28h15c7 0 12-2 16-5s5-8 5-14-2-11-5-14-9-5-16-5H45v38z" />
-          <path d="M105 95V25h30c10 0 18 3 23 8s7 10 7 17c0 5-1 10-4 14s-7 7-12 9l20 22h-18l-18-20h-13v20h-15zm15-34h14c6 0 10-1 13-4s5-7 5-11-2-8-5-11-7-4-13-4h-14v30z" />
-          <path d="M185 95V25h15v42c0 8 2 14 5 17s8 5 14 5 11-2 14-5 5-9 5-17V25h15v45c0 10-3 18-10 24s-15 8-24 8-17-3-24-8-10-14-10-24z" />
-          <path d="M285 82l11-7c2 5 5 9 9 11s8 4 14 4c5 0 10-1 13-4s5-6 5-10c0-3-1-6-3-8s-7-5-14-7c-9-3-16-7-20-11s-6-9-6-16c0-5 1-9 4-13s6-7 11-9 10-3 15-3c7 0 13 2 18 5s9 8 11 14l-11 6c-2-4-4-7-7-9s-7-3-11-3c-5 0-9 1-12 4s-4 5-4 9c0 3 1 5 3 7s7 5 14 7c9 4 16 7 20 12s6 10 6 16c0 5-1 10-4 14s-7 7-12 10-10 3-16 3c-8 0-15-2-20-6s-10-9-12-17z" />
-          <path d="M400 95V25h15v28h35V25h15v70h-15V67h-35v28h-15z" />
-          <path d="M495 95V25h30c10 0 18 3 23 8s7 10 7 17c0 5-1 10-4 14s-7 7-12 9l20 22h-18l-18-20h-13v20h-15zm15-34h14c6 0 10-1 13-4s5-7 5-11-2-8-5-11-7-4-13-4h-14v30z" />
-          <path d="M580 95V25h15v56h33v14h-48z" />
-          <path d="M650 95V25h15v70h-15z" />
-          <path d="M695 95V25h25c10 0 19 2 27 7s14 11 18 19 6 17 6 26-2 18-6 26-10 14-18 19-17 7-27 7h-25zm15-14h10c7 0 13-2 19-5s10-8 13-14 4-13 4-21-1-15-4-21-7-11-13-14-12-5-19-5h-10v56z" />
-          <path d="M800 82l11-7c2 5 5 9 9 11s8 4 14 4c5 0 10-1 13-4s5-6 5-10c0-3-1-6-3-8s-7-5-14-7c-9-3-16-7-20-11s-6-9-6-16c0-5 1-9 4-13s6-7 11-9 10-3 15-3c7 0 13 2 18 5s9 8 11 14l-11 6c-2-4-4-7-7-9s-7-3-11-3c-5 0-9 1-12 4s-4 5-4 9c0 3 1 5 3 7s7 5 14 7c9 4 16 7 20 12s6 10 6 16c0 5-1 10-4 14s-7 7-12 10-10 3-16 3c-8 0-15-2-20-6s-10-9-12-17z" />
-        </g>
-      </svg>
+        BrushBids
+      </span>
     </div>
   );
 }
