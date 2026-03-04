@@ -6,13 +6,6 @@ import logoImage from "@assets/BrushBids_Logo_1772561349423.png";
 function OutlinedBrushBidsLogo() {
   return (
     <div className="w-full flex items-center justify-center gap-5 py-12 select-none group">
-      <img
-        src={logoImage}
-        alt=""
-        className="brightness-0 invert opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700 flex-shrink-0"
-        draggable={false}
-        style={{ width: "clamp(120px, 18vw, 240px)", height: "clamp(120px, 18vw, 240px)" }}
-      />
       <span
         className="text-[4rem] md:text-[7rem] lg:text-[9rem] font-extrabold tracking-tight leading-none opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
         style={{
@@ -22,6 +15,13 @@ function OutlinedBrushBidsLogo() {
       >
         BrushBids
       </span>
+      <img
+        src={logoImage}
+        alt=""
+        className="brightness-0 invert opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700 flex-shrink-0"
+        draggable={false}
+        style={{ width: "clamp(120px, 18vw, 240px)", height: "clamp(120px, 18vw, 240px)" }}
+      />
     </div>
   );
 }
