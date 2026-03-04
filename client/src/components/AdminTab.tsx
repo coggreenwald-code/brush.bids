@@ -237,7 +237,7 @@ export function AdminTab() {
             <div className="space-y-4">
               {filteredArtworks.map((artwork) => (
                 <div key={artwork.id} className="p-4 md:p-5 flex flex-col md:flex-row gap-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors" data-testid={`card-admin-artwork-${artwork.id}`}>
-                  <div className="w-full md:w-40 aspect-square bg-white/5 rounded-lg overflow-hidden shrink-0">
+                  <div className="w-full md:w-80 aspect-square bg-white/5 rounded-lg overflow-hidden shrink-0">
                     <img src={artwork.imageUrl} alt={artwork.title} className="w-full h-full object-cover" />
                   </div>
 
