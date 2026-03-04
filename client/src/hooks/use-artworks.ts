@@ -1,7 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
 import { z } from "zod";
-import type { Artwork, InsertArtwork, UpdateArtworkStatusRequest } from "@shared/schema";
+import type { Artwork, InsertArtwork } from "@shared/schema";
+
+type UpdateArtworkStatusRequest = {
+  status: "approved" | "rejected";
+  feedback?: string;
+};
 
 export function useArtworks(filters?: { status?: string; artistId?: number; sortBy?: string }) {
   return useQuery({

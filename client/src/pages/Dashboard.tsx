@@ -58,7 +58,7 @@ export default function Dashboard() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [newItem, setNewItem] = useState({ title: "", description: "", imageUrl: "", dimensions: "" });
   const [sellPrice, setSellPrice] = useState("");
-  const [convertOpts, setConvertOpts] = useState({ auctionDurationDays: "7", charityId: "", reviewType: "ai_instant" as const });
+  const [convertOpts, setConvertOpts] = useState<{ auctionDurationDays: string; charityId: string; reviewType: "ai_instant" | "human_curator" }>({ auctionDurationDays: "7", charityId: "", reviewType: "ai_instant" });
 
   const { data: portfolioItems, isLoading: portfolioLoading } = useQuery<PortfolioItem[]>({
     queryKey: ['/api/portfolio', user?.id],

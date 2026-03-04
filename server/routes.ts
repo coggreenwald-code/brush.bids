@@ -489,7 +489,7 @@ export async function registerRoutes(
 
   // Portfolio Routes
   app.get(api.portfolio.list.path, async (req, res) => {
-    const artistId = req.params.artistId;
+    const artistId = req.params.artistId as string;
     const items = await storage.getPortfolioItems(artistId);
     const enriched = items.map(item => {
       let expired = false;

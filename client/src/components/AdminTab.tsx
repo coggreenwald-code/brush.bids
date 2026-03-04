@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Sparkles, Loader2, Search, Clock, AlertCircle, Trash2, Pencil, MessageSquare, Save, XCircle } from "lucide-react";
+import type { Artwork } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -20,8 +21,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+type ArtworkWithArtist = Artwork & {
+  artist?: { firstName?: string; lastName?: string; email?: string; username?: string };
+};
+
 export function AdminTab() {
-  const { data: allArtworks, isLoading } = useArtworks();
+  const { data: allArtworks, isLoading } = useArtworks() as { data: ArtworkWithArtist[] | undefined; isLoading: boolean };
   const updateStatus = useUpdateArtworkStatus();
   const aiReview = useAiReview();
   const deleteArtwork = useDeleteArtwork();
