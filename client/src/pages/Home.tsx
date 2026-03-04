@@ -221,6 +221,7 @@ export default function Home() {
               src={heroImage}
               alt="David Hockney - Portrait of an Artist (Pool with Two Figures)"
               className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: "70% 20%" }}
               data-testid="img-hero-background"
             />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(10,10,15,0.85) 0%, rgba(10,10,15,0.5) 40%, rgba(10,10,15,0.2) 70%, transparent 100%)" }} />
