@@ -153,7 +153,7 @@ export function AdminTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style={{ paddingLeft: "10px" }}>
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]" data-testid="text-admin-label">Curation Portal</span>
           <p className="text-white/50 text-sm mt-1">Review, approve, reject, and manage feedback on submissions</p>
