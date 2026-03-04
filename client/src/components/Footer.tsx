@@ -9,8 +9,9 @@ function OutlinedBrushBidsLogo() {
       <img
         src={logoImage}
         alt=""
-        className="w-14 h-14 md:w-20 md:h-20 brightness-0 invert opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
+        className="brightness-0 invert opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700 flex-shrink-0"
         draggable={false}
+        style={{ width: "clamp(120px, 18vw, 240px)", height: "clamp(120px, 18vw, 240px)" }}
       />
       <span
         className="text-[4rem] md:text-[7rem] lg:text-[9rem] font-extrabold tracking-tight leading-none opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-700"
