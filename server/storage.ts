@@ -15,6 +15,7 @@ export interface IStorage {
   updateUserRole(id: string, role: "artist" | "buyer" | "both" | "admin"): Promise<User>;
   updateUserBio(id: string, bio: string): Promise<User>;
   updateUserName(id: string, firstName: string, lastName: string): Promise<User>;
+  updateUserProfileImage(id: string, profileImageUrl: string): Promise<User>;
   completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string): Promise<User>;
 
   // Artworks
@@ -86,6 +87,14 @@ export class DatabaseStorage implements IStorage {
   async updateUserName(id: string, firstName: string, lastName: string): Promise<User> {
     const [user] = await db.update(users)
       .set({ firstName, lastName, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserProfileImage(id: string, profileImageUrl: string): Promise<User> {
+    const [user] = await db.update(users)
+      .set({ profileImageUrl, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
     return user;

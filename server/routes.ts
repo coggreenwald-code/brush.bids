@@ -424,6 +424,27 @@ export async function registerRoutes(
     }
   });
 
+  app.patch(api.users.updateProfileImage.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const currentUserId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (currentUserId !== userId) {
+      return res.status(403).json({ message: "You can only update your own profile" });
+    }
+    try {
+      const { profileImageUrl } = api.users.updateProfileImage.input.parse(req.body);
+      const user = await storage.updateUserProfileImage(userId, profileImageUrl);
+      res.json(user);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      throw err;
+    }
+  });
+
   // Update user role
   app.patch(api.users.updateRole.path, async (req, res) => {
     if (!req.user) {

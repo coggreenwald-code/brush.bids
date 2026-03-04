@@ -186,6 +186,51 @@ export default function Dashboard() {
     },
   });
 
+  const profilePicInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+
+  const updateProfileImageMutation = useMutation({
+    mutationFn: async (profileImageUrl: string) => {
+      if (!user?.id) throw new Error("Not authenticated");
+      const res = await apiRequest("PATCH", `/api/users/${user.id}/profile-image`, { profileImageUrl });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Profile Picture Updated", description: "Your profile picture has been saved." });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+    onError: () => {
+      toast({ title: "Update Failed", description: "Could not update your profile picture.", variant: "destructive" });
+    },
+  });
+
+  const uploadProfilePic = async (file: File) => {
+    setUploadingProfilePic(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("/api/artworks/upload-image", { method: "POST", body: formData, credentials: "include" });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      updateProfileImageMutation.mutate(data.imageUrl);
+    } catch {
+      toast({ title: "Upload Failed", variant: "destructive" });
+    } finally {
+      setUploadingProfilePic(false);
+    }
+  };
+
+  const initialAvatarColors = [
+    { bg: "#A78BFA", label: "Violet" },
+    { bg: "#F472B6", label: "Pink" },
+    { bg: "#60A5FA", label: "Blue" },
+    { bg: "#34D399", label: "Emerald" },
+    { bg: "#FB923C", label: "Orange" },
+    { bg: "#F87171", label: "Red" },
+    { bg: "#38BDF8", label: "Sky" },
+    { bg: "#A3E635", label: "Lime" },
+  ];
+
   const updateNameMutation = useMutation({
     mutationFn: async (data: { firstName: string; lastName: string }) => {
       if (!user?.id) throw new Error("Not authenticated");
@@ -526,7 +571,76 @@ export default function Dashboard() {
                 </h3>
               </div>
               <div className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
+                  <Label className="text-sm text-white/50">Profile Picture</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex-shrink-0">
+                      {user?.profileImageUrl && !user.profileImageUrl.startsWith("initial:") ? (
+                        <img
+                          src={user.profileImageUrl}
+                          alt="Profile"
+                          className="w-16 h-16 rounded-full object-cover border-2 border-white/10"
+                          data-testid="img-profile-picture"
+                        />
+                      ) : (
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white border-2 border-white/10"
+                          style={{ backgroundColor: user?.profileImageUrl?.startsWith("initial:") ? user.profileImageUrl.split(":")[1] : "#A78BFA" }}
+                          data-testid="img-profile-initial"
+                        >
+                          {(user?.firstName?.[0] || user?.email?.[0] || "?").toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <input
+                        ref={profilePicInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadProfilePic(file);
+                          e.target.value = "";
+                        }}
+                        data-testid="input-profile-pic-upload"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full border-white/10 text-white/60 text-xs"
+                        onClick={() => profilePicInputRef.current?.click()}
+                        disabled={uploadingProfilePic || updateProfileImageMutation.isPending}
+                        data-testid="button-upload-profile-pic"
+                      >
+                        {uploadingProfilePic ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ImagePlus className="w-3 h-3 mr-1" />}
+                        Upload Photo
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/40 mb-2">Or choose a color</p>
+                    <div className="flex flex-wrap gap-2">
+                      {initialAvatarColors.map((color) => (
+                        <button
+                          key={color.label}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white transition-colors hover:brightness-110 ${
+                            user?.profileImageUrl === `initial:${color.bg}` ? "ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0f]" : "hover:ring-1 hover:ring-white/30"
+                          }`}
+                          style={{ backgroundColor: color.bg }}
+                          onClick={() => updateProfileImageMutation.mutate(`initial:${color.bg}`)}
+                          disabled={updateProfileImageMutation.isPending}
+                          title={color.label}
+                          data-testid={`button-avatar-${color.label.toLowerCase()}`}
+                        >
+                          {(user?.firstName?.[0] || user?.email?.[0] || "?").toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-white/5">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm text-white/50">Name</Label>
                     {!editingName && (

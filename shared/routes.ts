@@ -175,6 +175,20 @@ export const api = {
         403: z.object({ message: z.string() }),
       },
     },
+    updateProfileImage: {
+      method: 'PATCH' as const,
+      path: '/api/users/:id/profile-image',
+      input: z.object({
+        profileImageUrl: z.string().refine(
+          (val) => val.startsWith("/uploads/") || val.startsWith("initial:#"),
+          { message: "Invalid profile image URL" }
+        ),
+      }),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        403: z.object({ message: z.string() }),
+      },
+    },
   },
   // Bids
   bids: {
