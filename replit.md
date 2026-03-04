@@ -26,6 +26,9 @@ Key features:
 - Mobile-optimized carousel with centered artist name and title below artwork
 - Profile picture system: upload custom photo or choose initial-based avatar in 8 colors (violet, pink, blue, emerald, orange, red, sky, lime)
 - Full SEO: meta tags, Open Graph, Twitter cards, JSON-LD (Organization + WebSite schemas), per-page titles via SEOHead component, robots.txt, dynamic sitemap.xml, semantic HTML with aria-labels
+- SEOHead component updates document.title, meta description, OG tags (title/description/url/image), Twitter tags, and canonical URL per page
+- FAQ page has FAQPage JSON-LD structured data for Google rich results, brand-targeting questions ("What is BrushBids?", "Who founded BrushBids?", "Is BrushBids free to use?")
+- Internal linking between About, FAQ, and Gallery pages for SEO authority distribution
 
 ### Anti-Sniping Auction System
 - Artworks have a configurable auction duration (1, 3, 5, 7, 14, or 30 days)

@@ -84,9 +84,10 @@ const revenueSplits = [
 export default function About() {
   return (
     <Layout>
-      <SEOHead title="About | BrushBids" description="Learn about BrushBids, the student art auction platform founded by Charlie Greenwald at The Dwight School, New York. Our mission is to empower student artists." />
+      <SEOHead title="About BrushBids — Student Art Auction Platform | BrushBids" description="BrushBids is a student art auction platform founded by Charlie Greenwald at The Dwight School, New York. 75% of every sale goes to the artist, 10% to charity. Discover our mission, values, and the charities we support." />
       <div className="pb-0">
         <section
+          aria-label="About BrushBids"
           className="hero-gradient relative py-24 md:py-36 text-center"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-about-hero"
@@ -105,6 +106,7 @@ export default function About() {
         </section>
 
         <section
+          aria-label="Our Story"
           className="py-20 md:py-28 relative bg-mesh-purple"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-about-story"
@@ -141,6 +143,7 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
+          aria-label="Founder"
           className="py-20 md:py-28 relative bg-mesh-mixed"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-founder"
@@ -159,7 +162,7 @@ export default function About() {
                   Charlie Greenwald
                 </h3>
                 <p className="text-white/50 leading-relaxed">
-                  A student at The Dwight School in New York City, Charlie identified a gap between the exceptional art created by students and the opportunities available to share it with the world. What started as a napkin sketch became a mission to democratize access for emerging artists everywhere.
+                  A student at The Dwight School in New York City, Charlie identified a gap between the exceptional art created by students and the opportunities available to share it with the world. What started as a napkin sketch became a mission to democratize access for emerging artists everywhere. <a href="/gallery" className="text-[#A78BFA] hover:underline">Explore the gallery</a> to see the results.
                 </p>
               </div>
             </div>
@@ -169,6 +172,7 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
+          aria-label="Our Values"
           className="py-20 md:py-28 relative bg-mesh-blue bg-dots"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-values"
@@ -206,6 +210,7 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
+          aria-label="Revenue Split"
           className="py-20 md:py-28 relative bg-mesh-purple bg-grid-fine"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-revenue-split"
@@ -256,6 +261,7 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
+          aria-label="Featured Charities"
           className="py-20 md:py-28 relative bg-mesh-mixed bg-dots-sparse"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-featured-charities"
@@ -303,6 +309,7 @@ export default function About() {
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
+          aria-label="Expert Curation"
           className="py-20 md:py-28 relative bg-mesh-blue"
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
           data-testid="section-curation"
@@ -335,7 +342,7 @@ export default function About() {
                 </div>
                 <h3 className="font-semibold text-lg text-white">Growth-Oriented</h3>
                 <p className="text-sm text-white/50 leading-relaxed">
-                  Artists can choose between instant feedback or a detailed human curator review. Even rejected works come with constructive guidance, making BrushBids a learning platform as much as a marketplace.
+                  Artists can choose between instant feedback or a detailed human curator review. Even rejected works come with constructive guidance, making BrushBids a learning platform as much as a marketplace. Have questions about the process? Check our <a href="/faq" className="text-[#A78BFA] hover:underline">FAQ</a>.
                 </p>
               </div>
             </div>
