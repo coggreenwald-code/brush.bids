@@ -65,6 +65,17 @@ export const api = {
         404: errorSchemas.notFound,
       },
     },
+    updateFeedback: {
+      method: 'PATCH' as const,
+      path: '/api/artworks/:id/feedback',
+      input: z.object({
+        feedback: z.string(),
+      }),
+      responses: {
+        200: z.custom<typeof artworks.$inferSelect>(),
+        404: errorSchemas.notFound,
+      },
+    },
     updatePromotion: {
       method: 'PATCH' as const,
       path: '/api/artworks/:id/promotion',

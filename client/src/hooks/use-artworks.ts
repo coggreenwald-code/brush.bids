@@ -89,6 +89,24 @@ export function useDeleteArtwork() {
   });
 }
 
+export function useUpdateFeedback() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, feedback }: { id: number; feedback: string }) => {
+      const url = buildUrl(api.artworks.updateFeedback.path, { id });
+      const res = await fetch(url, {
+        method: api.artworks.updateFeedback.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedback }),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error('Failed to update feedback');
+      return res.json();
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [api.artworks.list.path] }),
+  });
+}
+
 export function useAiReview() {
   const queryClient = useQueryClient();
   return useMutation({

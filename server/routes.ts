@@ -124,6 +124,29 @@ export async function registerRoutes(
     }
   });
 
+  app.patch(api.artworks.updateFeedback.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    const feedbackAdmin = await storage.getUser((req.user as any).claims?.sub);
+    if (!feedbackAdmin || feedbackAdmin.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    try {
+      const { feedback } = api.artworks.updateFeedback.input.parse(req.body);
+      const id = Number(req.params.id);
+      const artwork = await storage.getArtwork(id);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      const updated = await storage.updateArtworkStatus(id, artwork.status as any, feedback);
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
   app.delete(api.artworks.delete.path, async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
     const deleteAdminUser = await storage.getUser((req.user as any).claims?.sub);

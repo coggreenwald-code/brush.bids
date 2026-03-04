@@ -20,6 +20,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCharities } from "@/hooks/use-charities";
 import type { Artwork, PortfolioItem } from "@shared/schema";
+import { AdminTab } from "@/components/AdminTab";
+import { Shield } from "lucide-react";
 
 function SaleCountdown({ listedAt }: { listedAt: string }) {
   const endDate = new Date(new Date(listedAt).getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -301,6 +303,11 @@ export default function Dashboard() {
                     <FolderOpen className="w-4 h-4 mr-1" /> Portfolio
                   </TabsTrigger>
                   <TabsTrigger value="sold" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">Sold History</TabsTrigger>
+                  {user?.role === "admin" && (
+                    <TabsTrigger value="admin" data-testid="tab-admin" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-[#A78BFA]/20 data-[state=active]:shadow-none px-4 py-1.5 text-sm">
+                      <Shield className="w-4 h-4 mr-1" /> Admin
+                    </TabsTrigger>
+                  )}
                 </TabsList>
               </div>
               
@@ -487,6 +494,11 @@ export default function Dashboard() {
                   Transaction history will appear here.
                 </div>
               </TabsContent>
+              {user?.role === "admin" && (
+                <TabsContent value="admin">
+                  <AdminTab />
+                </TabsContent>
+              )}
             </Tabs>
           </div>
 

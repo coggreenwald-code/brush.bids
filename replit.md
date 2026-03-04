@@ -11,7 +11,8 @@ Key features:
 - Real-time auction gallery with bidding functionality
 - Charity selection for artists (10% of sales go to chosen charity)
 - Artist promotion tool (0-20% boost to increase listing visibility)
-- Admin panel for manual curation override
+- Admin curation tab in Dashboard (approve/reject, write/edit curator feedback, trigger AI review, manage past feedback, delete artworks)
+- Dedicated feedback update endpoint (PATCH /api/artworks/:id/feedback) for editing feedback without changing status
 - Replit Auth integration for user authentication
 - Role-based accounts: Artist, Collector, or Both
 - Welcome onboarding modal for new users to select their role and collect name
