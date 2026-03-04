@@ -166,7 +166,7 @@ export function AdminTab() {
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3" style={{ paddingLeft: "10px" }}>
         <div className="p-3 text-center rounded-xl bg-white/[0.02] border border-white/5">
           <div className="text-xl font-bold text-[#A78BFA]" data-testid="text-admin-pending-count">{pendingCount}</div>
           <div className="text-xs text-white/40">Pending</div>
@@ -181,7 +181,7 @@ export function AdminTab() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3" style={{ paddingLeft: "10px" }}>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <Input
@@ -206,7 +206,7 @@ export function AdminTab() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1">
+        <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1" style={{ marginLeft: "10px" }}>
           <TabsTrigger value="pending" data-testid="tab-admin-pending" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-3 py-1.5 text-sm">
             Pending ({pendingCount})
           </TabsTrigger>
