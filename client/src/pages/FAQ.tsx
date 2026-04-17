@@ -21,7 +21,7 @@ export default function FAQ() {
     },
     {
       question: "How much do I earn from a sale?",
-      answer: "You receive 75% of the final sale price. 15% goes to BrushBids for platform operations, and 10% goes to the charity you select when submitting your artwork.",
+      answer: "You receive 75% of the final sale price. 20% goes to BrushBids for platform operations, and 5% goes to the charity you select when submitting your artwork.",
     },
     {
       question: "How and when do I get paid?",
@@ -59,7 +59,7 @@ export default function FAQ() {
   const generalFaqs = [
     {
       question: "What is BrushBids?",
-      answer: "BrushBids is a student art auction platform that connects emerging student artists with collectors worldwide. Founded by Charles Greenwald at The Dwight School in New York, BrushBids provides a curated marketplace where students can showcase, auction, and sell their original artwork — with 10% of every sale going to a charity of the artist's choice.",
+      answer: "BrushBids is a student art auction platform that connects emerging student artists with collectors worldwide. Founded by Charles Greenwald at The Dwight School in New York, BrushBids provides a curated marketplace where students can showcase, auction, and sell their original artwork — with 5% of every sale going to a charity of the artist's choice.",
     },
     {
       question: "Who founded BrushBids?",
@@ -67,11 +67,11 @@ export default function FAQ() {
     },
     {
       question: "Is BrushBids free to use?",
-      answer: "Yes, BrushBids is completely free to join for both artists and collectors. There are no listing fees or membership costs. BrushBids only takes a 15% commission when an artwork sells, with 75% going to the artist and 10% to the artist's chosen charity.",
+      answer: "Yes, BrushBids is completely free to join for both artists and collectors. There are no listing fees or membership costs. BrushBids only takes a 20% commission when an artwork sells, with 75% going to the artist and 5% to the artist's chosen charity.",
     },
     {
       question: "What makes BrushBids different from other art marketplaces?",
-      answer: "BrushBids focuses exclusively on student artists, uses expert curation for fair and unbiased reviews, and ensures 10% of every sale goes to charity. We're building a community, not just a marketplace.",
+      answer: "BrushBids focuses exclusively on student artists, uses expert curation for fair and unbiased reviews, and ensures 5% of every sale goes to charity. We're building a community, not just a marketplace.",
     },
     {
       question: "How do charities receive donations?",

@@ -665,8 +665,8 @@ export async function registerRoutes(
       const promotionFee = amount * (promotionPercentage / 100);
       const baseArtistShare = amount * 0.75;
       const artistShare = baseArtistShare - promotionFee;
-      const platformShare = amount * 0.15 + promotionFee;
-      const charityShare = amount * 0.10;
+      const platformShare = amount * 0.20 + promotionFee;
+      const charityShare = amount * 0.05;
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],

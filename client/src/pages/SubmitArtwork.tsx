@@ -384,7 +384,7 @@ export default function SubmitArtwork() {
                           })()}
                         </SelectContent>
                       </Select>
-                      <FormDescription className="text-white/30">10% of proceeds go to your chosen charity.</FormDescription>
+                      <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

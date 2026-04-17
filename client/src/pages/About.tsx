@@ -70,21 +70,21 @@ const values = [
   {
     icon: TrendingUp,
     title: "Fair Compensation",
-    description: "Artists receive 75% of every sale, ensuring they're fairly compensated for their creative work.",
+    description: "Artists receive 75% of every sale, ensuring they're fully compensated for their creative work.",
     iconColor: "text-[#34D399]",
   },
 ];
 
 const revenueSplits = [
   { percent: 75, label: "Artist", sublabel: "Goes directly to the creator", color: "#A78BFA" },
-  { percent: 15, label: "BrushBids", sublabel: "Platform & operations", color: "#60A5FA" },
-  { percent: 10, label: "Charity", sublabel: "Artist's chosen cause", color: "#34D399" },
+  { percent: 20, label: "BrushBids", sublabel: "Platform & operations", color: "#60A5FA" },
+  { percent: 5, label: "Charity", sublabel: "Artist's chosen cause", color: "#34D399" },
 ];
 
 export default function About() {
   return (
     <Layout>
-      <SEOHead title="About BrushBids — Student Art Auction Platform | BrushBids" description="BrushBids is a student art auction platform founded by Charles Greenwald at The Dwight School, New York. 75% of every sale goes to the artist, 10% to charity. Discover our mission, values, and the charities we support." />
+      <SEOHead title="About BrushBids — Student Art Auction Platform | BrushBids" description="BrushBids is a student art auction platform founded by Charles Greenwald at The Dwight School, New York. 75% of every sale goes to the artist, 5% to charity. Discover our mission, values, and the charities we support." />
       <div className="pb-0">
         <section
           aria-label="About BrushBids"
@@ -235,8 +235,8 @@ export default function About() {
               <div className="space-y-6">
                 <div className="flex rounded-full overflow-hidden h-4 bg-white/[0.04]">
                   <div className="h-full bg-[#A78BFA]" style={{ width: "75%" }} />
-                  <div className="h-full bg-[#60A5FA]" style={{ width: "15%" }} />
-                  <div className="h-full bg-[#34D399]" style={{ width: "10%" }} />
+                  <div className="h-full bg-[#60A5FA]" style={{ width: "20%" }} />
+                  <div className="h-full bg-[#34D399]" style={{ width: "5%" }} />
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6 text-center">
@@ -279,7 +279,7 @@ export default function About() {
                 Charities We Champion
               </h2>
               <p className="text-white/50 max-w-2xl mx-auto">
-                Every sale on BrushBids directs 10% to a charity chosen by the artist. Here are some of the causes closest to our mission.
+                Every sale on BrushBids directs 5% to a charity chosen by the artist. Here are some of the causes closest to our mission.
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -311,7 +311,7 @@ export default function About() {
         <section
           aria-label="Expert Curation"
           className="py-20 md:py-28 relative bg-mesh-blue"
-          style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
+          style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)", marginTop: "-40px" }}
           data-testid="section-curation"
         >
           <div className="geometric-lines" />

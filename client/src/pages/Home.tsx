@@ -166,7 +166,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <SEOHead title="BrushBids — Student Art Auction Platform" description="BrushBids connects emerging student artists with collectors. Discover, bid on, and collect original student artwork with 10% of every sale going to charity." />
+      <SEOHead title="BrushBids — Student Art Auction Platform" description="BrushBids connects emerging student artists with collectors. Discover, bid on, and collect original student artwork with 5% of every sale going to charity." />
       <div>
         {/* Hero Section */}
         <section aria-label="Hero" className="relative -mt-16" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-hero">
@@ -583,8 +583,8 @@ export default function Home() {
               <div className="grid md:grid-cols-3 gap-6 relative z-10">
                 {[
                   { pct: "75%", label: "Artist", desc: "Goes directly to the student artist", color: "#A78BFA" },
-                  { pct: "15%", label: "Platform", desc: "Supports BrushBids operations", color: "#60A5FA" },
-                  { pct: "10%", label: "Charity", desc: "Donated to a cause the artist chooses", color: "#34D399" },
+                  { pct: "20%", label: "Platform", desc: "Supports BrushBids operations", color: "#60A5FA" },
+                  { pct: "5%", label: "Charity", desc: "Donated to a cause the artist chooses", color: "#34D399" },
                 ].map((item, i) => (
                   <motion.div
                     key={item.label}

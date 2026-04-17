@@ -41,9 +41,9 @@ Key features:
 - Auction end state disables bidding UI and shows "Auction Has Ended" notice
 
 ### Revenue Split
-- Base: 75% artist, 15% platform, 10% charity
+- Base: 75% artist, 20% platform, 5% charity
 - With boost: Boost percentage deducted from artist's share, added to platform's share
-- Example: 10% boost = 65% artist, 25% platform, 10% charity
+- Example: 10% boost = 65% artist, 30% platform, 5% charity
 
 ### Promotion Feature
 - Artists can boost approved artworks by paying 0-20% of final sale price

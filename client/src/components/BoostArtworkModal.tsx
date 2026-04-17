@@ -187,8 +187,8 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
                   <span className="font-medium text-white">~${((currentPrice * (75 - parseInt(selectedPercentage))) / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between gap-2 flex-wrap pt-2 border-t border-white/10">
-                  <span className="text-white/50">Charity (10%)</span>
-                  <span className="text-white">~${(currentPrice * 0.10).toFixed(2)}</span>
+                  <span className="text-white/50">Charity (5%)</span>
+                  <span className="text-white">~${(currentPrice * 0.05).toFixed(2)}</span>
                 </div>
               </div>
               <p className="text-xs text-white/40 mt-2">

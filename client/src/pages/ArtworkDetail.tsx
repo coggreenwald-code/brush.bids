@@ -171,8 +171,8 @@ export default function ArtworkDetail() {
 
   const revenueSplit = {
     artist: currentPrice * 0.75,
-    platform: currentPrice * 0.15,
-    charity: currentPrice * 0.10,
+    platform: currentPrice * 0.20,
+    charity: currentPrice * 0.05,
   };
 
   const isActiveAuction = artwork.status === 'approved' && !isAuctionEnded;
@@ -210,20 +210,20 @@ export default function ArtworkDetail() {
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-white/60">BrushBids (15%)</span>
+                    <span className="text-sm text-white/60">BrushBids (20%)</span>
                     <span className="font-mono text-sm text-white/70">${revenueSplit.platform.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-blue-400" style={{ width: '15%' }} />
+                    <div className="h-full rounded-full bg-blue-400" style={{ width: '20%' }} />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-emerald-400/80">Charity (10%)</span>
+                    <span className="text-sm text-emerald-400/80">Charity (5%)</span>
                     <span className="font-mono text-sm font-semibold text-emerald-400">${revenueSplit.charity.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-emerald-500" style={{ width: '10%' }} />
+                    <div className="h-full rounded-full bg-emerald-500" style={{ width: '5%' }} />
                   </div>
                 </div>
               </div>
