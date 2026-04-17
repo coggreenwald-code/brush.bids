@@ -84,7 +84,7 @@ const revenueSplits = [
 export default function About() {
   return (
     <Layout>
-      <SEOHead title="About BrushBids — Student Art Auction Platform | BrushBids" description="BrushBids is a student art auction platform founded by Charlie Greenwald at The Dwight School, New York. 75% of every sale goes to the artist, 10% to charity. Discover our mission, values, and the charities we support." />
+      <SEOHead title="About BrushBids — Student Art Auction Platform | BrushBids" description="BrushBids is a student art auction platform founded by Charles Greenwald at The Dwight School, New York. 75% of every sale goes to the artist, 10% to charity. Discover our mission, values, and the charities we support." />
       <div className="pb-0">
         <section
           aria-label="About BrushBids"
@@ -125,7 +125,7 @@ export default function About() {
             </div>
             <div className="space-y-6 text-white/60 text-base md:text-lg leading-relaxed">
               <p>
-                BrushBids was founded in 2024 at <span className="text-white/80 font-medium">The Dwight School New York</span> by <span className="text-white/80 font-medium">Charlie Greenwald</span>. The idea emerged during a junior-year course selection lecture led by the director of the art department. While the discussion focused on academics, a more structural issue stood out: exceptional student artwork filled the halls, yet there was no real infrastructure to help student artists gain exposure or sell their work through a credible online marketplace.
+                BrushBids was founded in 2024 at <span className="text-white/80 font-medium">The Dwight School New York</span> by <span className="text-white/80 font-medium">Charles Greenwald</span>. The idea emerged during a junior-year course selection lecture led by the director of the art department. While the discussion focused on academics, a more structural issue stood out: exceptional student artwork filled the halls, yet there was no real infrastructure to help student artists gain exposure or sell their work through a credible online marketplace.
               </p>
               <p>
                 During that lecture, the first version of BrushBids was sketched on a napkin in the high school's Quad, the central gathering space of the campus. That napkin remained pinned to a bulletin board throughout the year, serving as a constant reminder of a simple but persistent problem in student art: talent without access.
@@ -159,10 +159,10 @@ export default function About() {
                   Founder
                 </span>
                 <h3 className="text-2xl font-display font-bold text-white" data-testid="text-founder-name">
-                  Charlie Greenwald
+                  Charles Greenwald
                 </h3>
                 <p className="text-white/50 leading-relaxed">
-                  A student at The Dwight School in New York City, Charlie identified a gap between the exceptional art created by students and the opportunities available to share it with the world. What started as a napkin sketch became a mission to democratize access for emerging artists everywhere. <a href="/gallery" className="text-[#A78BFA] hover:underline">Explore the gallery</a> to see the results.
+                  A student at The Dwight School in New York City, Charles identified a gap between the exceptional art created by students and the opportunities available to share it with the world. What started as a napkin sketch became a mission to democratize access for emerging artists everywhere. <a href="/gallery" className="text-[#A78BFA] hover:underline">Explore the gallery</a> to see the results.
                 </p>
               </div>
             </div>

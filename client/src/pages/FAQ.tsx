@@ -59,11 +59,11 @@ export default function FAQ() {
   const generalFaqs = [
     {
       question: "What is BrushBids?",
-      answer: "BrushBids is a student art auction platform that connects emerging student artists with collectors worldwide. Founded by Charlie Greenwald at The Dwight School in New York, BrushBids provides a curated marketplace where students can showcase, auction, and sell their original artwork — with 10% of every sale going to a charity of the artist's choice.",
+      answer: "BrushBids is a student art auction platform that connects emerging student artists with collectors worldwide. Founded by Charles Greenwald at The Dwight School in New York, BrushBids provides a curated marketplace where students can showcase, auction, and sell their original artwork — with 10% of every sale going to a charity of the artist's choice.",
     },
     {
       question: "Who founded BrushBids?",
-      answer: "BrushBids was founded by Charlie Greenwald, a student at The Dwight School in New York City. The idea was born during a junior-year lecture when Charlie noticed that exceptional student art filled the school's halls, yet there was no credible online platform for students to sell their work. The concept was developed through the Tufts Entrepreneurship Center and the Derby School of Entrepreneurship.",
+      answer: "BrushBids was founded by Charles Greenwald, a student at The Dwight School in New York City. The idea was born during a junior-year lecture when Charles noticed that exceptional student art filled the school's halls, yet there was no credible online platform for students to sell their work. The concept was developed through the Tufts Entrepreneurship Center and the Derby School of Entrepreneurship.",
     },
     {
       question: "Is BrushBids free to use?",
