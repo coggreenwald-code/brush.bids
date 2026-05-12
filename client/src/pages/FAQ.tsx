@@ -119,7 +119,7 @@ export default function FAQ() {
 
   return (
     <Layout>
-      <SEOHead title="FAQ | BrushBids" description="Frequently asked questions about BrushBids, the student art auction platform. Learn how to submit artwork, bid on pieces, understand our 75/15/10 revenue split, and more." />
+      <SEOHead title="FAQ | BrushBids" description="Frequently asked questions about BrushBids, the student art auction platform. Learn how to submit artwork, bid on pieces, understand our 75/20/5 revenue split, and more." />
       <div className="space-y-16 pb-16 max-w-3xl mx-auto">
         <section className="text-center space-y-6" aria-label="FAQ Introduction">
           <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">
