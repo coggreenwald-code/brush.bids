@@ -40,20 +40,21 @@ function HoldStatusBadge({ status }: { status: HoldStatus }) {
   return <Badge className={`mt-1 ${className}`} data-testid={`badge-hold-${status}`}>{label}</Badge>;
 }
 
-function getTimeRemaining(createdAt: Date | string | null): string {
-  if (!createdAt) return "Unknown";
-  const created = new Date(createdAt);
-  const endDate = new Date(created);
-  endDate.setDate(endDate.getDate() + 7);
-  
-  const now = new Date();
-  const diff = endDate.getTime() - now.getTime();
-  
+function getTimeRemaining(artwork: { endTime?: Date | string | null; createdAt?: Date | string | null; auctionDurationDays?: number | null } | null): string {
+  if (!artwork) return "Unknown";
+  let end: Date;
+  if (artwork.endTime) {
+    end = new Date(artwork.endTime);
+  } else if (artwork.createdAt) {
+    end = new Date(artwork.createdAt);
+    end.setDate(end.getDate() + (artwork.auctionDurationDays || 7));
+  } else {
+    return "Unknown";
+  }
+  const diff = end.getTime() - Date.now();
   if (diff <= 0) return "Ended";
-  
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  
   if (days > 0) return `${days}d ${hours}h`;
   return `${hours}h`;
 }
@@ -211,7 +212,7 @@ export default function MyBids() {
                         </Link>
                         <div className="flex items-center gap-2 text-sm text-white/40">
                           <Clock className="w-3 h-3" />
-                          <span>Ends in {getTimeRemaining(bid.artwork?.createdAt || null)}</span>
+                          <span>Ends in {getTimeRemaining(bid.artwork || null)}</span>
                         </div>
                       </div>
                       <div className="text-right">
@@ -260,7 +261,7 @@ export default function MyBids() {
                         </Link>
                         <div className="flex items-center gap-2 text-sm text-white/40">
                           <Clock className="w-3 h-3" />
-                          <span>{bid.auctionEnded ? 'Auction Ended' : `Ends in ${getTimeRemaining(bid.artwork?.createdAt || null)}`}</span>
+                          <span>{bid.auctionEnded ? 'Auction Ended' : `Ends in ${getTimeRemaining(bid.artwork || null)}`}</span>
                         </div>
                       </div>
                       <div className="text-right">
