@@ -666,6 +666,16 @@ export async function registerRoutes(
     }
     try {
       const { auctionDurationDays, charityId, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
+      // Same payout-readiness gate as POST /api/artworks: a portfolio item
+      // can't be converted into a live auction unless the artist has finished
+      // Stripe Connect onboarding AND payouts are enabled — we'd otherwise be
+      // accepting card-authorization holds with no way to actually pay out.
+      const artist = await storage.getUser(currentUserId);
+      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
+        return res.status(403).json({
+          message: "Please finish Stripe payout setup on your Dashboard before listing this artwork.",
+        });
+      }
       const artwork = await storage.createArtwork({
         title: item.title,
         description: item.description || "",

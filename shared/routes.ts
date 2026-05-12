@@ -203,8 +203,15 @@ export const api = {
       method: 'POST' as const,
       path: '/api/bids',
       input: insertBidSchema,
+      // The bid row is NOT created synchronously — we return a Stripe Checkout
+      // URL so the bidder can authorize a card hold; the bid row itself is
+      // inserted by the webhook once Stripe confirms the authorization.
       responses: {
-        201: z.custom<typeof bids.$inferSelect>(),
+        200: z.object({
+          checkoutUrl: z.string().url(),
+          artworkId: z.number(),
+          amount: z.string(),
+        }),
         400: errorSchemas.validation,
       },
     },
