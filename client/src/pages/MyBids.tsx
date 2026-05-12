@@ -1,14 +1,13 @@
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link, useSearch } from "wouter";
-import { Gavel, Clock, TrendingUp, AlertCircle, Heart, Loader2, CheckCircle } from "lucide-react";
+import { Link } from "wouter";
+import { Gavel, Clock, TrendingUp, AlertCircle, Heart, Loader2 } from "lucide-react";
 import type { Artwork } from "@shared/schema";
 
 type HoldStatus = "pending" | "authorized" | "captured" | "canceled" | "failed";
@@ -61,16 +60,6 @@ function getTimeRemaining(artwork: { endTime?: Date | string | null; createdAt?:
 
 export default function MyBids() {
   const { isAuthenticated } = useAuth();
-  const searchString = useSearch();
-
-  const paymentStatus = new URLSearchParams(searchString).get('payment');
-  const paymentArtworkId = new URLSearchParams(searchString).get('artwork');
-
-  useEffect(() => {
-    if (paymentStatus === 'success') {
-      queryClient.invalidateQueries({ queryKey: ["/api/my-bids"] });
-    }
-  }, [paymentStatus]);
 
   const { data: bids, isLoading } = useQuery<UserBidSummary[]>({
     queryKey: ["/api/my-bids"],
@@ -284,26 +273,6 @@ export default function MyBids() {
           </TabsContent>
 
           <TabsContent value="won" className="mt-6">
-            {paymentStatus === 'success' && paymentArtworkId && 
-             wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.holdStatus === 'captured') && (
-              <div className="mb-6 p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <div className="flex items-center gap-2 text-emerald-400 font-semibold text-base pb-2">
-                  <CheckCircle className="w-5 h-5" />
-                  Payment Successful!
-                </div>
-                <p className="text-sm text-white/50">Your payment has been processed. The artwork will be delivered to you soon.</p>
-              </div>
-            )}
-            {paymentStatus === 'success' && paymentArtworkId && 
-             !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.holdStatus === 'captured') && (
-              <div className="mb-6 p-5 rounded-xl bg-[#A78BFA]/5 border border-[#A78BFA]/10">
-                <div className="flex items-center gap-2 text-[#A78BFA] font-semibold text-base pb-2">
-                  <Clock className="w-5 h-5" />
-                  Payment Processing
-                </div>
-                <p className="text-sm text-white/50">Your payment is being confirmed. This page will update once complete.</p>
-              </div>
-            )}
             {isLoading ? (
               <div className="flex justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-white/30" />
