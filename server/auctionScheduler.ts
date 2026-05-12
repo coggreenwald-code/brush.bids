@@ -32,10 +32,34 @@ export async function settleEndedAuctions(): Promise<{ settled: number; errors: 
         console.error(`[scheduler] failed to settle artwork ${artwork.id}:`, err);
       }
     }
+    // Defense-in-depth: even after an artwork has been marked paid, a previous
+    // loser-cancel call may have failed transiently. Sweep any lingering
+    // authorized holds on already-paid artworks and try to cancel them again.
+    try {
+      await releaseLingeringLosingHolds();
+    } catch (err) {
+      console.error("[scheduler] lingering-hold cleanup failed:", err);
+    }
   } finally {
     inFlight = false;
   }
   return { settled, errors };
+}
+
+async function releaseLingeringLosingHolds(): Promise<void> {
+  const lingering = await storage.getAuthorizedBidsOnPaidArtworks();
+  if (lingering.length === 0) return;
+  const stripe = await getUncachableStripeClient();
+  for (const bid of lingering) {
+    if (!bid.stripePaymentIntentId) continue;
+    try {
+      await stripe.paymentIntents.cancel(bid.stripePaymentIntentId);
+      await storage.updateBidByPaymentIntent(bid.stripePaymentIntentId, { holdStatus: "canceled" });
+      console.log(`[scheduler] cleaned up lingering loser hold ${bid.id}`);
+    } catch (err) {
+      console.error(`[scheduler] retry-cancel failed for bid ${bid.id}:`, err);
+    }
+  }
 }
 
 async function settleArtwork(artworkId: number): Promise<void> {
@@ -90,7 +114,7 @@ async function settleArtwork(artworkId: number): Promise<void> {
       if (err?.code !== "payment_intent_unexpected_state") {
         throw err;
       }
-      let pi: any = null;
+      let pi: import('stripe').Stripe.PaymentIntent | null = null;
       try {
         pi = await stripe.paymentIntents.retrieve(currentWinner.stripePaymentIntentId);
       } catch (retrieveErr) {

@@ -138,7 +138,7 @@ export default function ArtworkDetail() {
       bidderId: user.id as unknown as string,
       amount: amount.toString(),
     }, {
-      onSuccess: (data: any) => {
+      onSuccess: (data: { checkoutUrl?: string; auctionExtended?: boolean } | undefined) => {
         // If the server returned a checkoutUrl, the hook redirects automatically.
         // Otherwise (rare) we just notify the user the bid was recorded.
         if (data?.checkoutUrl) {

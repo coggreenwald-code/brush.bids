@@ -64,6 +64,7 @@ export interface IStorage {
   getActiveBidsForArtwork(artworkId: number): Promise<Bid[]>;
   getHighestAuthorizedBid(artworkId: number): Promise<Bid | undefined>;
   getOtherAuthorizedBids(artworkId: number, exceptBidId: number): Promise<Bid[]>;
+  getAuthorizedBidsOnPaidArtworks(): Promise<Bid[]>;
 
   getCharities(): Promise<Charity[]>;
 
@@ -343,6 +344,25 @@ export class DatabaseStorage implements IStorage {
         eq(bids.holdStatus, "authorized"),
         ne(bids.id, exceptBidId),
       ));
+  }
+
+  // Lingering authorized holds on artworks that already have paidAt set.
+  // The scheduler sweeps these every tick so a transient cancel failure on
+  // settlement day doesn't leave a buyer's card held forever.
+  async getAuthorizedBidsOnPaidArtworks(): Promise<Bid[]> {
+    return await db.select({
+      id: bids.id,
+      artworkId: bids.artworkId,
+      bidderId: bids.bidderId,
+      amount: bids.amount,
+      stripeCheckoutSessionId: bids.stripeCheckoutSessionId,
+      stripePaymentIntentId: bids.stripePaymentIntentId,
+      holdStatus: bids.holdStatus,
+      createdAt: bids.createdAt,
+    })
+      .from(bids)
+      .innerJoin(artworks, eq(bids.artworkId, artworks.id))
+      .where(and(eq(bids.holdStatus, "authorized"), sql`${artworks.paidAt} IS NOT NULL`));
   }
 
   async getCharities(): Promise<Charity[]> {
