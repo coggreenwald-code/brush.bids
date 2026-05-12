@@ -58,24 +58,68 @@ async function settleArtwork(artworkId: number): Promise<void> {
 
   const stripe = await getUncachableStripeClient();
 
-  // Capture the winner
-  try {
-    await stripe.paymentIntents.capture(winningBid.stripePaymentIntentId);
-    await storage.updateBidByPaymentIntent(winningBid.stripePaymentIntentId, { holdStatus: "captured" });
-    await storage.markArtworkPaid(artworkId, winningBid.bidderId);
-    console.log(`[scheduler] captured winning bid ${winningBid.id} for artwork ${artworkId}`);
-  } catch (err: any) {
-    // If already captured (idempotent retry), reflect that and continue
-    if (err?.code === "payment_intent_unexpected_state") {
-      await storage.updateBidByPaymentIntent(winningBid.stripePaymentIntentId, { holdStatus: "captured" });
-      await storage.markArtworkPaid(artworkId, winningBid.bidderId);
-    } else {
-      throw err;
+  // Try to capture the highest-authorized bid. If its hold is no longer
+  // capturable (expired auth, canceled by Stripe, etc.), invalidate that bid
+  // and immediately fall back to the next-highest authorized bid. We loop
+  // until something captures or we run out of valid bids.
+  let captured = false;
+  let currentWinner = winningBid;
+  while (!captured) {
+    if (!currentWinner.stripePaymentIntentId) {
+      await storage.updateBidByPaymentIntent(
+        currentWinner.stripePaymentIntentId || "",
+        { holdStatus: "failed" },
+      ).catch(() => {});
+      const next = await storage.getHighestAuthorizedBid(artworkId);
+      if (!next || next.id === currentWinner.id) return;
+      currentWinner = next;
+      continue;
+    }
+
+    try {
+      await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId);
+      await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "captured" });
+      await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
+      console.log(`[scheduler] captured winning bid ${currentWinner.id} for artwork ${artworkId}`);
+      captured = true;
+      break;
+    } catch (err: any) {
+      // payment_intent_unexpected_state covers BOTH "already captured" and
+      // "no longer capturable" (canceled/expired). Disambiguate by retrieving
+      // the PI's actual status from Stripe before deciding.
+      if (err?.code !== "payment_intent_unexpected_state") {
+        throw err;
+      }
+      let pi: any = null;
+      try {
+        pi = await stripe.paymentIntents.retrieve(currentWinner.stripePaymentIntentId);
+      } catch (retrieveErr) {
+        console.error(`[scheduler] failed to retrieve PI ${currentWinner.stripePaymentIntentId}:`, retrieveErr);
+        throw err;
+      }
+      if (pi.status === "succeeded") {
+        // Already captured on Stripe's side (idempotent retry). Reflect it.
+        await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "captured" });
+        await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
+        captured = true;
+        break;
+      }
+      // Hold is gone (canceled, expired, requires_payment_method, etc.).
+      // Mark this bid as failed and try the next-highest authorized bid.
+      console.warn(`[scheduler] winning bid ${currentWinner.id} not capturable (PI status=${pi.status}); falling back to next-highest`);
+      await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "failed" });
+      const next = await storage.getHighestAuthorizedBid(artworkId);
+      if (!next) {
+        console.log(`[scheduler] artwork ${artworkId} has no remaining authorized bids after capture failure`);
+        return;
+      }
+      if (next.id === currentWinner.id) return; // shouldn't happen, guard against loop
+      currentWinner = next;
     }
   }
 
   // Release every other authorized hold for this artwork
-  const losers = await storage.getOtherAuthorizedBids(artworkId, winningBid.id);
+  const losers = await storage.getOtherAuthorizedBids(artworkId, currentWinner.id);
   for (const bid of losers) {
     if (!bid.stripePaymentIntentId) continue;
     try {

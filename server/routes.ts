@@ -268,9 +268,10 @@ export async function registerRoutes(
 
   // Bids — public listing returns ONLY active (authorized or captured) bids.
   // Canceled/failed/pending holds must not affect the displayed current price
-  // or the bid floor in the UI.
+  // or the bid floor in the UI. Captured bids are included so the winning
+  // amount remains visible AFTER settlement.
   app.get(api.bids.list.path, async (req, res) => {
-    const bids = await storage.getAuthorizedBidsForArtwork(Number(req.params.artworkId));
+    const bids = await storage.getActiveBidsForArtwork(Number(req.params.artworkId));
     res.json(bids);
   });
 

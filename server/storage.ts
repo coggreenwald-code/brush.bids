@@ -7,7 +7,7 @@ import {
   type Charity, type InsertCharity,
   type PortfolioItem, type InsertPortfolioItem
 } from "@shared/schema";
-import { eq, desc, sql, and, lte, isNull, ne } from "drizzle-orm";
+import { eq, desc, sql, and, lte, isNull, ne, inArray } from "drizzle-orm";
 
 export type HoldStatus = "pending" | "authorized" | "captured" | "canceled" | "failed";
 
@@ -61,6 +61,7 @@ export interface IStorage {
   getBidByCheckoutSession(sessionId: string): Promise<Bid | undefined>;
   getBidByPaymentIntent(paymentIntentId: string): Promise<Bid | undefined>;
   getAuthorizedBidsForArtwork(artworkId: number): Promise<Bid[]>;
+  getActiveBidsForArtwork(artworkId: number): Promise<Bid[]>;
   getHighestAuthorizedBid(artworkId: number): Promise<Bid | undefined>;
   getOtherAuthorizedBids(artworkId: number, exceptBidId: number): Promise<Bid[]>;
 
@@ -316,6 +317,17 @@ export class DatabaseStorage implements IStorage {
   async getAuthorizedBidsForArtwork(artworkId: number): Promise<Bid[]> {
     return await db.select().from(bids)
       .where(and(eq(bids.artworkId, artworkId), eq(bids.holdStatus, "authorized")))
+      .orderBy(desc(bids.amount));
+  }
+
+  // "Active" = authorized OR captured. Used by the public bids list so the
+  // current price (and the winning amount AFTER settlement) stays visible.
+  async getActiveBidsForArtwork(artworkId: number): Promise<Bid[]> {
+    return await db.select().from(bids)
+      .where(and(
+        eq(bids.artworkId, artworkId),
+        inArray(bids.holdStatus, ["authorized", "captured"]),
+      ))
       .orderBy(desc(bids.amount));
   }
 
