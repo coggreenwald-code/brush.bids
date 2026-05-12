@@ -582,7 +582,8 @@ export async function registerRoutes(
     if (!req.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-    const bids = await storage.getBidsForUser((req.user as any).id);
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    const bids = await storage.getBidsForUser(userId);
     res.json(bids);
   });
 
