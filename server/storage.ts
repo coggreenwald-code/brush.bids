@@ -156,7 +156,10 @@ export class DatabaseStorage implements IStorage {
     if (score) updates.aiScore = score;
     if (status === "approved") {
       const artwork = await this.getArtwork(id);
-      const durationDays = Math.min(artwork?.auctionDurationDays || 7, 7);
+      // Use the artwork's stored auction duration verbatim. Submission flow
+      // restricts NEW listings to 1/3/5/7 days (Stripe auth holds expire at 7d),
+      // but legacy 14/30-day artworks must keep their original duration.
+      const durationDays = artwork?.auctionDurationDays || 7;
       const endTime = new Date();
       endTime.setDate(endTime.getDate() + durationDays);
       updates.endTime = endTime;
@@ -208,9 +211,12 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bids.bidderId, userId))
       .orderBy(desc(bids.createdAt));
 
+    // Keep ALL of the user's bids in the summary — including canceled/failed —
+    // so the My Bids UI can show "Released", "Failed", etc. We pick the user's
+    // highest-AMOUNT bid per artwork; ties broken by most-recent. We then
+    // surface that bid's holdStatus so users see the actual outcome.
     const map = new Map<number, { userHighestBid: number; latestBidAt: Date | null; holdStatus: HoldStatus }>();
     for (const bid of userBids) {
-      if (bid.holdStatus === "canceled" || bid.holdStatus === "failed") continue;
       const existing = map.get(bid.artworkId);
       const amount = Number(bid.amount);
       if (!existing || amount > existing.userHighestBid) {
@@ -235,7 +241,7 @@ export class DatabaseStorage implements IStorage {
           auctionEnded = new Date(artwork.endTime) <= new Date();
         } else {
           const end = new Date(artwork?.createdAt || new Date());
-          end.setDate(end.getDate() + (artwork?.auctionDurationDays || 7));
+          end.setDate(end.getDate() + (artwork?.auctionDurationDays || 7)); // legacy fallback only
           auctionEnded = end <= new Date();
         }
         return {

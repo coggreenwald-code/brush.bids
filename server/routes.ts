@@ -289,7 +289,7 @@ export async function registerRoutes(
         auctionEndTime = new Date(artwork.endTime);
       } else {
         auctionEndTime = new Date(artwork.createdAt || now);
-        auctionEndTime.setDate(auctionEndTime.getDate() + Math.min(artwork.auctionDurationDays || 7, 7));
+        auctionEndTime.setDate(auctionEndTime.getDate() + (artwork.auctionDurationDays || 7));
       }
       if (now >= auctionEndTime) return res.status(400).json({ message: "This auction has ended" });
 
@@ -353,19 +353,15 @@ export async function registerRoutes(
         cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
       });
 
-      // Record the pending bid with the session ID so the webhook can find it.
-      const bid = await storage.createBid({
-        ...input,
-        holdStatus: "pending",
-        stripeCheckoutSessionId: session.id,
-      });
-
-      // NOTE: anti-snipe extension is applied in the webhook when the bid is
-      // *authorized* — not on bid attempt — so spammy unfinished checkouts
-      // can't be used to extend the auction indefinitely.
+      // The bid row itself is NOT inserted here — we record it only after the
+      // Stripe webhook confirms the card authorization. All the data we need
+      // to do that insert (artworkId, bidderId, amount) lives in the checkout
+      // session metadata, which Stripe propagates to the PaymentIntent too.
+      // This way an abandoned checkout never leaves a phantom bid row behind.
 
       res.status(201).json({
-        ...bid,
+        artworkId: input.artworkId,
+        amount: input.amount,
         checkoutUrl: session.url,
       });
     } catch (err: any) {
