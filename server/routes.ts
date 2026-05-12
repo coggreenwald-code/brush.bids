@@ -88,8 +88,23 @@ export async function registerRoutes(
   });
 
   app.post(api.artworks.create.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
     try {
       const input = api.artworks.create.input.parse(req.body);
+      // Authorization: artist must be the logged-in user
+      if (input.artistId !== userId) {
+        return res.status(403).json({ message: "You can only submit artwork as yourself" });
+      }
+      // Server-side payout-readiness gate: a listing can't go live unless the
+      // artist has finished Connect onboarding AND payouts are enabled, otherwise
+      // we'd accept bid holds we couldn't actually pay out on.
+      const artist = await storage.getUser(userId);
+      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
+        return res.status(403).json({
+          message: "Please finish Stripe payout setup on your Dashboard before submitting artwork.",
+        });
+      }
       const artwork = await storage.createArtwork(input);
       res.status(201).json(artwork);
     } catch (err) {
@@ -343,7 +358,7 @@ export async function registerRoutes(
         ...input,
         holdStatus: "pending",
         stripeCheckoutSessionId: session.id,
-      } as any);
+      });
 
       // NOTE: anti-snipe extension is applied in the webhook when the bid is
       // *authorized* — not on bid attempt — so spammy unfinished checkouts

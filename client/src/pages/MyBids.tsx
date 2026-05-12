@@ -1,16 +1,17 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useSearch } from "wouter";
-import { Gavel, Clock, TrendingUp, AlertCircle, Heart, Loader2, CreditCard, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Gavel, Clock, TrendingUp, AlertCircle, Heart, Loader2, CheckCircle } from "lucide-react";
 import type { Artwork } from "@shared/schema";
+
+type HoldStatus = "pending" | "authorized" | "captured" | "canceled" | "failed";
 
 interface UserBidSummary {
   artworkId: number;
@@ -21,6 +22,22 @@ interface UserBidSummary {
   auctionEnded: boolean;
   latestBidAt: string | null;
   isPaid: boolean;
+  holdStatus: HoldStatus;
+}
+
+// Maps the raw bid hold state to user-facing copy. Authorized = card hold
+// placed but not yet charged. Charged = scheduler captured the hold after
+// auction end. Released = the user was outbid and their hold was canceled.
+function HoldStatusBadge({ status }: { status: HoldStatus }) {
+  const map: Record<HoldStatus, { label: string; className: string }> = {
+    pending:    { label: "Awaiting Authorization", className: "bg-white/10 text-white/60 border border-white/10" },
+    authorized: { label: "Authorized (Hold)",      className: "bg-[#A78BFA]/20 text-[#A78BFA] border border-[#A78BFA]/20" },
+    captured:   { label: "Charged",                className: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" },
+    canceled:   { label: "Released",               className: "bg-white/5 text-white/40 border border-white/10" },
+    failed:     { label: "Failed",                 className: "bg-red-500/15 text-red-400 border border-red-500/20" },
+  };
+  const { label, className } = map[status];
+  return <Badge className={`mt-1 ${className}`} data-testid={`badge-hold-${status}`}>{label}</Badge>;
 }
 
 function getTimeRemaining(createdAt: Date | string | null): string {
@@ -42,10 +59,8 @@ function getTimeRemaining(createdAt: Date | string | null): string {
 }
 
 export default function MyBids() {
-  const { user, isAuthenticated } = useAuth();
-  const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const searchString = useSearch();
-  const [processingPayment, setProcessingPayment] = useState<number | null>(null);
 
   const paymentStatus = new URLSearchParams(searchString).get('payment');
   const paymentArtworkId = new URLSearchParams(searchString).get('artwork');
@@ -60,31 +75,6 @@ export default function MyBids() {
     queryKey: ["/api/my-bids"],
     enabled: isAuthenticated,
   });
-
-  const checkoutMutation = useMutation({
-    mutationFn: async (artworkId: number) => {
-      const res = await apiRequest("POST", `/api/checkout/artwork/${artworkId}`);
-      return res.json();
-    },
-    onSuccess: (data) => {
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    },
-    onError: () => {
-      toast({
-        title: "Payment Error",
-        description: "Failed to start checkout. Please try again.",
-        variant: "destructive",
-      });
-      setProcessingPayment(null);
-    },
-  });
-
-  const handlePayNow = (artworkId: number) => {
-    setProcessingPayment(artworkId);
-    checkoutMutation.mutate(artworkId);
-  };
 
   const { activeBids, wonBids, outbidBids } = useMemo(() => {
     if (!bids) return { activeBids: [], wonBids: [], outbidBids: [] };
@@ -228,6 +218,7 @@ export default function MyBids() {
                         <p className="text-sm text-white/40">Your Bid</p>
                         <p className="text-lg font-mono font-bold text-white">${bid.userHighestBid.toLocaleString()}</p>
                         <Badge className="mt-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">Highest Bidder</Badge>
+                        <HoldStatusBadge status={bid.holdStatus} />
                       </div>
                     </div>
                   </div>
@@ -277,6 +268,7 @@ export default function MyBids() {
                         <p className="text-lg font-mono font-bold text-orange-400">${bid.userHighestBid.toLocaleString()}</p>
                         <p className="text-xs text-white/40">Current: ${bid.artworkHighestBid.toLocaleString()}</p>
                         <Badge variant="outline" className="mt-1 border-orange-500/30 text-orange-400 bg-orange-500/10">Outbid</Badge>
+                        <HoldStatusBadge status={bid.holdStatus} />
                       </div>
                       {!bid.auctionEnded && (
                         <Link href={`/artwork/${bid.artworkId}`}>
@@ -292,7 +284,7 @@ export default function MyBids() {
 
           <TabsContent value="won" className="mt-6">
             {paymentStatus === 'success' && paymentArtworkId && 
-             wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
+             wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.holdStatus === 'captured') && (
               <div className="mb-6 p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
                 <div className="flex items-center gap-2 text-emerald-400 font-semibold text-base pb-2">
                   <CheckCircle className="w-5 h-5" />
@@ -302,7 +294,7 @@ export default function MyBids() {
               </div>
             )}
             {paymentStatus === 'success' && paymentArtworkId && 
-             !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.isPaid) && (
+             !wonBids.some(bid => bid.artworkId === Number(paymentArtworkId) && bid.holdStatus === 'captured') && (
               <div className="mb-6 p-5 rounded-xl bg-[#A78BFA]/5 border border-[#A78BFA]/10">
                 <div className="flex items-center gap-2 text-[#A78BFA] font-semibold text-base pb-2">
                   <Clock className="w-5 h-5" />
@@ -346,12 +338,17 @@ export default function MyBids() {
                       <div className="text-right">
                         <p className="text-sm text-white/40">Winning Bid</p>
                         <p className="text-lg font-mono font-bold text-emerald-400">${bid.userHighestBid.toLocaleString()}</p>
-                        <Badge className={`mt-1 ${bid.isPaid ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-[#A78BFA]/20 text-[#A78BFA] border border-[#A78BFA]/20'}`}>{bid.isPaid ? 'Paid' : 'Won'}</Badge>
+                        <HoldStatusBadge status={bid.holdStatus} />
                       </div>
-                      {!bid.isPaid && (
+                      {bid.holdStatus === 'authorized' && (
                         <div className="text-right text-xs text-white/40 max-w-[160px]">
                           Charging your card on file…<br />
                           You'll get a receipt by email.
+                        </div>
+                      )}
+                      {bid.holdStatus === 'failed' && (
+                        <div className="text-right text-xs text-red-400 max-w-[160px]">
+                          Card authorization failed. Please contact support.
                         </div>
                       )}
                     </div>

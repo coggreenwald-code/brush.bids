@@ -11,6 +11,12 @@ import { eq, desc, sql, and, lte, isNull, ne } from "drizzle-orm";
 
 export type HoldStatus = "pending" | "authorized" | "captured" | "canceled" | "failed";
 
+type BidInsertWithStripe = InsertBid & {
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  holdStatus?: HoldStatus;
+};
+
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   updateUserRole(id: string, role: "artist" | "buyer" | "both" | "admin"): Promise<User>;
@@ -49,7 +55,7 @@ export interface IStorage {
     isPaid: boolean;
     holdStatus: HoldStatus;
   }>>;
-  createBid(bid: InsertBid & { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; holdStatus?: HoldStatus }): Promise<Bid>;
+  createBid(bid: BidInsertWithStripe): Promise<Bid>;
   updateBidByCheckoutSession(sessionId: string, updates: { holdStatus?: HoldStatus; stripePaymentIntentId?: string }): Promise<Bid | undefined>;
   updateBidByPaymentIntent(paymentIntentId: string, updates: { holdStatus?: HoldStatus }): Promise<Bid | undefined>;
   getBidByCheckoutSession(sessionId: string): Promise<Bid | undefined>;
@@ -189,7 +195,7 @@ export class DatabaseStorage implements IStorage {
         eq(artworks.status, "approved"),
         isNull(artworks.paidAt),
         lte(artworks.endTime, new Date()),
-      ) as any,
+      ),
     );
   }
 
@@ -248,14 +254,14 @@ export class DatabaseStorage implements IStorage {
     return results;
   }
 
-  async createBid(bid: InsertBid & { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; holdStatus?: HoldStatus }): Promise<Bid> {
-    const [newBid] = await db.insert(bids).values(bid as any).returning();
+  async createBid(bid: BidInsertWithStripe): Promise<Bid> {
+    const [newBid] = await db.insert(bids).values(bid).returning();
     return newBid;
   }
 
   async updateBidByCheckoutSession(sessionId: string, updates: { holdStatus?: HoldStatus; stripePaymentIntentId?: string }): Promise<Bid | undefined> {
     const [updated] = await db.update(bids)
-      .set(updates as any)
+      .set(updates)
       .where(eq(bids.stripeCheckoutSessionId, sessionId))
       .returning();
     return updated;
@@ -263,7 +269,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateBidByPaymentIntent(paymentIntentId: string, updates: { holdStatus?: HoldStatus }): Promise<Bid | undefined> {
     const [updated] = await db.update(bids)
-      .set(updates as any)
+      .set(updates)
       .where(eq(bids.stripePaymentIntentId, paymentIntentId))
       .returning();
     return updated;

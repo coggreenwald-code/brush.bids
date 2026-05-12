@@ -7,6 +7,7 @@
 //   • Legacy winner-pay flow: untagged sessions still mark the artwork as paid
 //     for backwards compatibility.
 
+import type Stripe from 'stripe';
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
 import { releaseLosingHoldsForArtwork } from './auctionScheduler';
@@ -36,19 +37,19 @@ export class WebhookHandlers {
     try {
       switch (event.type) {
         case 'checkout.session.completed':
-          await handleCheckoutCompleted(event.data.object as any);
+          await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
           break;
         case 'checkout.session.expired':
-          await handleCheckoutExpired(event.data.object as any);
+          await handleCheckoutExpired(event.data.object as Stripe.Checkout.Session);
           break;
         case 'payment_intent.canceled':
-          await handlePaymentIntentCanceled(event.data.object as any);
+          await handlePaymentIntentCanceled(event.data.object as Stripe.PaymentIntent);
           break;
         case 'payment_intent.payment_failed':
-          await handlePaymentIntentFailed(event.data.object as any);
+          await handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent);
           break;
         case 'account.updated':
-          await handleAccountUpdated(event.data.object as any);
+          await handleAccountUpdated(event.data.object as Stripe.Account);
           break;
       }
     } catch (err) {
@@ -57,7 +58,7 @@ export class WebhookHandlers {
   }
 }
 
-async function handleCheckoutCompleted(session: any) {
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const kind = session.metadata?.kind;
 
   if (kind === 'bid_hold') {
@@ -117,7 +118,7 @@ async function handleCheckoutCompleted(session: any) {
   }
 }
 
-async function handleCheckoutExpired(session: any) {
+async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
   if (session.metadata?.kind !== 'bid_hold') return;
   const bid = await storage.getBidByCheckoutSession(session.id);
   if (!bid || bid.holdStatus !== 'pending') return;
@@ -125,7 +126,7 @@ async function handleCheckoutExpired(session: any) {
   console.log(`Bid ${bid.id} expired without authorization`);
 }
 
-async function handlePaymentIntentCanceled(pi: any) {
+async function handlePaymentIntentCanceled(pi: Stripe.PaymentIntent) {
   const bid = await storage.getBidByPaymentIntent(pi.id);
   if (!bid) return;
   if (bid.holdStatus === 'captured') return; // safety: never overwrite captured
@@ -133,14 +134,14 @@ async function handlePaymentIntentCanceled(pi: any) {
   await storage.updateBidByPaymentIntent(pi.id, { holdStatus: 'canceled' });
 }
 
-async function handlePaymentIntentFailed(pi: any) {
+async function handlePaymentIntentFailed(pi: Stripe.PaymentIntent) {
   const bid = await storage.getBidByPaymentIntent(pi.id);
   if (!bid) return;
   if (bid.holdStatus === 'captured') return;
   await storage.updateBidByPaymentIntent(pi.id, { holdStatus: 'failed' });
 }
 
-async function handleAccountUpdated(account: any) {
+async function handleAccountUpdated(account: Stripe.Account) {
   const user = await storage.getUserByStripeAccount(account.id);
   if (!user) return;
   await storage.updateUserStripeStatus(user.id, {

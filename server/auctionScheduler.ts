@@ -10,9 +10,11 @@ import { storage } from "./storage";
 import { getUncachableStripeClient } from "./stripeClient";
 
 let inFlight = false;
-// In-memory set of ended auctions we've already determined have no authorized
-// bidder, so the scheduler doesn't reprocess them every tick. Cleared on restart.
-const noWinnerArtworkIds = new Set<number>();
+// Track which artwork IDs we've already logged as "no authorized bid" so the
+// scheduler doesn't spam the console every tick — but we DO still re-check
+// them, because a late-arriving webhook (or a bid PI that flips to authorized
+// after the first scan) must still be eligible to win.
+const noWinnerLogged = new Set<number>();
 
 export async function settleEndedAuctions(): Promise<{ settled: number; errors: number }> {
   if (inFlight) return { settled: 0, errors: 0 };
@@ -22,7 +24,6 @@ export async function settleEndedAuctions(): Promise<{ settled: number; errors: 
   try {
     const ended = await storage.getEndedAuctionsAwaitingCapture();
     for (const artwork of ended) {
-      if (noWinnerArtworkIds.has(artwork.id)) continue;
       try {
         await settleArtwork(artwork.id);
         settled++;
@@ -43,15 +44,17 @@ async function settleArtwork(artworkId: number): Promise<void> {
 
   const winningBid = await storage.getHighestAuthorizedBid(artworkId);
   if (!winningBid || !winningBid.stripePaymentIntentId) {
-    // No authorized bid — record it in memory so we stop re-checking. If a
-    // late webhook ever flips a hold to authorized after end time, the next
-    // process restart will re-discover it; that's an acceptable trade-off.
-    if (!noWinnerArtworkIds.has(artworkId)) {
-      noWinnerArtworkIds.add(artworkId);
-      console.log(`[scheduler] artwork ${artworkId} ended with no authorized bids; marking as no-winner`);
+    // No authorized bid right now. We keep re-checking every tick — a late
+    // webhook may still flip a pending hold to authorized — but we only log
+    // the "no winner" message once to avoid spamming the console.
+    if (!noWinnerLogged.has(artworkId)) {
+      noWinnerLogged.add(artworkId);
+      console.log(`[scheduler] artwork ${artworkId} ended with no authorized bids yet; will re-check each tick`);
     }
     return;
   }
+  // Reset the log gate when a winner finally appears
+  noWinnerLogged.delete(artworkId);
 
   const stripe = await getUncachableStripeClient();
 
