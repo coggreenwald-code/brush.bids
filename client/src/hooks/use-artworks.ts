@@ -48,11 +48,12 @@ export function useCreateArtwork() {
         credentials: "include",
       });
       if (!res.ok) {
-        if (res.status === 400) {
-          const error = api.artworks.create.responses[400].parse(await res.json());
-          throw new Error(error.message);
-        }
-        throw new Error('Failed to create artwork');
+        let message = 'Failed to create artwork';
+        try {
+          const body = await res.json();
+          if (body?.message) message = body.message;
+        } catch {/* non-JSON body */}
+        throw new Error(message);
       }
       return api.artworks.create.responses[201].parse(await res.json());
     },

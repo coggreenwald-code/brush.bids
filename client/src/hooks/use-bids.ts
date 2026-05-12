@@ -27,11 +27,12 @@ export function usePlaceBid() {
         credentials: "include",
       });
       if (!res.ok) {
-        if (res.status === 400) {
-          const error = api.bids.create.responses[400].parse(await res.json());
-          throw new Error(error.message);
-        }
-        throw new Error('Failed to place bid');
+        let message = 'Failed to place bid';
+        try {
+          const body = await res.json();
+          if (body?.message) message = body.message;
+        } catch {/* non-JSON body */}
+        throw new Error(message);
       }
       const json = await res.json();
       // Redirect to Stripe Checkout to capture the card hold; the bid will be
