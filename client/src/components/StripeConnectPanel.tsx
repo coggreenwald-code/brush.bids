@@ -18,6 +18,8 @@ export default function StripeConnectPanel() {
 
   const { data: status, isLoading } = useQuery<ConnectStatus>({
     queryKey: ["/api/stripe/connect/status"],
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const refresh = useMutation({

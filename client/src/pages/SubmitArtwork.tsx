@@ -39,6 +39,8 @@ export default function SubmitArtwork() {
   const createArtwork = useCreateArtwork();
   const { data: connectStatus } = useQuery<{ hasAccount: boolean; onboardingComplete: boolean; payoutsEnabled: boolean }>({
     queryKey: ["/api/stripe/connect/status"],
+    staleTime: 0,
+    refetchOnMount: "always",
     enabled: !!user,
   });
   const needsConnect = !!user && (!connectStatus?.onboardingComplete || !connectStatus?.payoutsEnabled);

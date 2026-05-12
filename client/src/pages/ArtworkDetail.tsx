@@ -363,7 +363,7 @@ export default function ArtworkDetail() {
                               disabled={placeBid.isPending} 
                               data-testid="button-place-bid"
                             >
-                              {placeBid.isPending ? "Authorizing..." : "Authorize Bid Hold"}
+                              {placeBid.isPending ? "Authorizing..." : "Bid (will be authorized on your card)"}
                             </Button>
                           </div>
                           <FormMessage />
