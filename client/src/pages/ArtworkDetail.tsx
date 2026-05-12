@@ -95,6 +95,25 @@ export default function ArtworkDetail() {
   const [saved, setSaved] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const bidParam = params.get('bid');
+    if (bidParam === 'success') {
+      toast({
+        title: "Bid hold authorized",
+        description: "Your card has been authorized. We'll only charge it if you win.",
+      });
+      window.history.replaceState({}, "", window.location.pathname);
+    } else if (bidParam === 'cancelled') {
+      toast({
+        title: "Bid cancelled",
+        description: "No charge was made. You can try again any time before the auction ends.",
+        variant: "destructive",
+      });
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [toast]);
+
   const { data: artist } = useQuery<UserType>({
     queryKey: ['/api/users', artwork?.artistId],
     enabled: !!artwork?.artistId,
