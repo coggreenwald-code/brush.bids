@@ -96,6 +96,15 @@ export async function registerRoutes(
       if (input.artistId !== userId) {
         return res.status(403).json({ message: "You can only submit artwork as yourself" });
       }
+      // Stripe card-authorization holds expire after 7 days, so we refuse any
+      // NEW listing whose duration would outlive the hold. Existing legacy
+      // 14/30-day artworks are unaffected (they were created before this gate).
+      if ((input.auctionDurationDays ?? 7) > 7) {
+        return res.status(400).json({
+          message: "Auction duration cannot exceed 7 days.",
+          field: "auctionDurationDays",
+        });
+      }
       // Server-side payout-readiness gate: a listing can't go live unless the
       // artist has finished Connect onboarding AND payouts are enabled, otherwise
       // we'd accept bid holds we couldn't actually pay out on.
@@ -257,9 +266,11 @@ export async function registerRoutes(
     }
   });
 
-  // Bids
+  // Bids — public listing returns ONLY active (authorized or captured) bids.
+  // Canceled/failed/pending holds must not affect the displayed current price
+  // or the bid floor in the UI.
   app.get(api.bids.list.path, async (req, res) => {
-    const bids = await storage.getBidsForArtwork(Number(req.params.artworkId));
+    const bids = await storage.getAuthorizedBidsForArtwork(Number(req.params.artworkId));
     res.json(bids);
   });
 
@@ -313,8 +324,13 @@ export async function registerRoutes(
 
       const stripe = await getUncachableStripeClient();
       const amountCents = Math.round(Number(input.amount) * 100);
-      // 25% application fee → platform retains 25, charity 5% paid manually from that pool
-      const appFeeCents = Math.round(amountCents * 0.25);
+      // Base split: 75% artist / 20% platform / 5% charity (charity paid manually
+      // from the platform's 25% pool). With a Boost, the artist gives up
+      // `promotionPercentage` to the platform, so the application fee grows by
+      // that amount. We clamp to keep the artist share non-negative.
+      const boostPct = Math.max(0, Math.min(75, artwork.promotionPercentage || 0));
+      const appFeePct = 0.25 + boostPct / 100;
+      const appFeeCents = Math.min(amountCents, Math.round(amountCents * appFeePct));
 
       const origin = getAppOrigin();
       const session = await stripe.checkout.sessions.create({
