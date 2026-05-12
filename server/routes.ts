@@ -731,7 +731,11 @@ export async function registerRoutes(
 
       if (!accountId) {
         const account = await stripe.accounts.create({
-          type: 'standard',
+          type: 'express',
+          capabilities: {
+            card_payments: { requested: true },
+            transfers: { requested: true },
+          },
           email: user.email || undefined,
           metadata: { userId: user.id },
         });
