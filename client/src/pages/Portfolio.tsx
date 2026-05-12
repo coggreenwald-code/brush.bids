@@ -378,9 +378,8 @@ export default function Portfolio() {
                 <SelectContent>
                   <SelectItem value="1">1 Day</SelectItem>
                   <SelectItem value="3">3 Days</SelectItem>
+                  <SelectItem value="5">5 Days</SelectItem>
                   <SelectItem value="7">7 Days</SelectItem>
-                  <SelectItem value="14">14 Days</SelectItem>
-                  <SelectItem value="30">30 Days</SelectItem>
                 </SelectContent>
               </Select>
             </div>
