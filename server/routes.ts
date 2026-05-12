@@ -676,6 +676,26 @@ export async function registerRoutes(
     const userId = (req.user as any).id || (req.user as any).claims?.sub;
     const user = await storage.getUser(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    // If the artist has a Connect account, fetch the live state from Stripe on
+    // every dashboard load so the UI never shows stale onboarding/payout flags
+    // (we still keep the DB cache in sync for places that don't need a live read).
+    if (user.stripeAccountId) {
+      try {
+        const stripe = await getUncachableStripeClient();
+        const account = await stripe.accounts.retrieve(user.stripeAccountId);
+        const onboardingComplete = !!account.details_submitted;
+        const payoutsEnabled = !!account.payouts_enabled;
+        if (onboardingComplete !== !!user.stripeOnboardingComplete ||
+            payoutsEnabled !== !!user.stripePayoutsEnabled) {
+          await storage.updateUserStripeStatus(user.id, { onboardingComplete, payoutsEnabled });
+        }
+        return res.json({ hasAccount: true, onboardingComplete, payoutsEnabled });
+      } catch (err) {
+        console.error("Live Stripe status fetch failed, falling back to cached:", err);
+        // Fall through to cached values below
+      }
+    }
     res.json({
       hasAccount: !!user.stripeAccountId,
       onboardingComplete: !!user.stripeOnboardingComplete,

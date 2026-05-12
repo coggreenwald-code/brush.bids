@@ -33,10 +33,12 @@ async function ensureBidAuthorized(opts: {
   if (!bid) bid = await storage.getBidByPaymentIntent(opts.paymentIntentId);
 
   if (!bid) {
+    // The drizzle-zod insertBidSchema types `amount` as a string (Postgres
+    // decimal columns serialize as strings); we mirror that here.
     bid = await storage.createBid({
       artworkId: opts.artworkId,
       bidderId: opts.bidderId,
-      amount: String(opts.amount) as any,
+      amount: opts.amount.toFixed(2),
       stripeCheckoutSessionId: opts.sessionId,
       stripePaymentIntentId: opts.paymentIntentId,
       holdStatus: 'authorized',

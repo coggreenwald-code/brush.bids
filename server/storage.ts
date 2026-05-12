@@ -211,20 +211,40 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bids.bidderId, userId))
       .orderBy(desc(bids.createdAt));
 
-    // Keep ALL of the user's bids in the summary — including canceled/failed —
-    // so the My Bids UI can show "Released", "Failed", etc. We pick the user's
-    // highest-AMOUNT bid per artwork; ties broken by most-recent. We then
-    // surface that bid's holdStatus so users see the actual outcome.
-    const map = new Map<number, { userHighestBid: number; latestBidAt: Date | null; holdStatus: HoldStatus }>();
+    // For each artwork, keep TWO values:
+    //   • competitiveBid — the user's highest *valid* bid (authorized or
+    //     captured). This is what we compare against the artwork's highest
+    //     authorized bid to decide isHighest/won/outbid. A failed/canceled
+    //     bid must NEVER win.
+    //   • displayBid    — the user's most recent bid of any status, used for
+    //     the holdStatus badge and the headline amount in MyBids so users can
+    //     still see "Released" or "Failed" outcomes.
+    type Entry = {
+      competitiveBid: number;
+      displayBid: number;
+      latestBidAt: Date | null;
+      holdStatus: HoldStatus;
+    };
+    const map = new Map<number, Entry>();
     for (const bid of userBids) {
-      const existing = map.get(bid.artworkId);
       const amount = Number(bid.amount);
-      if (!existing || amount > existing.userHighestBid) {
+      const status = bid.holdStatus as HoldStatus;
+      const isValid = status === "authorized" || status === "captured";
+      const existing = map.get(bid.artworkId);
+      if (!existing) {
         map.set(bid.artworkId, {
-          userHighestBid: amount,
+          competitiveBid: isValid ? amount : 0,
+          displayBid: amount,
           latestBidAt: bid.createdAt,
-          holdStatus: bid.holdStatus as HoldStatus,
+          holdStatus: status,
         });
+        continue;
+      }
+      if (isValid && amount > existing.competitiveBid) existing.competitiveBid = amount;
+      if (amount > existing.displayBid) {
+        existing.displayBid = amount;
+        existing.latestBidAt = bid.createdAt;
+        existing.holdStatus = status;
       }
     }
 
@@ -234,8 +254,10 @@ export class DatabaseStorage implements IStorage {
         const allBids = await this.getAuthorizedBidsForArtwork(artworkId);
         const artworkHighestBid = allBids.length > 0
           ? Math.max(...allBids.map(b => Number(b.amount)))
-          : info.userHighestBid;
-        const isHighest = info.userHighestBid >= artworkHighestBid;
+          : 0;
+        // isHighest only counts the user's currently-VALID bid; a failed or
+        // released bid never makes them the leader.
+        const isHighest = info.competitiveBid > 0 && info.competitiveBid >= artworkHighestBid;
         let auctionEnded = false;
         if (artwork?.endTime) {
           auctionEnded = new Date(artwork.endTime) <= new Date();
@@ -247,8 +269,8 @@ export class DatabaseStorage implements IStorage {
         return {
           artworkId,
           artwork: artwork || null,
-          userHighestBid: info.userHighestBid,
-          artworkHighestBid,
+          userHighestBid: info.displayBid,
+          artworkHighestBid: artworkHighestBid || info.displayBid,
           isHighest,
           auctionEnded,
           latestBidAt: info.latestBidAt,
