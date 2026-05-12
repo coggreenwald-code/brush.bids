@@ -366,6 +366,14 @@ export async function registerRoutes(
           artworkId: String(artwork.id),
           bidderId,
         },
+        // Bound the Checkout session lifetime so a bidder can't sit on the page
+        // forever and complete payment after the auction ends. Stripe requires
+        // expires_at to be at least 30 minutes from creation, so we use
+        // min(30 min, auctionEnd) clamped to the 30-min minimum.
+        expires_at: Math.max(
+          Math.floor(Date.now() / 1000) + 30 * 60,
+          Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 30 * 60 * 1000) / 1000),
+        ),
         success_url: `${origin}/artwork/${artwork.id}?bid=success&amount=${input.amount}`,
         cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
       });
@@ -376,7 +384,7 @@ export async function registerRoutes(
       // session metadata, which Stripe propagates to the PaymentIntent too.
       // This way an abandoned checkout never leaves a phantom bid row behind.
 
-      res.status(201).json({
+      res.status(200).json({
         artworkId: input.artworkId,
         amount: input.amount,
         checkoutUrl: session.url,

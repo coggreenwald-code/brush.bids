@@ -32,6 +32,51 @@ async function ensureBidAuthorized(opts: {
   let bid = opts.sessionId ? await storage.getBidByCheckoutSession(opts.sessionId) : undefined;
   if (!bid) bid = await storage.getBidByPaymentIntent(opts.paymentIntentId);
 
+  // Revalidate auction state at AUTHORIZATION TIME. A bidder could have started
+  // Checkout while the auction was open and only completed it after the deadline
+  // (or after the artwork was already sold). We must not let a late-arriving
+  // authorization win or alter outcomes — cancel the hold and mark the bid
+  // failed so MyBids reflects the real state.
+  const artworkNow = await storage.getArtwork(opts.artworkId);
+  const ended = artworkNow?.endTime ? new Date(artworkNow.endTime) <= new Date() : false;
+  const closed = !artworkNow || artworkNow.status !== 'approved' || !!artworkNow.paidAt || ended;
+
+  // Also enforce competitive validity at authorization time: the just-authorized
+  // amount must be STRICTLY higher than every other currently-authorized amount.
+  // A late lower auth must be canceled immediately, not left as a stale hold.
+  let outcompeted = false;
+  if (!closed) {
+    const existing = await storage.getAuthorizedBidsForArtwork(opts.artworkId);
+    const competing = existing.filter(b => b.id !== bid?.id).map(b => Number(b.amount));
+    const currentHigh = competing.length ? Math.max(...competing) : 0;
+    if (opts.amount <= currentHigh) outcompeted = true;
+  }
+
+  if (closed || outcompeted) {
+    const reason = closed ? 'auction closed' : 'outbid at authorization';
+    try {
+      const stripe = await getUncachableStripeClient();
+      await stripe.paymentIntents.cancel(opts.paymentIntentId).catch(() => {});
+    } catch {/* best-effort */}
+    if (bid) {
+      await storage.updateBidByPaymentIntent(opts.paymentIntentId, {
+        holdStatus: closed ? 'failed' : 'canceled',
+      });
+    } else {
+      // Record the bid so the user can see why it didn't take
+      await storage.createBid({
+        artworkId: opts.artworkId,
+        bidderId: opts.bidderId,
+        amount: opts.amount.toFixed(2),
+        stripeCheckoutSessionId: opts.sessionId,
+        stripePaymentIntentId: opts.paymentIntentId,
+        holdStatus: closed ? 'failed' : 'canceled',
+      });
+    }
+    console.warn(`Bid ${opts.paymentIntentId} rejected at authorization (${reason})`);
+    return;
+  }
+
   if (!bid) {
     // The drizzle-zod insertBidSchema types `amount` as a string (Postgres
     // decimal columns serialize as strings); we mirror that here.
