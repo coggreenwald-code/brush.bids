@@ -17,6 +17,43 @@ type BidInsertWithStripe = InsertBid & {
   holdStatus?: HoldStatus;
 };
 
+export type BidTaxUpdate = {
+  taxAmount?: string;
+  taxRate?: string;
+  taxJurisdiction?: string;
+  taxableAmount?: string;
+  stripeTaxTransactionId?: string;
+  shippingState?: string;
+  shippingPostalCode?: string;
+  shippingCity?: string;
+};
+
+export type TaxReportRow = {
+  month: string;
+  state: string;
+  taxableAmount: number;
+  taxAmount: number;
+  saleCount: number;
+};
+
+export type TaxReportSaleRow = {
+  bidId: number;
+  artworkId: number;
+  artworkTitle: string;
+  bidderId: string;
+  capturedAt: Date | null;
+  amount: number;
+  taxableAmount: number;
+  taxAmount: number;
+  taxRate: number;
+  shippingState: string;
+  shippingPostalCode: string;
+  shippingCity: string;
+  taxJurisdiction: string;
+  stripePaymentIntentId: string | null;
+  stripeTaxTransactionId: string | null;
+};
+
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   updateUserRole(id: string, role: "artist" | "buyer" | "both" | "admin"): Promise<User>;
@@ -54,6 +91,10 @@ export interface IStorage {
     latestBidAt: Date | null;
     isPaid: boolean;
     holdStatus: HoldStatus;
+    taxAmount: number | null;
+    taxRate: number | null;
+    taxJurisdiction: string | null;
+    capturedAt: Date | null;
   }>>;
   createBid(bid: BidInsertWithStripe): Promise<Bid>;
   updateBidByCheckoutSession(sessionId: string, updates: { holdStatus?: HoldStatus; stripePaymentIntentId?: string }): Promise<Bid | undefined>;
@@ -65,6 +106,10 @@ export interface IStorage {
   getHighestAuthorizedBid(artworkId: number): Promise<Bid | undefined>;
   getOtherAuthorizedBids(artworkId: number, exceptBidId: number): Promise<Bid[]>;
   getAuthorizedBidsOnPaidArtworks(): Promise<Bid[]>;
+  updateBidTaxInfo(paymentIntentId: string, info: BidTaxUpdate): Promise<Bid | undefined>;
+  markBidCaptured(paymentIntentId: string, taxInfo?: BidTaxUpdate): Promise<Bid | undefined>;
+  getTaxReportSummary(opts?: { from?: Date; to?: Date }): Promise<TaxReportRow[]>;
+  getTaxReportSales(opts?: { from?: Date; to?: Date }): Promise<TaxReportSaleRow[]>;
 
   getCharities(): Promise<Charity[]>;
 
@@ -213,28 +258,46 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bids.bidderId, userId))
       .orderBy(desc(bids.createdAt));
 
+    type BidMeta = {
+      amount: number;
+      at: Date | null;
+      status: HoldStatus;
+      taxAmount: number | null;
+      taxRate: number | null;
+      taxJurisdiction: string | null;
+      capturedAt: Date | null;
+    };
     type Entry = {
-      bestValid: { amount: number; at: Date | null; status: HoldStatus } | null;
-      latest: { amount: number; at: Date | null; status: HoldStatus };
+      bestValid: BidMeta | null;
+      latest: BidMeta;
     };
     const map = new Map<number, Entry>();
     for (const bid of userBids) {
       const amount = Number(bid.amount);
       const status = bid.holdStatus as HoldStatus;
       const isValid = status === "authorized" || status === "captured";
+      const meta: BidMeta = {
+        amount,
+        at: bid.createdAt,
+        status,
+        taxAmount: bid.taxAmount != null ? Number(bid.taxAmount) : null,
+        taxRate: bid.taxRate != null ? Number(bid.taxRate) : null,
+        taxJurisdiction: bid.taxJurisdiction ?? null,
+        capturedAt: bid.capturedAt ?? null,
+      };
       const existing = map.get(bid.artworkId);
       if (!existing) {
         map.set(bid.artworkId, {
-          bestValid: isValid ? { amount, at: bid.createdAt, status } : null,
-          latest: { amount, at: bid.createdAt, status },
+          bestValid: isValid ? meta : null,
+          latest: meta,
         });
         continue;
       }
       if (isValid && (!existing.bestValid || amount > existing.bestValid.amount)) {
-        existing.bestValid = { amount, at: bid.createdAt, status };
+        existing.bestValid = meta;
       }
       if (amount > existing.latest.amount) {
-        existing.latest = { amount, at: bid.createdAt, status };
+        existing.latest = meta;
       }
     }
 
@@ -269,6 +332,10 @@ export class DatabaseStorage implements IStorage {
           latestBidAt: headline.at,
           isPaid: !!artwork?.paidAt,
           holdStatus: headline.status,
+          taxAmount: headline.taxAmount,
+          taxRate: headline.taxRate,
+          taxJurisdiction: headline.taxJurisdiction,
+          capturedAt: headline.capturedAt,
         };
       })
     );
@@ -340,19 +407,98 @@ export class DatabaseStorage implements IStorage {
   // The scheduler sweeps these every tick so a transient cancel failure on
   // settlement day doesn't leave a buyer's card held forever.
   async getAuthorizedBidsOnPaidArtworks(): Promise<Bid[]> {
-    return await db.select({
-      id: bids.id,
-      artworkId: bids.artworkId,
-      bidderId: bids.bidderId,
-      amount: bids.amount,
-      stripeCheckoutSessionId: bids.stripeCheckoutSessionId,
-      stripePaymentIntentId: bids.stripePaymentIntentId,
-      holdStatus: bids.holdStatus,
-      createdAt: bids.createdAt,
-    })
+    const rows = await db.select()
       .from(bids)
       .innerJoin(artworks, eq(bids.artworkId, artworks.id))
       .where(and(eq(bids.holdStatus, "authorized"), sql`${artworks.paidAt} IS NOT NULL`));
+    return rows.map(r => r.bids);
+  }
+
+  async updateBidTaxInfo(paymentIntentId: string, info: BidTaxUpdate): Promise<Bid | undefined> {
+    if (Object.keys(info).length === 0) return await this.getBidByPaymentIntent(paymentIntentId);
+    const [updated] = await db.update(bids)
+      .set(info)
+      .where(eq(bids.stripePaymentIntentId, paymentIntentId))
+      .returning();
+    return updated;
+  }
+
+  async markBidCaptured(paymentIntentId: string, taxInfo?: BidTaxUpdate): Promise<Bid | undefined> {
+    const updates: any = { holdStatus: "captured", capturedAt: new Date() };
+    if (taxInfo) Object.assign(updates, taxInfo);
+    const [updated] = await db.update(bids)
+      .set(updates)
+      .where(eq(bids.stripePaymentIntentId, paymentIntentId))
+      .returning();
+    return updated;
+  }
+
+  async getTaxReportSummary(opts?: { from?: Date; to?: Date }): Promise<TaxReportRow[]> {
+    const conditions: any[] = [eq(bids.holdStatus, "captured"), sql`${bids.taxAmount} IS NOT NULL`];
+    if (opts?.from) conditions.push(sql`${bids.capturedAt} >= ${opts.from}`);
+    if (opts?.to) conditions.push(sql`${bids.capturedAt} <= ${opts.to}`);
+    const rows = await db.select({
+      month: sql<string>`to_char(date_trunc('month', ${bids.capturedAt}), 'YYYY-MM')`,
+      state: sql<string>`coalesce(${bids.shippingState}, '')`,
+      taxableAmount: sql<string>`sum(${bids.taxableAmount})`,
+      taxAmount: sql<string>`sum(${bids.taxAmount})`,
+      saleCount: sql<number>`count(*)::int`,
+    })
+      .from(bids)
+      .where(and(...conditions))
+      .groupBy(sql`date_trunc('month', ${bids.capturedAt})`, bids.shippingState)
+      .orderBy(sql`date_trunc('month', ${bids.capturedAt}) desc`, bids.shippingState);
+    return rows.map(r => ({
+      month: r.month || "",
+      state: r.state || "",
+      taxableAmount: Number(r.taxableAmount || 0),
+      taxAmount: Number(r.taxAmount || 0),
+      saleCount: Number(r.saleCount || 0),
+    }));
+  }
+
+  async getTaxReportSales(opts?: { from?: Date; to?: Date }): Promise<TaxReportSaleRow[]> {
+    const conditions: any[] = [eq(bids.holdStatus, "captured"), sql`${bids.taxAmount} IS NOT NULL`];
+    if (opts?.from) conditions.push(sql`${bids.capturedAt} >= ${opts.from}`);
+    if (opts?.to) conditions.push(sql`${bids.capturedAt} <= ${opts.to}`);
+    const rows = await db.select({
+      bidId: bids.id,
+      artworkId: bids.artworkId,
+      artworkTitle: artworks.title,
+      bidderId: bids.bidderId,
+      capturedAt: bids.capturedAt,
+      amount: bids.amount,
+      taxableAmount: bids.taxableAmount,
+      taxAmount: bids.taxAmount,
+      taxRate: bids.taxRate,
+      shippingState: bids.shippingState,
+      shippingPostalCode: bids.shippingPostalCode,
+      shippingCity: bids.shippingCity,
+      taxJurisdiction: bids.taxJurisdiction,
+      stripePaymentIntentId: bids.stripePaymentIntentId,
+      stripeTaxTransactionId: bids.stripeTaxTransactionId,
+    })
+      .from(bids)
+      .innerJoin(artworks, eq(bids.artworkId, artworks.id))
+      .where(and(...conditions))
+      .orderBy(desc(bids.capturedAt));
+    return rows.map(r => ({
+      bidId: r.bidId,
+      artworkId: r.artworkId,
+      artworkTitle: r.artworkTitle,
+      bidderId: r.bidderId,
+      capturedAt: r.capturedAt,
+      amount: Number(r.amount || 0),
+      taxableAmount: Number(r.taxableAmount || 0),
+      taxAmount: Number(r.taxAmount || 0),
+      taxRate: Number(r.taxRate || 0),
+      shippingState: r.shippingState || "",
+      shippingPostalCode: r.shippingPostalCode || "",
+      shippingCity: r.shippingCity || "",
+      taxJurisdiction: r.taxJurisdiction || "",
+      stripePaymentIntentId: r.stripePaymentIntentId,
+      stripeTaxTransactionId: r.stripeTaxTransactionId,
+    }));
   }
 
   async getCharities(): Promise<Charity[]> {

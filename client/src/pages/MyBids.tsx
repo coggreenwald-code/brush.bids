@@ -22,6 +22,27 @@ interface UserBidSummary {
   latestBidAt: string | null;
   isPaid: boolean;
   holdStatus: HoldStatus;
+  taxAmount: number | null;
+  taxRate: number | null;
+  taxJurisdiction: string | null;
+  capturedAt: string | null;
+}
+
+function TaxLine({ bid }: { bid: UserBidSummary }) {
+  if (bid.taxAmount == null || bid.taxAmount <= 0) return null;
+  const total = bid.userHighestBid + bid.taxAmount;
+  return (
+    <div className="mt-2 text-xs space-y-0.5 text-right" data-testid={`text-tax-line-${bid.artworkId}`}>
+      <div className="flex items-center justify-end gap-2 text-white/40">
+        <span>Sales tax{bid.taxJurisdiction ? ` (${bid.taxJurisdiction})` : ""}</span>
+        <span className="font-mono text-emerald-300">+${bid.taxAmount.toFixed(2)}</span>
+      </div>
+      <div className="flex items-center justify-end gap-2 text-white/60">
+        <span>Total charged</span>
+        <span className="font-mono text-white">${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+      </div>
+    </div>
+  );
 }
 
 // Maps the raw bid hold state to user-facing copy. Authorized = card hold
@@ -209,6 +230,7 @@ export default function MyBids() {
                         <p className="text-lg font-mono font-bold text-white">${bid.userHighestBid.toLocaleString()}</p>
                         <Badge className="mt-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">Highest Bidder</Badge>
                         <HoldStatusBadge status={bid.holdStatus} />
+                        <TaxLine bid={bid} />
                       </div>
                     </div>
                   </div>
@@ -309,6 +331,7 @@ export default function MyBids() {
                         <p className="text-sm text-white/40">Winning Bid</p>
                         <p className="text-lg font-mono font-bold text-emerald-400">${bid.userHighestBid.toLocaleString()}</p>
                         <HoldStatusBadge status={bid.holdStatus} />
+                        <TaxLine bid={bid} />
                       </div>
                       {bid.holdStatus === 'authorized' && (
                         <div className="text-right text-xs text-white/40 max-w-[160px]">

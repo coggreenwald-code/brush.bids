@@ -402,6 +402,9 @@ export default function ArtworkDetail() {
                             ))}
                           </div>
                           <p className="text-xs text-white/30 mt-1">Bids in the last 2 minutes automatically extend the auction by 2 minutes to prevent sniping.</p>
+                          <p className="text-xs text-white/30 mt-1" data-testid="text-tax-disclosure">
+                            You'll enter a US shipping address at checkout. Sales tax is calculated by Stripe and added on top of your bid; BrushBids collects and remits it as the marketplace facilitator. Your card is only charged if you win.
+                          </p>
                         </FormItem>
                       )}
                     />

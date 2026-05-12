@@ -7,6 +7,7 @@ import type Stripe from 'stripe';
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
 import { releaseLosingHoldsForArtwork } from './auctionScheduler';
+import { persistTaxFromCheckoutSession, persistTaxIfMissing } from './taxPersistence';
 
 async function ensureBidAuthorized(opts: {
   artworkId: number;
@@ -151,13 +152,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
     const artworkId = Number(session.metadata?.artworkId);
     const bidderId = String(session.metadata?.bidderId || '');
-    // Read amount in dollars from session.amount_total (cents)
-    const amount = (session.amount_total ?? 0) / 100;
+    // Bid amount = pre-tax subtotal (dollars). amount_total now includes tax,
+    // so use amount_subtotal (or fall back to the metadata value we set when
+    // creating the session).
+    const subtotalCents = session.amount_subtotal ?? 0;
+    const metaAmount = Number(session.metadata?.bidAmount || 0);
+    const amount = subtotalCents > 0 ? subtotalCents / 100 : metaAmount;
     if (!artworkId || !bidderId || !amount) {
       console.warn(`bid_hold session ${session.id} missing required metadata`);
       return;
     }
     await ensureBidAuthorized({ artworkId, bidderId, amount, sessionId: session.id, paymentIntentId });
+    await persistTaxFromCheckoutSession(session.id, paymentIntentId);
     return;
   }
 
@@ -189,13 +195,16 @@ async function handleAmountCapturableUpdated(pi: Stripe.PaymentIntent) {
 
 // Mark a bid captured once Stripe confirms the funds have been pulled.
 // The scheduler also writes this state directly when it captures, but this
-// webhook is the source-of-truth fallback.
+// webhook is the source-of-truth fallback. We always run through markBidCaptured
+// (so capturedAt is set) and ensure tax data is persisted before returning.
 async function handlePaymentIntentSucceeded(pi: Stripe.PaymentIntent) {
   const bid = await storage.getBidByPaymentIntent(pi.id);
   if (!bid) return;
-  if (bid.holdStatus === 'captured') return;
-  await storage.updateBidByPaymentIntent(pi.id, { holdStatus: 'captured' });
-  console.log(`Bid ${bid.id} marked captured via payment_intent.succeeded`);
+  await persistTaxIfMissing(bid.stripeCheckoutSessionId, pi.id);
+  if (bid.holdStatus !== 'captured' || bid.capturedAt == null) {
+    await storage.markBidCaptured(pi.id);
+    console.log(`Bid ${bid.id} marked captured via payment_intent.succeeded`);
+  }
 }
 
 async function handleCheckoutExpired(session: Stripe.Checkout.Session) {

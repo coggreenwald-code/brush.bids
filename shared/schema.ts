@@ -54,10 +54,28 @@ export const bids = pgTable("bids", {
   holdStatus: holdStatusEnum("hold_status").default("pending").notNull(),
   stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
   stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+  // Sales-tax columns. Populated by the Stripe Tax automatic-tax flow once the
+  // buyer completes Checkout (for the persisted shipping address) and finalized
+  // when the auction settles. taxJurisdiction stores e.g. "NY-10024" (state +
+  // postal). taxRate is the effective combined percent (state + locality).
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }),
+  taxRate: decimal("tax_rate", { precision: 6, scale: 4 }),
+  taxJurisdiction: text("tax_jurisdiction"),
+  taxableAmount: decimal("taxable_amount", { precision: 10, scale: 2 }),
+  // Stripe Tax audit reference. Holds the Stripe Tax Transaction id when we
+  // can resolve one (created automatically by Checkout's automatic_tax flow).
+  // Falls back to the Checkout Session id, which uniquely identifies the same
+  // taxable event in the Stripe Tax dashboard.
+  stripeTaxTransactionId: text("stripe_tax_transaction_id"),
+  shippingState: text("shipping_state"),
+  shippingPostalCode: text("shipping_postal_code"),
+  shippingCity: text("shipping_city"),
+  capturedAt: timestamp("captured_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("idx_bids_pi").on(table.stripePaymentIntentId),
   index("idx_bids_session").on(table.stripeCheckoutSessionId),
+  index("idx_bids_captured_at").on(table.capturedAt),
 ]);
 
 export const charities = pgTable("charities", {

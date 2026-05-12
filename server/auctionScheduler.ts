@@ -4,6 +4,7 @@
 
 import { storage } from "./storage";
 import { getUncachableStripeClient } from "./stripeClient";
+import { persistTaxIfMissing } from "./taxPersistence";
 
 let inFlight = false;
 const noWinnerLogged = new Set<number>();
@@ -73,10 +74,23 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
   while (true) {
     if (!currentWinner.stripePaymentIntentId) return false;
     try {
-      await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId);
-      await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "captured" });
+      // Recompute application_fee at capture time so the platform retains
+      // (its pre-tax cut) + (collected sales tax). Artist payout stays based
+      // on the pre-tax bid.
+      const piBefore = await stripe.paymentIntents.retrieve(currentWinner.stripePaymentIntentId);
+      const totalCents = piBefore.amount;
+      const bidCents = Math.round(Number(currentWinner.amount) * 100);
+      const taxCents = Math.max(0, totalCents - bidCents);
+      const baseFeeCents = Number(piBefore.metadata?.baseAppFeeCents || 0)
+        || Math.round(bidCents * 0.25);
+      const captureFeeCents = Math.min(totalCents, baseFeeCents + taxCents);
+      await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId, {
+        application_fee_amount: captureFeeCents,
+      });
+      await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId);
+      await storage.markBidCaptured(currentWinner.stripePaymentIntentId);
       await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
-      console.log(`[scheduler] captured winning bid ${currentWinner.id} for artwork ${artworkId}`);
+      console.log(`[scheduler] captured winning bid ${currentWinner.id} for artwork ${artworkId} (bid ${bidCents}c + tax ${taxCents}c)`);
       break;
     } catch (err: any) {
       if (err?.code !== "payment_intent_unexpected_state") throw err;
@@ -84,7 +98,8 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
       // the actual PI status before deciding.
       const pi = await stripe.paymentIntents.retrieve(currentWinner.stripePaymentIntentId);
       if (pi.status === "succeeded") {
-        await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "captured" });
+        await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId);
+        await storage.markBidCaptured(currentWinner.stripePaymentIntentId);
         await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
         break;
       }

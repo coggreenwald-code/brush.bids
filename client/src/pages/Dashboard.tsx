@@ -850,6 +850,13 @@ export default function Dashboard() {
                 Boost your listings to get more visibility! Promoted artworks appear first in the gallery and attract more bidders.
               </p>
             </div>
+
+            <div className="rounded-lg p-5 border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-transparent" data-testid="card-tax-info">
+              <h3 className="text-emerald-300 font-semibold mb-2">Sales Tax — Handled For You</h3>
+              <p className="text-white/60 text-sm">
+                BrushBids is the marketplace facilitator for your sales. Stripe Tax calculates US sales tax based on the buyer's shipping address and we collect &amp; remit it for you. Your 75% payout is always based on the pre-tax winning bid.
+              </p>
+            </div>
           </div>
         </div>
       </div>

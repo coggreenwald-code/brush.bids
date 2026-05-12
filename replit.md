@@ -29,6 +29,7 @@ Key features:
 - SEOHead component updates document.title, meta description, OG tags (title/description/url/image), Twitter tags, and canonical URL per page
 - FAQ page has FAQPage JSON-LD structured data for Google rich results, brand-targeting questions ("What is BrushBids?", "Who founded BrushBids?", "Is BrushBids free to use?")
 - Internal linking between About, FAQ, and Gallery pages for SEO authority distribution
+- Stripe Tax marketplace-facilitator flow: Checkout collects US shipping address, `automatic_tax` enabled, tax added on top of bid (`tax_behavior: 'exclusive'`), tax persisted on bid row (taxAmount/taxRate/taxJurisdiction/taxableAmount + ship-to address), application_fee_amount recomputed at capture so platform retains pre-tax cut + tax (artist payout stays based on pre-tax bid). Admin "Tax Collected" tab shows by-state and by-month breakdown with CSV export at `/api/admin/tax-report.csv`. FAQ + Dashboard explain that BrushBids files; artists never handle sales tax.
 
 ### Anti-Sniping Auction System
 - Artworks have a configurable auction duration (1, 3, 5, 7, 14, or 30 days)

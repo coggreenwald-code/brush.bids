@@ -331,20 +331,41 @@ export async function registerRoutes(
         payment_method_types: ['card'],
         mode: 'payment',
         customer_email: (req.user as any).email || undefined,
+        // Stripe Tax requires a customer record for address-based calculation.
+        customer_creation: 'always',
+        // Buyer must enter a US ship-to address before paying so Stripe Tax
+        // can determine sales-tax obligation per the marketplace facilitator
+        // rules. Tax registrations are configured in the Stripe Dashboard;
+        // jurisdictions with no registration return $0 tax.
+        billing_address_collection: 'required',
+        shipping_address_collection: { allowed_countries: ['US'] },
+        automatic_tax: { enabled: true },
         line_items: [{
           price_data: {
             currency: 'usd',
             product_data: {
               name: `Bid hold: ${artwork.title}`,
-              description: `Card authorization for your bid on "${artwork.title}". Your card will only be charged if you win the auction.`,
+              description: `Card authorization for your bid on "${artwork.title}". Your card will only be charged if you win the auction. Sales tax shown below is collected by BrushBids as the marketplace facilitator.`,
               images: artwork.imageUrl ? [artwork.imageUrl] : [],
+              // General tangible goods. Stripe Tax matches this to state-level
+              // sales-tax rules. Override per artwork later if we add digital
+              // or service categories.
+              tax_code: 'txcd_99999999',
             },
             unit_amount: amountCents,
+            // Tax is added on top of the bid (exclusive). The bid amount the
+            // artist sees, the application fee, and the transfer split are all
+            // computed against the pre-tax bid.
+            tax_behavior: 'exclusive',
           },
           quantity: 1,
         }],
         payment_intent_data: {
           capture_method: 'manual',
+          // appFeeCents covers ONLY the platform's pre-tax cut. The auction
+          // scheduler updates application_fee_amount at capture time to also
+          // retain the collected tax on the platform account (the artist
+          // payout stays based on the pre-tax bid).
           application_fee_amount: appFeeCents,
           transfer_data: { destination: artist.stripeAccountId },
           metadata: {
@@ -352,12 +373,15 @@ export async function registerRoutes(
             artworkId: String(artwork.id),
             bidderId,
             bidAmount: String(input.amount),
+            baseAppFeeCents: String(appFeeCents),
           },
         },
         metadata: {
           kind: 'bid_hold',
           artworkId: String(artwork.id),
           bidderId,
+          bidAmount: String(input.amount),
+          baseAppFeeCents: String(appFeeCents),
         },
         // Bound to min(auctionEnd, now+24h), clamped to Stripe's 30-min min.
         expires_at: Math.max(
@@ -794,6 +818,123 @@ export async function registerRoutes(
     } catch (err: any) {
       console.error("Auction settle failed:", err);
       res.status(500).json({ message: err.message });
+    }
+  });
+
+  // ─── Admin: Sales-tax reporting ──────────────────────────────────────────
+  // Returns aggregated tax collected (by state and month) for captured bids,
+  // plus an optional CSV export. Used by the admin Tax Collected tab to back
+  // marketplace-facilitator filings.
+  async function requireAdmin(req: any, res: any): Promise<boolean> {
+    if (!req.user) {
+      res.status(401).json({ message: "Not authenticated" });
+      return false;
+    }
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== "admin") {
+      res.status(403).json({ message: "Admin only" });
+      return false;
+    }
+    return true;
+  }
+
+  function parseTaxRange(req: any): { from?: Date; to?: Date } {
+    const out: { from?: Date; to?: Date } = {};
+    if (req.query.from) {
+      const d = new Date(String(req.query.from));
+      if (!isNaN(d.getTime())) out.from = d;
+    }
+    if (req.query.to) {
+      const raw = String(req.query.to);
+      const d = new Date(raw);
+      if (!isNaN(d.getTime())) {
+        // Treat YYYY-MM-DD as inclusive end-of-day so same-day sales aren't
+        // dropped from the report when the user picks today's date.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+          d.setUTCHours(23, 59, 59, 999);
+        }
+        out.to = d;
+      }
+    }
+    return out;
+  }
+
+  app.get("/api/admin/tax-report", async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    const range = parseTaxRange(req);
+    try {
+      const [summary, sales] = await Promise.all([
+        storage.getTaxReportSummary(range),
+        storage.getTaxReportSales(range),
+      ]);
+      const totals = sales.reduce(
+        (acc, s) => {
+          acc.taxableAmount += s.taxableAmount;
+          acc.taxAmount += s.taxAmount;
+          acc.saleCount += 1;
+          return acc;
+        },
+        { taxableAmount: 0, taxAmount: 0, saleCount: 0 },
+      );
+      res.json({ summary, sales, totals });
+    } catch (err: any) {
+      console.error("Tax report failed:", err);
+      res.status(500).json({ message: err.message || "Failed to load tax report" });
+    }
+  });
+
+  app.get("/api/admin/tax-report.csv", async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    const range = parseTaxRange(req);
+    try {
+      const sales = await storage.getTaxReportSales(range);
+      const header = [
+        "captured_at",
+        "bid_id",
+        "artwork_id",
+        "artwork_title",
+        "bidder_id",
+        "shipping_state",
+        "shipping_city",
+        "shipping_postal_code",
+        "tax_jurisdiction",
+        "taxable_amount",
+        "tax_amount",
+        "tax_rate_percent",
+        "stripe_payment_intent_id",
+        "stripe_tax_transaction_id",
+      ];
+      const escape = (v: unknown) => {
+        const s = v == null ? "" : String(v);
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const lines = [header.join(",")];
+      for (const s of sales) {
+        lines.push([
+          s.capturedAt ? s.capturedAt.toISOString() : "",
+          s.bidId,
+          s.artworkId,
+          s.artworkTitle,
+          s.bidderId,
+          s.shippingState,
+          s.shippingCity,
+          s.shippingPostalCode,
+          s.taxJurisdiction,
+          s.taxableAmount.toFixed(2),
+          s.taxAmount.toFixed(2),
+          s.taxRate.toFixed(4),
+          s.stripePaymentIntentId || "",
+          s.stripeTaxTransactionId || "",
+        ].map(escape).join(","));
+      }
+      const filename = `brushbids-tax-${new Date().toISOString().slice(0, 10)}.csv`;
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.send(lines.join("\n"));
+    } catch (err: any) {
+      console.error("Tax CSV export failed:", err);
+      res.status(500).json({ message: err.message || "Failed to export tax CSV" });
     }
   });
 

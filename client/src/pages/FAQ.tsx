@@ -28,6 +28,10 @@ export default function FAQ() {
       answer: "Once your artwork sells on BrushBids and the buyer completes payment, your earnings are deposited to your connected payment account within 5-7 business days.",
     },
     {
+      question: "Do I need to handle US sales tax on my sales?",
+      answer: "No. BrushBids operates as the marketplace facilitator and uses Stripe Tax to calculate, collect, and remit US sales tax to each state on your behalf. Your payout is always based on your pre-tax winning bid — the tax the buyer pays does not come out of your 75% share. You'll see the pre-tax sale amount on your earnings dashboard.",
+    },
+    {
       question: "What happens if my artwork is rejected?",
       answer: "You'll receive detailed feedback from our curators explaining why. Common reasons include image quality issues, incomplete descriptions, or technique areas needing improvement. You can always resubmit after making adjustments.",
     },
@@ -41,6 +45,10 @@ export default function FAQ() {
     {
       question: "What payment methods are accepted?",
       answer: "BrushBids accepts all major credit cards, debit cards, and PayPal through our secure payment processor. Payment is collected when you win an auction.",
+    },
+    {
+      question: "Will I be charged sales tax?",
+      answer: "If your shipping address is in a US state where BrushBids is required to collect sales tax, the appropriate tax will be calculated by Stripe and added on top of your winning bid at checkout. As the marketplace facilitator, BrushBids collects and remits the tax to the relevant authorities — artists do not need to handle sales tax themselves. Your tax is shown as a separate line on your receipt.",
     },
     {
       question: "How is artwork delivered?",
