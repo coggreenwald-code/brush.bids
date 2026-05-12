@@ -269,7 +269,7 @@ export const api = {
       method: 'POST' as const,
       path: '/api/portfolio/:id/convert-to-auction',
       input: z.object({
-        auctionDurationDays: z.coerce.number().min(1).max(7).default(7),
+        auctionDurationDays: z.coerce.number().refine(v => [1, 3, 5, 7].includes(v), { message: "Auction duration must be 1, 3, 5, or 7 days" }).default(7),
         charityId: z.coerce.number().optional(),
         reviewType: z.enum(["ai_instant", "human_curator"]).default("ai_instant"),
       }),

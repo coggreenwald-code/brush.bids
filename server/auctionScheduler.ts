@@ -8,17 +8,19 @@ import { getUncachableStripeClient } from "./stripeClient";
 let inFlight = false;
 const noWinnerLogged = new Set<number>();
 
-export async function settleEndedAuctions(): Promise<{ settled: number; errors: number }> {
-  if (inFlight) return { settled: 0, errors: 0 };
+export async function settleEndedAuctions(): Promise<{ processed: number; captured: number; errors: number }> {
+  if (inFlight) return { processed: 0, captured: 0, errors: 0 };
   inFlight = true;
-  let settled = 0;
+  let processed = 0;
+  let captured = 0;
   let errors = 0;
   try {
     const ended = await storage.getEndedAuctionsAwaitingCapture();
     for (const artwork of ended) {
+      processed++;
       try {
-        await settleArtwork(artwork.id);
-        settled++;
+        const didCapture = await settleArtwork(artwork.id);
+        if (didCapture) captured++;
       } catch (err) {
         errors++;
         console.error(`[scheduler] failed to settle artwork ${artwork.id}:`, err);
@@ -33,7 +35,7 @@ export async function settleEndedAuctions(): Promise<{ settled: number; errors: 
   } finally {
     inFlight = false;
   }
-  return { settled, errors };
+  return { processed, captured, errors };
 }
 
 async function releaseLingeringLosingHolds(): Promise<void> {
@@ -52,9 +54,9 @@ async function releaseLingeringLosingHolds(): Promise<void> {
   }
 }
 
-async function settleArtwork(artworkId: number): Promise<void> {
+async function settleArtwork(artworkId: number): Promise<boolean> {
   const artwork = await storage.getArtwork(artworkId);
-  if (!artwork || artwork.paidAt) return;
+  if (!artwork || artwork.paidAt) return false;
 
   const winningBid = await storage.getHighestAuthorizedBid(artworkId);
   if (!winningBid || !winningBid.stripePaymentIntentId) {
@@ -62,14 +64,14 @@ async function settleArtwork(artworkId: number): Promise<void> {
       noWinnerLogged.add(artworkId);
       console.log(`[scheduler] artwork ${artworkId} ended with no authorized bids yet`);
     }
-    return;
+    return false;
   }
   noWinnerLogged.delete(artworkId);
 
   const stripe = await getUncachableStripeClient();
   let currentWinner = winningBid;
   while (true) {
-    if (!currentWinner.stripePaymentIntentId) return;
+    if (!currentWinner.stripePaymentIntentId) return false;
     try {
       await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId);
       await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "captured" });
@@ -89,7 +91,7 @@ async function settleArtwork(artworkId: number): Promise<void> {
       console.warn(`[scheduler] bid ${currentWinner.id} not capturable (${pi.status}); falling back`);
       await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "failed" });
       const next = await storage.getHighestAuthorizedBid(artworkId);
-      if (!next || next.id === currentWinner.id) return;
+      if (!next || next.id === currentWinner.id) return false;
       currentWinner = next;
     }
   }
@@ -105,6 +107,7 @@ async function settleArtwork(artworkId: number): Promise<void> {
       console.error(`[scheduler] failed to release losing bid ${bid.id}:`, err);
     }
   }
+  return true;
 }
 
 let timer: NodeJS.Timeout | null = null;

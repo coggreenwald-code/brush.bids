@@ -27,7 +27,7 @@ const formSchema = z.object({
   price: z.coerce.number().min(1, "Price must be positive"),
   dimensionLength: z.coerce.number().min(0.1, "Length is required"),
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
-  auctionDurationDays: z.coerce.number().min(1).max(7).default(7),
+  auctionDurationDays: z.coerce.number().refine(v => [1, 3, 5, 7].includes(v), { message: "Auction duration must be 1, 3, 5, or 7 days" }).default(7),
   charityId: z.coerce.number().optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
 });

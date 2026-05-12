@@ -98,9 +98,9 @@ export async function registerRoutes(
       }
       // Card-authorization holds expire at 7 days, so new listings can't
       // outlive that. Existing 14/30-day artworks are unaffected.
-      if ((input.auctionDurationDays ?? 7) > 7) {
+      if (![1, 3, 5, 7].includes(input.auctionDurationDays ?? 7)) {
         return res.status(400).json({
-          message: "Auction duration cannot exceed 7 days.",
+          message: "Auction duration must be 1, 3, 5, or 7 days.",
           field: "auctionDurationDays",
         });
       }
