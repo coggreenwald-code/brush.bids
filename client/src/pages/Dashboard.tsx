@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useArtworks } from "@/hooks/use-artworks";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StripeConnectPanel from "@/components/StripeConnectPanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -308,6 +309,10 @@ export default function Dashboard() {
             </Link>
           )}
         </div>
+
+        {(user.role === "artist" || user.role === "both") && (
+          <StripeConnectPanel />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">

@@ -349,19 +349,10 @@ export default function MyBids() {
                         <Badge className={`mt-1 ${bid.isPaid ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-[#A78BFA]/20 text-[#A78BFA] border border-[#A78BFA]/20'}`}>{bid.isPaid ? 'Paid' : 'Won'}</Badge>
                       </div>
                       {!bid.isPaid && (
-                        <Button 
-                          onClick={() => handlePayNow(bid.artworkId)}
-                          disabled={processingPayment === bid.artworkId}
-                          className="rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90"
-                          data-testid={`button-pay-${bid.artworkId}`}
-                        >
-                          {processingPayment === bid.artworkId ? (
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          ) : (
-                            <CreditCard className="w-4 h-4 mr-2" />
-                          )}
-                          Pay Now
-                        </Button>
+                        <div className="text-right text-xs text-white/40 max-w-[160px]">
+                          Charging your card on file…<br />
+                          You'll get a receipt by email.
+                        </div>
                       )}
                     </div>
                   </div>

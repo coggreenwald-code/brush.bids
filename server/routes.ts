@@ -5,7 +5,7 @@ import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
-import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
+import { getUncachableStripeClient, getStripePublishableKey, getAppOrigin } from "./stripeClient";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -248,22 +248,25 @@ export async function registerRoutes(
     res.json(bids);
   });
 
+  // Bids — creates a Stripe Checkout Session that places a CARD AUTHORIZATION HOLD.
+  // The bid is recorded immediately as `pending`; the webhook flips it to `authorized` once
+  // Stripe confirms the hold. Auction end auto-captures the winning hold and releases losers.
   app.post(api.bids.create.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "You must be signed in to bid" });
+    }
     try {
       const input = api.bids.create.input.parse(req.body);
-      
+      const bidderId = (req.user as any).id || (req.user as any).claims?.sub;
+      if (input.bidderId !== bidderId) {
+        return res.status(403).json({ message: "Bid bidder mismatch" });
+      }
+
       const artwork = await storage.getArtwork(input.artworkId);
-      if (!artwork) {
-        return res.status(404).json({ message: "Artwork not found" });
-      }
-      
-      if (artwork.status !== "approved") {
-        return res.status(400).json({ message: "Bidding is not open for this artwork" });
-      }
-      
-      if (artwork.paidAt) {
-        return res.status(400).json({ message: "This artwork has already been sold" });
-      }
+      if (!artwork) return res.status(404).json({ message: "Artwork not found" });
+      if (artwork.status !== "approved") return res.status(400).json({ message: "Bidding is not open for this artwork" });
+      if (artwork.paidAt) return res.status(400).json({ message: "This artwork has already been sold" });
+      if (artwork.artistId === bidderId) return res.status(400).json({ message: "You cannot bid on your own artwork" });
 
       const now = new Date();
       let auctionEndTime: Date;
@@ -271,38 +274,91 @@ export async function registerRoutes(
         auctionEndTime = new Date(artwork.endTime);
       } else {
         auctionEndTime = new Date(artwork.createdAt || now);
-        auctionEndTime.setDate(auctionEndTime.getDate() + (artwork.auctionDurationDays || 7));
+        auctionEndTime.setDate(auctionEndTime.getDate() + Math.min(artwork.auctionDurationDays || 7, 7));
       }
-      
-      if (now >= auctionEndTime) {
-        return res.status(400).json({ message: "This auction has ended" });
-      }
+      if (now >= auctionEndTime) return res.status(400).json({ message: "This auction has ended" });
 
-      const existingBids = await storage.getBidsForArtwork(input.artworkId);
-      const currentHighest = existingBids.length > 0 ? Math.max(...existingBids.map(b => Number(b.amount))) : Number(artwork.price);
+      // Highest active (authorized) bid sets the floor — we ignore canceled/failed/pending holds
+      const existingBids = await storage.getAuthorizedBidsForArtwork(input.artworkId);
+      const currentHighest = existingBids.length > 0
+        ? Math.max(...existingBids.map(b => Number(b.amount)))
+        : Number(artwork.price);
       if (Number(input.amount) <= currentHighest) {
         return res.status(400).json({ message: `Bid must be higher than the current price of $${currentHighest}` });
       }
 
-      const bid = await storage.createBid(input);
-
-      const ANTI_SNIPE_WINDOW_MS = 2 * 60 * 1000;
-      const timeRemaining = auctionEndTime.getTime() - now.getTime();
-      if (timeRemaining < ANTI_SNIPE_WINDOW_MS) {
-        const newEndTime = new Date(now.getTime() + ANTI_SNIPE_WINDOW_MS);
-        await storage.extendAuctionEndTime(artwork.id, newEndTime);
-        return res.status(201).json({ ...bid, auctionExtended: true, newEndTime: newEndTime.toISOString() });
-      }
-
-      res.status(201).json(bid);
-    } catch (err) {
-      if (err instanceof z.ZodError) {
+      // Verify the artist has finished Stripe Connect onboarding (we need their account
+      // ID for the destination charge so they can actually receive payout).
+      const artist = await storage.getUser(artwork.artistId);
+      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete) {
         return res.status(400).json({
-          message: err.errors[0].message,
-          field: err.errors[0].path.join('.'),
+          message: "This artist has not completed payout setup yet. Please try again later.",
         });
       }
-      throw err;
+
+      const stripe = await getUncachableStripeClient();
+      const amountCents = Math.round(Number(input.amount) * 100);
+      // 25% application fee → platform retains 25, charity 5% paid manually from that pool
+      const appFeeCents = Math.round(amountCents * 0.25);
+
+      const origin = getAppOrigin();
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'payment',
+        customer_email: (req.user as any).email || undefined,
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Bid hold: ${artwork.title}`,
+              description: `Card authorization for your bid on "${artwork.title}". Your card will only be charged if you win the auction.`,
+              images: artwork.imageUrl ? [artwork.imageUrl] : [],
+            },
+            unit_amount: amountCents,
+          },
+          quantity: 1,
+        }],
+        payment_intent_data: {
+          capture_method: 'manual',
+          application_fee_amount: appFeeCents,
+          transfer_data: { destination: artist.stripeAccountId },
+          metadata: {
+            kind: 'bid_hold',
+            artworkId: String(artwork.id),
+            bidderId,
+            bidAmount: String(input.amount),
+          },
+        },
+        metadata: {
+          kind: 'bid_hold',
+          artworkId: String(artwork.id),
+          bidderId,
+        },
+        success_url: `${origin}/artwork/${artwork.id}?bid=success&amount=${input.amount}`,
+        cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
+      });
+
+      // Record the pending bid with the session ID so the webhook can find it.
+      const bid = await storage.createBid({
+        ...input,
+        holdStatus: "pending",
+        stripeCheckoutSessionId: session.id,
+      } as any);
+
+      // NOTE: anti-snipe extension is applied in the webhook when the bid is
+      // *authorized* — not on bid attempt — so spammy unfinished checkouts
+      // can't be used to extend the auction indefinitely.
+
+      res.status(201).json({
+        ...bid,
+        checkoutUrl: session.url,
+      });
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      console.error("Bid hold creation failed:", err);
+      res.status(500).json({ message: err.message || "Failed to create bid hold" });
     }
   });
 
@@ -603,7 +659,91 @@ export async function registerRoutes(
     }
   });
 
-  // Stripe Payment Routes
+  // ─── Stripe Connect (artist payout onboarding) ───────────────────────────
+  app.get("/api/stripe/connect/status", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    const user = await storage.getUser(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({
+      hasAccount: !!user.stripeAccountId,
+      onboardingComplete: !!user.stripeOnboardingComplete,
+      payoutsEnabled: !!user.stripePayoutsEnabled,
+    });
+  });
+
+  app.post("/api/stripe/connect/onboard", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    const user = await storage.getUser(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    try {
+      const stripe = await getUncachableStripeClient();
+      let accountId = user.stripeAccountId;
+
+      if (!accountId) {
+        const account = await stripe.accounts.create({
+          type: 'standard',
+          email: user.email || undefined,
+          metadata: { userId: user.id },
+        });
+        accountId = account.id;
+        await storage.setUserStripeAccount(user.id, accountId);
+      }
+
+      const origin = getAppOrigin();
+      const link = await stripe.accountLinks.create({
+        account: accountId,
+        refresh_url: `${origin}/dashboard?stripe=refresh`,
+        return_url: `${origin}/dashboard?stripe=return`,
+        type: 'account_onboarding',
+      });
+      res.json({ url: link.url });
+    } catch (err: any) {
+      console.error("Stripe Connect onboarding failed:", err);
+      res.status(500).json({ message: err.message || "Failed to start onboarding" });
+    }
+  });
+
+  // Refresh status from Stripe — called when user returns from onboarding
+  app.post("/api/stripe/connect/refresh-status", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    const user = await storage.getUser(userId);
+    if (!user?.stripeAccountId) return res.status(400).json({ message: "No Stripe account" });
+
+    try {
+      const stripe = await getUncachableStripeClient();
+      const account = await stripe.accounts.retrieve(user.stripeAccountId);
+      const onboardingComplete = !!account.details_submitted;
+      const payoutsEnabled = !!account.payouts_enabled;
+      await storage.updateUserStripeStatus(user.id, { onboardingComplete, payoutsEnabled });
+      res.json({ onboardingComplete, payoutsEnabled });
+    } catch (err: any) {
+      console.error("Stripe status refresh failed:", err);
+      res.status(500).json({ message: err.message || "Failed to refresh status" });
+    }
+  });
+
+  // Manual trigger to settle ended auctions (also runs on a 60s interval).
+  // Admin-only — buyers/artists must never be able to trigger Stripe API churn.
+  app.post("/api/auctions/settle", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    const user = await storage.getUser(userId);
+    if (user?.role !== "admin") return res.status(403).json({ message: "Admin only" });
+    try {
+      const { settleEndedAuctions } = await import("./auctionScheduler");
+      const result = await settleEndedAuctions();
+      res.json(result);
+    } catch (err: any) {
+      console.error("Auction settle failed:", err);
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  // ─── Stripe Payment Routes ───────────────────────────────────────────────
   app.get("/api/stripe/publishable-key", async (req, res) => {
     try {
       const publishableKey = await getStripePublishableKey();
@@ -615,6 +755,15 @@ export async function registerRoutes(
   });
 
   app.post("/api/checkout/artwork/:artworkId", async (req, res) => {
+    // DEPRECATED: legacy "Pay Now after auction ends" flow. Bids are now
+    // pre-authorized via the bid hold flow and captured automatically by the
+    // scheduler when the auction ends, so this endpoint is intentionally
+    // disabled to avoid double-charging or bypassing the hold/capture model.
+    return res.status(410).json({
+      message: "This payment flow has been replaced. Winning bids are now charged automatically when the auction ends.",
+    });
+
+    // eslint-disable-next-line no-unreachable
     if (!req.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }

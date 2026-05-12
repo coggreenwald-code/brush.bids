@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, jsonb, pgTable, timestamp, varchar, text, pgEnum } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, timestamp, varchar, text, pgEnum } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["artist", "buyer", "both", "admin"]);
 
@@ -27,6 +27,9 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   hasCompletedOnboarding: timestamp("has_completed_onboarding"),
+  stripeAccountId: varchar("stripe_account_id"),
+  stripeOnboardingComplete: boolean("stripe_onboarding_complete").default(false).notNull(),
+  stripePayoutsEnabled: boolean("stripe_payouts_enabled").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

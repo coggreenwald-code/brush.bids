@@ -14,9 +14,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useRef, useCallback } from "react";
+import { Link } from "wouter";
+import { Wallet } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title too short"),
@@ -25,7 +27,7 @@ const formSchema = z.object({
   price: z.coerce.number().min(1, "Price must be positive"),
   dimensionLength: z.coerce.number().min(0.1, "Length is required"),
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
-  auctionDurationDays: z.coerce.number().min(1).max(30).default(7),
+  auctionDurationDays: z.coerce.number().min(1).max(7).default(7),
   charityId: z.coerce.number().optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
 });
@@ -35,6 +37,11 @@ export default function SubmitArtwork() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createArtwork = useCreateArtwork();
+  const { data: connectStatus } = useQuery<{ hasAccount: boolean; onboardingComplete: boolean; payoutsEnabled: boolean }>({
+    queryKey: ["/api/stripe/connect/status"],
+    enabled: !!user,
+  });
+  const needsConnect = !!user && (!connectStatus?.onboardingComplete || !connectStatus?.payoutsEnabled);
   const { data: charities } = useCharities();
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -304,8 +311,6 @@ export default function SubmitArtwork() {
                           <SelectItem value="3">3 Days</SelectItem>
                           <SelectItem value="5">5 Days</SelectItem>
                           <SelectItem value="7">7 Days</SelectItem>
-                          <SelectItem value="14">14 Days</SelectItem>
-                          <SelectItem value="30">30 Days</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -554,11 +559,28 @@ export default function SubmitArtwork() {
                 )}
               />
 
+              {needsConnect && (
+                <div className="rounded-xl border border-[#A78BFA]/20 bg-[#A78BFA]/5 p-4 flex items-start gap-3" data-testid="alert-connect-required">
+                  <Wallet className="w-5 h-5 text-[#A78BFA] mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-white">Connect Stripe to receive payouts</p>
+                    <p className="text-xs text-white/60 mt-1">
+                      You need to finish payout setup before submitting artwork. This is a one-time step that lets us send your share to your bank when you sell.
+                    </p>
+                    <Link href="/dashboard">
+                      <Button size="sm" className="mt-3 rounded-full bg-white text-[#0a0a0f] hover:bg-white/90" data-testid="button-go-onboard">
+                        Set up payouts
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               <Button
                 type="submit"
                 size="lg"
                 className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90"
-                disabled={createArtwork.isPending}
+                disabled={createArtwork.isPending || needsConnect}
                 data-testid="button-submit-artwork"
               >
                 {createArtwork.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

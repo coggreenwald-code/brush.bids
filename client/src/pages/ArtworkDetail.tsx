@@ -139,16 +139,26 @@ export default function ArtworkDetail() {
       amount: amount.toString(),
     }, {
       onSuccess: (data: any) => {
-        if (data?.auctionExtended) {
-          toast({ 
-            title: "Bid Placed + Time Extended!", 
-            description: `You bid $${amount}. The auction was extended by 2 minutes due to last-minute bidding.` 
+        // If the server returned a checkoutUrl, the hook redirects automatically.
+        // Otherwise (rare) we just notify the user the bid was recorded.
+        if (data?.checkoutUrl) {
+          toast({
+            title: "Securing your bid...",
+            description: "Redirecting to checkout to authorize a card hold for $" + amount,
+          });
+        } else if (data?.auctionExtended) {
+          toast({
+            title: "Bid Placed + Time Extended!",
+            description: `You bid $${amount}. The auction was extended by 2 minutes due to last-minute bidding.`,
           });
         } else {
           toast({ title: "Bid Placed!", description: `You successfully bid $${amount}` });
         }
         form.reset();
-      }
+      },
+      onError: (err: Error) => {
+        toast({ title: "Bid failed", description: err.message, variant: "destructive" });
+      },
     });
   };
 

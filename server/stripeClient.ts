@@ -65,6 +65,14 @@ export async function getStripeSecretKey() {
   return secretKey;
 }
 
+export function getAppOrigin(): string {
+  const isProduction = process.env.REPLIT_DEPLOYMENT === '1';
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0];
+  if (isProduction && domain) return `https://${domain}`;
+  if (domain) return `https://${domain}`;
+  return 'http://localhost:5000';
+}
+
 let stripeSync: any = null;
 
 export async function getStripeSync() {

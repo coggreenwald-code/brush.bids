@@ -123,6 +123,8 @@ app.use((req, res, next) => {
 (async () => {
   await initStripe();
   await registerRoutes(httpServer, app);
+  const { startAuctionScheduler } = await import("./auctionScheduler");
+  startAuctionScheduler();
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

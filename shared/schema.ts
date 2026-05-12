@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, decimal, pgEnum, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, decimal, pgEnum, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { users, roleEnum } from "./models/auth";
@@ -8,6 +8,7 @@ export * from "./models/chat";
 
 export const statusEnum = pgEnum("status", ["pending", "approved", "rejected"]);
 export const reviewTypeEnum = pgEnum("review_type", ["ai_instant", "human_curator"]);
+export const holdStatusEnum = pgEnum("hold_status", ["pending", "authorized", "captured", "canceled", "failed"]);
 
 export const artworks = pgTable("artworks", {
   id: serial("id").primaryKey(),
@@ -50,8 +51,14 @@ export const bids = pgTable("bids", {
   artworkId: integer("artwork_id").references(() => artworks.id).notNull(),
   bidderId: varchar("bidder_id").references(() => users.id).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  holdStatus: holdStatusEnum("hold_status").default("pending").notNull(),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  index("idx_bids_pi").on(table.stripePaymentIntentId),
+  index("idx_bids_session").on(table.stripeCheckoutSessionId),
+]);
 
 export const charities = pgTable("charities", {
   id: serial("id").primaryKey(),
@@ -65,7 +72,7 @@ export const charities = pgTable("charities", {
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true, createdAt: true, endTime: true, aiScore: true, aiFeedback: true, status: true });
-export const insertBidSchema = createInsertSchema(bids).omit({ id: true, createdAt: true });
+export const insertBidSchema = createInsertSchema(bids).omit({ id: true, createdAt: true, holdStatus: true, stripeCheckoutSessionId: true, stripePaymentIntentId: true });
 export const insertCharitySchema = createInsertSchema(charities).omit({ id: true });
 export const insertPortfolioItemSchema = createInsertSchema(portfolioItems).omit({ id: true, createdAt: true, listedForSale: true, listedAt: true });
 

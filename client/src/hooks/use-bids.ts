@@ -33,11 +33,17 @@ export function usePlaceBid() {
         }
         throw new Error('Failed to place bid');
       }
-      return await res.json();
+      const json = await res.json();
+      // Redirect to Stripe Checkout to capture the card hold; the bid will be
+      // marked authorized via webhook when the user finishes checkout.
+      if (json?.checkoutUrl) {
+        window.location.href = json.checkoutUrl;
+      }
+      return json;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: [api.bids.list.path, variables.artworkId] 
+      queryClient.invalidateQueries({
+        queryKey: [api.bids.list.path, variables.artworkId],
       });
       queryClient.invalidateQueries({
         queryKey: [api.artworks.get.path, variables.artworkId],
