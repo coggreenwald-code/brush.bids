@@ -34,21 +34,20 @@ export function usePlaceBid() {
         } catch {/* non-JSON body */}
         throw new Error(message);
       }
-      const json = await res.json();
-      // Redirect to Stripe Checkout to capture the card hold; the bid will be
-      // marked authorized via webhook when the user finishes checkout.
-      if (json?.checkoutUrl) {
-        window.location.href = json.checkoutUrl;
-      }
-      return json;
+      return await res.json();
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
         queryKey: [api.bids.list.path, variables.artworkId],
       });
       queryClient.invalidateQueries({
         queryKey: [api.artworks.get.path, variables.artworkId],
       });
+      // Redirect to Stripe Checkout to authorize the card hold; the bid is
+      // persisted as authorized when the webhook fires after checkout.
+      if (data?.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
     },
   });
 }
