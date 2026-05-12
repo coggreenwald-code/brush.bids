@@ -131,7 +131,7 @@ export default function About() {
                 During that lecture, the first version of BrushBids was sketched on a napkin in the high school's Quad, the central gathering space of the campus. That napkin remained pinned to a bulletin board throughout the year, serving as a constant reminder of a simple but persistent problem in student art: talent without access.
               </p>
               <p>
-                The concept was rigorously developed through hands-on iteration at the <span className="text-white/80 font-medium">Tufts Entrepreneurship Center</span>, where constant pitching, mentorship, and feedback refined the original model. Further progress came through collaboration with the <span className="text-white/80 font-medium">Derby School of Entrepreneurship</span>, helping transition BrushBids from an early idea into a working product.
+                The concept was rigorously developed through hands-on iteration during the <span className="text-white/80 font-medium">Venture Accelerator Program at Tufts University</span>, where constant pitching, mentorship, and feedback refined the original model. Further progress came through collaboration with the <span className="text-white/80 font-medium">Derby School of Entrepreneurship</span>, helping transition BrushBids from an early idea into a working product.
               </p>
               <p>
                 Today, BrushBids is a student-first art marketplace. The platform creates a direct pathway for student artists to share, sell, and be discovered without relying on elite galleries, institutions, or traditional gatekeepers.

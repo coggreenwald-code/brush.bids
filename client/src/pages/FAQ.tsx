@@ -63,7 +63,7 @@ export default function FAQ() {
     },
     {
       question: "Who founded BrushBids?",
-      answer: "BrushBids was founded by Charles Greenwald, a student at The Dwight School in New York City. The idea was born during a junior-year lecture when Charles noticed that exceptional student art filled the school's halls, yet there was no credible online platform for students to sell their work. The concept was developed through the Tufts Entrepreneurship Center and the Derby School of Entrepreneurship.",
+      answer: "BrushBids was founded by Charles Greenwald, a student at The Dwight School in New York City. The idea was born during a junior-year lecture when Charles noticed that exceptional student art filled the school's halls, yet there was no credible online platform for students to sell their work. The concept was developed during the Venture Accelerator Program at Tufts University and the Derby School of Entrepreneurship.",
     },
     {
       question: "Is BrushBids free to use?",
