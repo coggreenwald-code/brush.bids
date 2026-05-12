@@ -724,6 +724,9 @@ export async function registerRoutes(
     const userId = (req.user as any).id || (req.user as any).claims?.sub;
     const user = await storage.getUser(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role !== "artist" && user.role !== "both") {
+      return res.status(403).json({ message: "Only artist accounts can connect for payouts." });
+    }
 
     try {
       const stripe = await getUncachableStripeClient();
