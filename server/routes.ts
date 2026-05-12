@@ -314,10 +314,12 @@ export async function registerRoutes(
         return res.status(400).json({ message: `Bid must be higher than the current price of $${currentHighest}` });
       }
 
-      // Verify the artist has finished Stripe Connect onboarding (we need their account
-      // ID for the destination charge so they can actually receive payout).
+      // Verify the artist has finished Stripe Connect onboarding AND that
+      // payouts are currently enabled — Stripe can temporarily disable
+      // payouts (e.g., needs more verification) on an otherwise-onboarded
+      // account, and we shouldn't accept holds we can't pay out on.
       const artist = await storage.getUser(artwork.artistId);
-      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete) {
+      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
         return res.status(400).json({
           message: "This artist has not completed payout setup yet. Please try again later.",
         });
@@ -366,13 +368,15 @@ export async function registerRoutes(
           artworkId: String(artwork.id),
           bidderId,
         },
-        // Bound the Checkout session lifetime so a bidder can't sit on the page
-        // forever and complete payment after the auction ends. Stripe requires
-        // expires_at to be at least 30 minutes from creation, so we use
-        // min(30 min, auctionEnd) clamped to the 30-min minimum.
+        // Bound the Checkout session lifetime so a bidder can't sit on the
+        // page forever and complete payment after the auction ends.
+        // Target = min(auctionEnd, now + 24h [Stripe's max]); clamp to Stripe's
+        // 30-minute minimum. Webhook revalidation is the real safety net, but
+        // this gives Stripe an accurate hint and short-auction sessions die
+        // close to (or right at) the deadline.
         expires_at: Math.max(
           Math.floor(Date.now() / 1000) + 30 * 60,
-          Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 30 * 60 * 1000) / 1000),
+          Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 24 * 60 * 60 * 1000) / 1000),
         ),
         success_url: `${origin}/artwork/${artwork.id}?bid=success&amount=${input.amount}`,
         cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
@@ -820,108 +824,14 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/checkout/artwork/:artworkId", async (req, res) => {
-    // DEPRECATED: legacy "Pay Now after auction ends" flow. Bids are now
-    // pre-authorized via the bid hold flow and captured automatically by the
-    // scheduler when the auction ends, so this endpoint is intentionally
-    // disabled to avoid double-charging or bypassing the hold/capture model.
-    return res.status(410).json({
+  // DEPRECATED: legacy "Pay Now after auction ends" flow. Bids are now
+  // pre-authorized via the bid hold flow and captured automatically by the
+  // scheduler when the auction ends, so this endpoint is permanently disabled
+  // to avoid double-charging or bypassing the hold/capture model.
+  app.post("/api/checkout/artwork/:artworkId", (_req, res) => {
+    res.status(410).json({
       message: "This payment flow has been replaced. Winning bids are now charged automatically when the auction ends.",
     });
-
-    // eslint-disable-next-line no-unreachable
-    if (!req.user) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-
-    try {
-      const artworkId = Number(req.params.artworkId);
-      const artwork = await storage.getArtwork(artworkId);
-      
-      if (!artwork) {
-        return res.status(404).json({ message: "Artwork not found" });
-      }
-
-      // Check if already paid
-      if (artwork.paidAt) {
-        return res.status(400).json({ message: "This artwork has already been paid for" });
-      }
-
-      // Allow re-checkout if previous session didn't complete (no paidAt means not paid)
-      // This handles abandoned checkouts
-
-      let auctionEndDate: Date;
-      if (artwork.endTime) {
-        auctionEndDate = new Date(artwork.endTime);
-      } else {
-        auctionEndDate = new Date(artwork.createdAt || new Date());
-        auctionEndDate.setDate(auctionEndDate.getDate() + (artwork.auctionDurationDays || 7));
-      }
-      if (auctionEndDate > new Date()) {
-        return res.status(400).json({ message: "Auction has not ended yet" });
-      }
-
-      // Get bids ordered by amount descending (highest first)
-      const bids = await storage.getBidsForArtwork(artworkId);
-      if (bids.length === 0) {
-        return res.status(400).json({ message: "No bids found for this artwork" });
-      }
-
-      // bids[0] is the highest bid (ordered by amount desc in storage)
-      const highestBid = bids[0];
-      if (highestBid.bidderId !== (req.user as any).id) {
-        return res.status(403).json({ message: "Only the winning bidder can purchase" });
-      }
-
-      const stripe = await getUncachableStripeClient();
-      const amount = Number(highestBid.amount);
-
-      const promotionPercentage = artwork.promotionPercentage || 0;
-      const promotionFee = amount * (promotionPercentage / 100);
-      const baseArtistShare = amount * 0.75;
-      const artistShare = baseArtistShare - promotionFee;
-      const platformShare = amount * 0.20 + promotionFee;
-      const charityShare = amount * 0.05;
-
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: artwork.title,
-              description: `Artwork by ${artwork.artistId} - Winning bid`,
-              images: artwork.imageUrl ? [artwork.imageUrl] : [],
-            },
-            unit_amount: Math.round(amount * 100),
-          },
-          quantity: 1,
-        }],
-        mode: 'payment',
-        success_url: `${req.protocol}://${req.get('host')}/my-bids?payment=success&artwork=${artworkId}`,
-        cancel_url: `${req.protocol}://${req.get('host')}/my-bids?payment=cancelled`,
-        metadata: {
-          artworkId: artworkId.toString(),
-          bidderId: (req.user as any).id,
-          artistId: artwork.artistId,
-          charityId: artwork.charityId?.toString() || '',
-          totalAmount: amount.toString(),
-          artistShare: artistShare.toFixed(2),
-          platformShare: platformShare.toFixed(2),
-          charityShare: charityShare.toFixed(2),
-          promotionPercentage: promotionPercentage.toString(),
-          promotionFee: promotionFee.toFixed(2),
-        },
-      });
-
-      // Store session ID and expected payer for tracking (payment confirmation comes via webhook)
-      await storage.setArtworkCheckoutSession(artworkId, session.id, (req.user as any).id);
-      
-      res.json({ url: session.url });
-    } catch (error) {
-      console.error("Checkout error:", error);
-      res.status(500).json({ message: "Failed to create checkout session" });
-    }
   });
 
   // Get payment status for an artwork
