@@ -213,19 +213,9 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bids.bidderId, userId))
       .orderBy(desc(bids.createdAt));
 
-    // For each artwork, keep TWO values:
-    //   • competitiveBid — the user's highest *valid* bid (authorized or
-    //     captured). This is what we compare against the artwork's highest
-    //     authorized bid to decide isHighest/won/outbid. A failed/canceled
-    //     bid must NEVER win.
-    //   • displayBid    — the user's most recent bid of any status, used for
-    //     the holdStatus badge and the headline amount in MyBids so users can
-    //     still see "Released" or "Failed" outcomes.
     type Entry = {
-      competitiveBid: number;
-      displayBid: number;
-      latestBidAt: Date | null;
-      holdStatus: HoldStatus;
+      bestValid: { amount: number; at: Date | null; status: HoldStatus } | null;
+      latest: { amount: number; at: Date | null; status: HoldStatus };
     };
     const map = new Map<number, Entry>();
     for (const bid of userBids) {
@@ -235,53 +225,53 @@ export class DatabaseStorage implements IStorage {
       const existing = map.get(bid.artworkId);
       if (!existing) {
         map.set(bid.artworkId, {
-          competitiveBid: isValid ? amount : 0,
-          displayBid: amount,
-          latestBidAt: bid.createdAt,
-          holdStatus: status,
+          bestValid: isValid ? { amount, at: bid.createdAt, status } : null,
+          latest: { amount, at: bid.createdAt, status },
         });
         continue;
       }
-      if (isValid && amount > existing.competitiveBid) existing.competitiveBid = amount;
-      if (amount > existing.displayBid) {
-        existing.displayBid = amount;
-        existing.latestBidAt = bid.createdAt;
-        existing.holdStatus = status;
+      if (isValid && (!existing.bestValid || amount > existing.bestValid.amount)) {
+        existing.bestValid = { amount, at: bid.createdAt, status };
+      }
+      if (amount > existing.latest.amount) {
+        existing.latest = { amount, at: bid.createdAt, status };
       }
     }
 
-    const results = await Promise.all(
+    return Promise.all(
       Array.from(map.entries()).map(async ([artworkId, info]) => {
         const artwork = await this.getArtwork(artworkId);
-        const allBids = await this.getAuthorizedBidsForArtwork(artworkId);
-        const artworkHighestBid = allBids.length > 0
-          ? Math.max(...allBids.map(b => Number(b.amount)))
+        const authorized = await this.getAuthorizedBidsForArtwork(artworkId);
+        const artworkHighestBid = authorized.length > 0
+          ? Math.max(...authorized.map(b => Number(b.amount)))
           : 0;
-        // isHighest only counts the user's currently-VALID bid; a failed or
-        // released bid never makes them the leader.
-        const isHighest = info.competitiveBid > 0 && info.competitiveBid >= artworkHighestBid;
+        const isHighest = !!info.bestValid && info.bestValid.amount >= artworkHighestBid;
         let auctionEnded = false;
         if (artwork?.endTime) {
           auctionEnded = new Date(artwork.endTime) <= new Date();
         } else {
           const end = new Date(artwork?.createdAt || new Date());
-          end.setDate(end.getDate() + (artwork?.auctionDurationDays || 7)); // legacy fallback only
+          end.setDate(end.getDate() + (artwork?.auctionDurationDays || 7));
           auctionEnded = end <= new Date();
         }
+        // Prefer the user's currently-valid bid for the headline amount and
+        // status badge so we never tell them they're winning with a failed
+        // higher attempt. Fall back to their latest attempt only when no
+        // valid bid exists, so Released/Failed outcomes still surface.
+        const headline = info.bestValid ?? info.latest;
         return {
           artworkId,
           artwork: artwork || null,
-          userHighestBid: info.displayBid,
-          artworkHighestBid: artworkHighestBid || info.displayBid,
+          userHighestBid: headline.amount,
+          artworkHighestBid: artworkHighestBid || headline.amount,
           isHighest,
           auctionEnded,
-          latestBidAt: info.latestBidAt,
+          latestBidAt: headline.at,
           isPaid: !!artwork?.paidAt,
-          holdStatus: info.holdStatus,
+          holdStatus: headline.status,
         };
       })
     );
-    return results;
   }
 
   async createBid(bid: BidInsertWithStripe): Promise<Bid> {

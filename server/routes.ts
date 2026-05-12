@@ -96,18 +96,15 @@ export async function registerRoutes(
       if (input.artistId !== userId) {
         return res.status(403).json({ message: "You can only submit artwork as yourself" });
       }
-      // Stripe card-authorization holds expire after 7 days, so we refuse any
-      // NEW listing whose duration would outlive the hold. Existing legacy
-      // 14/30-day artworks are unaffected (they were created before this gate).
+      // Card-authorization holds expire at 7 days, so new listings can't
+      // outlive that. Existing 14/30-day artworks are unaffected.
       if ((input.auctionDurationDays ?? 7) > 7) {
         return res.status(400).json({
           message: "Auction duration cannot exceed 7 days.",
           field: "auctionDurationDays",
         });
       }
-      // Server-side payout-readiness gate: a listing can't go live unless the
-      // artist has finished Connect onboarding AND payouts are enabled, otherwise
-      // we'd accept bid holds we couldn't actually pay out on.
+      // Payout-readiness gate: don't accept holds we can't pay out on.
       const artist = await storage.getUser(userId);
       if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
         return res.status(403).json({
@@ -305,7 +302,7 @@ export async function registerRoutes(
       }
       if (now >= auctionEndTime) return res.status(400).json({ message: "This auction has ended" });
 
-      // Highest active (authorized) bid sets the floor — we ignore canceled/failed/pending holds
+      // Floor uses authorized bids only; canceled/failed/pending don't count.
       const existingBids = await storage.getAuthorizedBidsForArtwork(input.artworkId);
       const currentHighest = existingBids.length > 0
         ? Math.max(...existingBids.map(b => Number(b.amount)))
@@ -314,10 +311,7 @@ export async function registerRoutes(
         return res.status(400).json({ message: `Bid must be higher than the current price of $${currentHighest}` });
       }
 
-      // Verify the artist has finished Stripe Connect onboarding AND that
-      // payouts are currently enabled — Stripe can temporarily disable
-      // payouts (e.g., needs more verification) on an otherwise-onboarded
-      // account, and we shouldn't accept holds we can't pay out on.
+      // Artist must have Connect onboarding complete AND payouts enabled.
       const artist = await storage.getUser(artwork.artistId);
       if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
         return res.status(400).json({
@@ -327,13 +321,10 @@ export async function registerRoutes(
 
       const stripe = await getUncachableStripeClient();
       const amountCents = Math.round(Number(input.amount) * 100);
-      // Base split: 75% artist / 20% platform / 5% charity (charity paid manually
-      // from the platform's 25% pool). With a Boost, the artist gives up
-      // `promotionPercentage` to the platform, so the application fee grows by
-      // that amount. We clamp to keep the artist share non-negative.
+      // Split: 75% artist / 20% platform / 5% charity (charity paid manually
+      // off-Stripe). Boost shifts that much from artist to platform.
       const boostPct = Math.max(0, Math.min(75, artwork.promotionPercentage || 0));
-      const appFeePct = 0.25 + boostPct / 100;
-      const appFeeCents = Math.min(amountCents, Math.round(amountCents * appFeePct));
+      const appFeeCents = Math.min(amountCents, Math.round(amountCents * (0.25 + boostPct / 100)));
 
       const origin = getAppOrigin();
       const session = await stripe.checkout.sessions.create({
@@ -368,12 +359,7 @@ export async function registerRoutes(
           artworkId: String(artwork.id),
           bidderId,
         },
-        // Bound the Checkout session lifetime so a bidder can't sit on the
-        // page forever and complete payment after the auction ends.
-        // Target = min(auctionEnd, now + 24h [Stripe's max]); clamp to Stripe's
-        // 30-minute minimum. Webhook revalidation is the real safety net, but
-        // this gives Stripe an accurate hint and short-auction sessions die
-        // close to (or right at) the deadline.
+        // Bound to min(auctionEnd, now+24h), clamped to Stripe's 30-min min.
         expires_at: Math.max(
           Math.floor(Date.now() / 1000) + 30 * 60,
           Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 24 * 60 * 60 * 1000) / 1000),
@@ -382,12 +368,8 @@ export async function registerRoutes(
         cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
       });
 
-      // The bid row itself is NOT inserted here — we record it only after the
-      // Stripe webhook confirms the card authorization. All the data we need
-      // to do that insert (artworkId, bidderId, amount) lives in the checkout
-      // session metadata, which Stripe propagates to the PaymentIntent too.
-      // This way an abandoned checkout never leaves a phantom bid row behind.
-
+      // No bid row is written here — the webhook inserts it once Stripe
+      // confirms the authorization, so abandoned checkouts leave no rows.
       res.status(200).json({
         artworkId: input.artworkId,
         amount: input.amount,
@@ -678,10 +660,7 @@ export async function registerRoutes(
     }
     try {
       const { auctionDurationDays, charityId, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
-      // Same payout-readiness gate as POST /api/artworks: a portfolio item
-      // can't be converted into a live auction unless the artist has finished
-      // Stripe Connect onboarding AND payouts are enabled — we'd otherwise be
-      // accepting card-authorization holds with no way to actually pay out.
+      // Same payout-readiness gate as POST /api/artworks.
       const artist = await storage.getUser(currentUserId);
       if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
         return res.status(403).json({
@@ -716,9 +695,7 @@ export async function registerRoutes(
     const user = await storage.getUser(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // If the artist has a Connect account, fetch the live state from Stripe on
-    // every dashboard load so the UI never shows stale onboarding/payout flags
-    // (we still keep the DB cache in sync for places that don't need a live read).
+    // Fetch live state from Stripe on every load and resync the cached flags.
     if (user.stripeAccountId) {
       try {
         const stripe = await getUncachableStripeClient();
@@ -732,7 +709,6 @@ export async function registerRoutes(
         return res.json({ hasAccount: true, onboardingComplete, payoutsEnabled });
       } catch (err) {
         console.error("Live Stripe status fetch failed, falling back to cached:", err);
-        // Fall through to cached values below
       }
     }
     res.json({

@@ -1,27 +1,13 @@
-// Webhook handlers for Stripe events.
-//
-// Bid hold flow (kind=bid_hold):
-//   1. /api/bids creates a Checkout Session in manual-capture mode and returns
-//      the URL. NO bid row is written yet.
-//   2. checkout.session.completed OR payment_intent.amount_capturable_updated
-//      arrives — whichever fires first inserts the bid row as "authorized",
-//      releases lower holds, and applies anti-snipe.
-//   3. payment_intent.succeeded marks the bid "captured" (the scheduler also
-//      handles this when it captures the winning hold).
-//   4. checkout.session.expired / payment_intent.canceled / payment_failed
-//      either no-op (no bid existed) or mark an existing bid as canceled/failed.
-//
-// Legacy winner-pay flow: untagged sessions still mark the artwork as paid
-// for backwards compatibility, though that endpoint is now disabled.
+// Stripe webhook handlers. The bid_hold flow defers bid persistence until the
+// webhook confirms a card authorization; checkout.session.completed and
+// payment_intent.amount_capturable_updated are both routed through
+// ensureBidAuthorized (idempotent on session id / PI id).
 
 import type Stripe from 'stripe';
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
 import { releaseLosingHoldsForArtwork } from './auctionScheduler';
 
-// Best-effort idempotent bid record: insert if no bid exists for this checkout
-// session yet, otherwise just patch the existing row to "authorized" with the
-// PI id. Then release lower holds and apply anti-snipe.
 async function ensureBidAuthorized(opts: {
   artworkId: number;
   bidderId: string;
@@ -32,54 +18,40 @@ async function ensureBidAuthorized(opts: {
   let bid = opts.sessionId ? await storage.getBidByCheckoutSession(opts.sessionId) : undefined;
   if (!bid) bid = await storage.getBidByPaymentIntent(opts.paymentIntentId);
 
-  // Revalidate auction state at AUTHORIZATION TIME. A bidder could have started
-  // Checkout while the auction was open and only completed it after the deadline
-  // (or after the artwork was already sold). We must not let a late-arriving
-  // authorization win or alter outcomes — cancel the hold and mark the bid
-  // failed so MyBids reflects the real state.
+  // Revalidate auction state at authorization time — a bidder could complete
+  // Checkout after the deadline or after the artwork sold.
   const artworkNow = await storage.getArtwork(opts.artworkId);
   const ended = artworkNow?.endTime ? new Date(artworkNow.endTime) <= new Date() : false;
   const closed = !artworkNow || artworkNow.status !== 'approved' || !!artworkNow.paidAt || ended;
 
-  // Also enforce competitive validity at authorization time: the just-authorized
-  // amount must be STRICTLY higher than every other currently-authorized amount.
-  // A late lower auth must be canceled immediately, not left as a stale hold.
   let outcompeted = false;
   if (!closed) {
     const existing = await storage.getAuthorizedBidsForArtwork(opts.artworkId);
     const competing = existing.filter(b => b.id !== bid?.id).map(b => Number(b.amount));
-    const currentHigh = competing.length ? Math.max(...competing) : 0;
-    if (opts.amount <= currentHigh) outcompeted = true;
+    if (competing.length && opts.amount <= Math.max(...competing)) outcompeted = true;
   }
 
   if (closed || outcompeted) {
-    const reason = closed ? 'auction closed' : 'outbid at authorization';
-    try {
-      const stripe = await getUncachableStripeClient();
-      await stripe.paymentIntents.cancel(opts.paymentIntentId).catch(() => {});
-    } catch {/* best-effort */}
+    const stripe = await getUncachableStripeClient();
+    await stripe.paymentIntents.cancel(opts.paymentIntentId).catch(() => {});
+    const status = closed ? 'failed' : 'canceled';
     if (bid) {
-      await storage.updateBidByPaymentIntent(opts.paymentIntentId, {
-        holdStatus: closed ? 'failed' : 'canceled',
-      });
+      await storage.updateBidByPaymentIntent(opts.paymentIntentId, { holdStatus: status });
     } else {
-      // Record the bid so the user can see why it didn't take
       await storage.createBid({
         artworkId: opts.artworkId,
         bidderId: opts.bidderId,
         amount: opts.amount.toFixed(2),
         stripeCheckoutSessionId: opts.sessionId,
         stripePaymentIntentId: opts.paymentIntentId,
-        holdStatus: closed ? 'failed' : 'canceled',
+        holdStatus: status,
       });
     }
-    console.warn(`Bid ${opts.paymentIntentId} rejected at authorization (${reason})`);
+    console.warn(`Bid ${opts.paymentIntentId} rejected at authorization (${closed ? 'closed' : 'outbid'})`);
     return;
   }
 
   if (!bid) {
-    // The drizzle-zod insertBidSchema types `amount` as a string (Postgres
-    // decimal columns serialize as strings); we mirror that here.
     bid = await storage.createBid({
       artworkId: opts.artworkId,
       bidderId: opts.bidderId,
@@ -88,7 +60,6 @@ async function ensureBidAuthorized(opts: {
       stripePaymentIntentId: opts.paymentIntentId,
       holdStatus: 'authorized',
     });
-    console.log(`Bid ${bid.id} created+authorized via webhook (PI: ${opts.paymentIntentId})`);
   } else if (bid.holdStatus !== 'authorized' && bid.holdStatus !== 'captured') {
     await storage.updateBidByPaymentIntent(opts.paymentIntentId, { holdStatus: 'authorized' });
     if (opts.sessionId) {
@@ -97,23 +68,20 @@ async function ensureBidAuthorized(opts: {
         stripePaymentIntentId: opts.paymentIntentId,
       });
     }
-    console.log(`Bid ${bid.id} authorized via webhook (PI: ${opts.paymentIntentId})`);
   } else {
-    return; // already authorized/captured — nothing to do
+    return;
   }
 
   await releaseLosingHoldsForArtwork(bid.artworkId, bid.id);
 
-  const artwork = await storage.getArtwork(bid.artworkId);
-  if (artwork?.endTime && Number(bid.amount) >= Number(artwork.price)) {
-    const now = new Date();
-    const endTime = new Date(artwork.endTime);
-    const remainingMs = endTime.getTime() - now.getTime();
-    const ANTI_SNIPE_WINDOW_MS = 2 * 60 * 1000;
-    if (remainingMs > 0 && remainingMs < ANTI_SNIPE_WINDOW_MS) {
-      const newEnd = new Date(now.getTime() + ANTI_SNIPE_WINDOW_MS);
-      await storage.extendAuctionEndTime(artwork.id, newEnd);
-      console.log(`Auction ${artwork.id} extended to ${newEnd.toISOString()} (anti-snipe)`);
+  // Anti-snipe: if a qualifying bid lands inside the last 2 minutes, push the
+  // end time out by 2 minutes.
+  if (artworkNow?.endTime && Number(bid.amount) >= Number(artworkNow.price)) {
+    const now = Date.now();
+    const remainingMs = new Date(artworkNow.endTime).getTime() - now;
+    const WINDOW = 2 * 60 * 1000;
+    if (remainingMs > 0 && remainingMs < WINDOW) {
+      await storage.extendAuctionEndTime(artworkNow.id, new Date(now + WINDOW));
     }
   }
 }
