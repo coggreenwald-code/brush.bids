@@ -272,9 +272,9 @@ export async function registerRoutes(
     res.json(bids);
   });
 
-  // Bids — creates a Stripe Checkout Session that places a CARD AUTHORIZATION HOLD.
-  // The bid is recorded immediately as `pending`; the webhook flips it to `authorized` once
-  // Stripe confirms the hold. Auction end auto-captures the winning hold and releases losers.
+  // Bids — opens a Stripe Checkout Session in manual-capture mode for a card
+  // authorization hold. The bid row is inserted by the webhook once Stripe
+  // confirms authorization; the scheduler captures the winner at auction end.
   app.post(api.bids.create.path, async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "You must be signed in to bid" });

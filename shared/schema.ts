@@ -52,8 +52,8 @@ export const bids = pgTable("bids", {
   bidderId: varchar("bidder_id").references(() => users.id).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   holdStatus: holdStatusEnum("hold_status").default("pending").notNull(),
-  stripeCheckoutSessionId: text("stripe_checkout_session_id"),
-  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("idx_bids_pi").on(table.stripePaymentIntentId),
