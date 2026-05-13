@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode, Trash2, ArrowRight, ImagePlus, FolderOpen } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode, Trash2, ArrowRight, ImagePlus, FolderOpen, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
 import { QRCodeModal } from "@/components/QRCodeModal";
@@ -258,6 +258,16 @@ export default function Dashboard() {
     },
   });
 
+  const isArtist = user?.role === "artist" || user?.role === "both";
+  const { data: connectStatus } = useQuery<{ hasAccount: boolean; onboardingComplete: boolean; payoutsEnabled: boolean }>({
+    queryKey: ["/api/stripe/connect/status"],
+    enabled: !!user && isArtist,
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const payoutSetupNeeded = isArtist && connectStatus !== undefined &&
+    !(connectStatus.onboardingComplete && connectStatus.payoutsEnabled);
+
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
   const soldArtworks = myArtworks.filter(a => a.paidAt);
@@ -361,6 +371,20 @@ export default function Dashboard() {
               </div>
               
               <TabsContent value="artworks" className="space-y-6">
+                {payoutSetupNeeded && (
+                  <div
+                    className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+                    data-testid="banner-payout-setup-artworks"
+                  >
+                    <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+                    <p className="text-sm text-amber-200/90">
+                      Your payout account isn't set up yet — collectors can't bid on your artworks until it's ready.{" "}
+                      <a href="#payouts" className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup-artworks">
+                        Finish setup above →
+                      </a>
+                    </p>
+                  </div>
+                )}
                 {isLoading ? (
                   <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#A78BFA]" /></div>
                 ) : myArtworks.length === 0 ? (
