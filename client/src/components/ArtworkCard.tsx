@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { type Artwork, type User } from "@shared/schema";
 import { Rocket, Clock } from "lucide-react";
+import { useCharities } from "@/hooks/use-charities";
 
 function getAuctionEndDate(artwork: Artwork): Date {
   if (artwork.endTime) return new Date(artwork.endTime);
@@ -27,6 +28,8 @@ interface ArtworkCardProps {
 
 export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
   const displayImage = artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800&auto=format&fit=crop";
+  const { data: charities } = useCharities();
+  const charityLabel = artwork.charityNote || charities?.find(c => c.id === artwork.charityId)?.name;
 
   return (
     <Link href={`/artwork/${artwork.id}`}>
@@ -90,6 +93,11 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
                 : artwork.artistId}
             </span>
           </p>
+          {charityLabel && (
+            <p className="text-xs text-emerald-400/70 mt-1" data-testid={`text-charity-${artwork.id}`}>
+              5% → {charityLabel}
+            </p>
+          )}
           {artwork.status === "approved" && (
             <div
               className="flex items-center gap-1 mt-3 text-xs text-[#60A5FA]/70"
