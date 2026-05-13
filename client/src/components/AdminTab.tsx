@@ -79,6 +79,8 @@ export function AdminTab() {
   const pendingCount = allArtworks?.filter(a => a.status === "pending").length || 0;
   const approvedCount = allArtworks?.filter(a => a.status === "approved").length || 0;
   const rejectedCount = allArtworks?.filter(a => a.status === "rejected").length || 0;
+  const otherCharityArtworks = allArtworks?.filter(a => !!a.charityNote && !a.charityId) || [];
+  const otherCharityCount = otherCharityArtworks.length;
 
   const handleReview = (id: number) => {
     aiReview.mutate(id, {
@@ -213,7 +215,7 @@ export function AdminTab() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1" style={{ marginLeft: "10px" }}>
+        <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 flex-wrap h-auto" style={{ marginLeft: "10px" }}>
           <TabsTrigger value="pending" data-testid="tab-admin-pending" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-3 py-1.5 text-sm">
             Pending ({pendingCount})
           </TabsTrigger>
@@ -223,9 +225,48 @@ export function AdminTab() {
           <TabsTrigger value="rejected" data-testid="tab-admin-rejected" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-3 py-1.5 text-sm">
             Rejected ({rejectedCount})
           </TabsTrigger>
+          <TabsTrigger value="charity-notes" data-testid="tab-admin-charity-notes" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-3 py-1.5 text-sm">
+            Other Charities {otherCharityCount > 0 && `(${otherCharityCount})`}
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="mt-4">
+        <TabsContent value="charity-notes" className="mt-4">
+          {isLoading ? (
+            <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-emerald-400" /></div>
+          ) : otherCharityCount === 0 ? (
+            <div className="p-10 text-center rounded-xl bg-white/[0.02] border border-white/5">
+              <Check className="w-10 h-10 mx-auto text-emerald-400 mb-3" />
+              <h3 className="text-lg font-bold text-white">No "Other" charity entries</h3>
+              <p className="text-white/50 text-sm">Artists haven't submitted any custom charity destinations yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-3" data-testid="list-charity-notes">
+              <p className="text-xs text-white/40 px-1" style={{ paddingLeft: "10px" }}>These are custom charity destinations entered by artists who chose "Other". Review them to ensure they are legitimate charitable causes.</p>
+              {otherCharityArtworks.map((artwork) => (
+                <div key={artwork.id} className="p-4 flex flex-col sm:flex-row gap-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-colors" data-testid={`card-charity-note-${artwork.id}`}>
+                  <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden shrink-0">
+                    <img src={artwork.imageUrl} alt={artwork.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-start justify-between gap-2 flex-wrap">
+                      <div>
+                        <p className="font-semibold text-white text-sm">{artwork.title}</p>
+                        <p className="text-xs text-white/40">by {artistName(artwork)} · {artwork.status}</p>
+                      </div>
+                      <Badge variant="outline" className="bg-emerald-400/10 text-emerald-400 border-emerald-400/20 text-xs shrink-0">Other</Badge>
+                    </div>
+                    <div className="flex items-start gap-2 pt-1">
+                      <span className="text-emerald-400/70 text-xs shrink-0 mt-0.5">5% →</span>
+                      <p className="text-sm text-white/80 font-medium" data-testid={`text-charity-note-${artwork.id}`}>{artwork.charityNote}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value={activeTab === 'charity-notes' ? '__none__' : activeTab} className="mt-4">
           {isLoading ? (
             <div className="flex justify-center py-12"><Loader2 className="animate-spin w-8 h-8 text-[#A78BFA]" /></div>
           ) : filteredArtworks.length === 0 ? (

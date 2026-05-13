@@ -95,14 +95,13 @@ export default function ArtworkDetail() {
   const [saved, setSaved] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
+  const [pendingBidSuccess, setPendingBidSuccess] = useState(false);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const bidParam = params.get('bid');
     if (bidParam === 'success') {
-      toast({
-        title: "Bid hold authorized",
-        description: "Your card has been authorized. We'll only charge it if you win.",
-      });
+      setPendingBidSuccess(true);
       window.history.replaceState({}, "", window.location.pathname);
     } else if (bidParam === 'cancelled') {
       toast({
@@ -126,6 +125,19 @@ export default function ArtworkDetail() {
   const charityName = artwork?.charityId
     ? charities?.find(c => c.id === artwork.charityId)?.name
     : null;
+
+  useEffect(() => {
+    if (!pendingBidSuccess || !artwork) return;
+    if (artwork.charityId && !charities) return;
+    const charityLabel = artwork.charityNote || charityName;
+    toast({
+      title: "Bid hold authorized",
+      description: charityLabel
+        ? `Your card has been authorized. We'll only charge it if you win. 5% of the sale goes to ${charityLabel}.`
+        : "Your card has been authorized. We'll only charge it if you win.",
+    });
+    setPendingBidSuccess(false);
+  }, [pendingBidSuccess, artwork, charities, charityName, toast]);
 
   const form = useForm({
     resolver: zodResolver(bidSchema),
@@ -256,19 +268,18 @@ export default function ArtworkDetail() {
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-emerald-400/80">Charity (5%)</span>
-                    <span className="font-mono text-sm font-semibold text-emerald-400">${revenueSplit.charity.toFixed(2)}</span>
+                    <span className="text-sm text-emerald-400/80">
+                      {artwork.charityNote || charityName
+                        ? <>Charity (5%) <span className="text-white/40">—</span> <span className="text-emerald-300/90 font-medium truncate max-w-[160px] inline-block align-bottom" title={artwork.charityNote || charityName || undefined}>{artwork.charityNote || charityName}</span></>
+                        : "Charity (5%)"}
+                    </span>
+                    <span className="font-mono text-sm font-semibold text-emerald-400 shrink-0">${revenueSplit.charity.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
                     <div className="h-full rounded-full bg-emerald-500" style={{ width: '5%' }} />
                   </div>
                 </div>
               </div>
-              {(artwork.charityId || artwork.charityNote) && (
-                <div className="mt-5 pt-4 border-t border-white/5">
-                  <p className="text-sm text-white/40">Supporting: <span className="font-medium text-white/70">{artwork.charityNote || charityName || "Chosen charity"}</span></p>
-                </div>
-              )}
             </div>
           </div>
 
