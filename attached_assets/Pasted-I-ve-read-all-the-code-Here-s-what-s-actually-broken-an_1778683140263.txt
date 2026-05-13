@@ -1,0 +1,107 @@
+I've read all the code. Here's what's actually broken and the exact fixes:
+Issue 1 — Charity field not working: The charityId form field is controlled by both field (from react-hook-form) AND a separate charitySelection state. But the Select component uses value={charitySelection} (the state) while the form schema drives validation. This split control means selections don't register properly. The "Other" path is already coded correctly in onSubmit — it just needs the UI wiring fixed.
+Issue 2 — Stripe onboarding link fails: The handleOnboardClick function opens a blank tab first (window.open("")), then tries to redirect it in onSuccess. Popup blockers often kill or detach that blank tab reference, so onboardTabRef.current is null or closed by the time the URL arrives. The fix is to get the URL first, then open the tab.
+Issue 3 — Stripe sandbox: This is a Stripe Dashboard configuration issue, not a code bug. The code in routes.ts is correct. I'll write you the exact steps below.
+Here are the two code fixes:Plan the fixesPlan the fixesHere are the exact changes to make in SubmitArtwork.tsx:
+
+Fix 1: Stripe onboarding link
+Replace the handleOnboardClick function (around line 90) with this:
+typescriptconst handleOnboardClick = async () => {
+  try {
+    const res = await fetch("/api/stripe/connect/onboard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ origin: window.location.origin }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
+    window.open(body.url, "_blank", "noopener,noreferrer");
+  } catch (err: any) {
+    toast({ title: "Couldn't start onboarding", description: err.message, variant: "destructive" });
+  }
+};
+Also find the two other places that call onboard.mutate() directly (the two buttons inside the alert boxes at the bottom) and replace each onClick with onClick={handleOnboardClick}. The onboard mutation and onboardTabRef can be removed entirely since they're no longer needed.
+
+Fix 2: Charity selection
+Replace the entire charity <div className="grid grid-cols-1 gap-4"> block (both the charityId FormField and the conditional charityNote FormField below it) with this:
+tsx<div className="grid grid-cols-1 gap-4">
+  <FormItem>
+    <FormLabel className="text-white/70">Select Charity (Optional)</FormLabel>
+    <Select
+      value={charitySelection}
+      onValueChange={(val) => {
+        setCharitySelection(val);
+        if (val === "other" || val === "") {
+          form.setValue("charityId", undefined);
+        } else {
+          form.setValue("charityId", Number(val));
+        }
+      }}
+    >
+      <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-charity">
+        <SelectValue placeholder="Choose a cause" />
+      </SelectTrigger>
+      <SelectContent className="max-h-72">
+        {(() => {
+          const groups: Record<string, { label: string; items: Array<{ id: number; name: string; category?: string }> }> = {
+            global: { label: "Global & National Charities", items: [] },
+            nyc_art: { label: "NYC Art Charities", items: [] },
+            us_art: { label: "U.S. Art Charities", items: [] },
+          };
+          (charities ?? []).forEach(c => {
+            const cat = (c as any).category || "global";
+            if (groups[cat]) groups[cat].items.push(c);
+            else groups.global.items.push(c);
+          });
+          return Object.entries(groups).map(([key, group]) => (
+            group.items.length > 0 ? (
+              <SelectGroup key={key}>
+                <SelectLabel className="text-xs font-semibold uppercase tracking-wider text-white/40">{group.label}</SelectLabel>
+                {group.items.map(c => (
+                  <SelectItem key={c.id} value={c.id.toString()} data-testid={`charity-option-${c.id}`}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ) : null
+          ));
+        })()}
+        <SelectItem value="other" data-testid="charity-option-other">Other (describe below)</SelectItem>
+      </SelectContent>
+    </Select>
+    <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
+  </FormItem>
+
+  {charitySelection === "other" && (
+    <FormField
+      control={form.control}
+      name="charityNote"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-white/70">Where should the 5% go?</FormLabel>
+          <FormControl>
+            <Input
+              placeholder="e.g. Local after-school art program"
+              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              {...field}
+              data-testid="input-charity-note"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )}
+</div>
+The key change: the outer <FormField> wrapper for charityId is removed since it was creating a conflict between react-hook-form's internal state and your charitySelection state. Now charitySelection purely drives the UI, and form.setValue("charityId", ...) writes directly into the form — no split control.
+
+Fix 3: Stripe live mode (not a code issue)
+Your code is fine. Stripe is keeping you in sandbox because your platform account isn't activated for live mode yet. Do this in order:
+
+Go to dashboard.stripe.com and make sure the Test mode toggle is OFF (top right)
+Look for the "Activate your account" banner — fill out your business details (identity, bank account, business description). This is required before any live payments or Connect onboarding work
+Go to Connect → Settings and make sure Connect is enabled
+Under Connect → Settings → Platform profile, fill in your website (brushbids.com), product description, and support email — Stripe will reject accountLinks.create calls if this is blank, which is exactly the error you're seeing
+Once all that's done, swap your Replit secrets from pk_test_ / sk_test_ to your pk_live_ / sk_live_ keys
+
+Step 4 is almost certainly the direct cause of the onboarding link failing in live mode — the platform profile being incomplete is what Stripe returns as the vague error your backend is already catching.

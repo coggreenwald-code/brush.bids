@@ -65,10 +65,11 @@ export default function SubmitArtwork() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const onboardTabRef = useRef<Window | null>(null);
+  const [isOnboarding, setIsOnboarding] = useState(false);
 
-  const onboard = useMutation({
-    mutationFn: async () => {
+  const handleOnboardClick = async () => {
+    setIsOnboarding(true);
+    try {
       const res = await fetch("/api/stripe/connect/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -76,26 +77,12 @@ export default function SubmitArtwork() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
-      return body as { url: string };
-    },
-    onSuccess: (data) => {
-      if (onboardTabRef.current && !onboardTabRef.current.closed) {
-        onboardTabRef.current.location.href = data.url;
-      } else {
-        window.open(data.url, "_blank", "noopener,noreferrer");
-      }
-      onboardTabRef.current = null;
-    },
-    onError: (err: Error) => {
-      onboardTabRef.current?.close();
-      onboardTabRef.current = null;
+      window.open(body.url, "_blank", "noopener,noreferrer");
+    } catch (err: any) {
       toast({ title: "Couldn't start onboarding", description: err.message, variant: "destructive" });
-    },
-  });
-
-  const handleOnboardClick = () => {
-    onboardTabRef.current = window.open("", "_blank", "noopener,noreferrer");
-    onboard.mutate();
+    } finally {
+      setIsOnboarding(false);
+    }
   };
 
   const generateDescription = useMutation({
@@ -294,11 +281,11 @@ export default function SubmitArtwork() {
                 <button
                   type="button"
                   onClick={handleOnboardClick}
-                  disabled={onboard.isPending}
+                  disabled={isOnboarding}
                   className="underline underline-offset-2 hover:text-amber-100 cursor-pointer disabled:opacity-60"
                   data-testid="link-payout-setup-submit"
                 >
-                  {onboard.isPending ? "Opening…" : "Finish setup →"}
+                  {isOnboarding ? "Opening…" : "Finish setup →"}
                 </button>
               </p>
             </motion.div>
@@ -318,11 +305,11 @@ export default function SubmitArtwork() {
                 <button
                   type="button"
                   onClick={handleOnboardClick}
-                  disabled={onboard.isPending}
+                  disabled={isOnboarding}
                   className="underline underline-offset-2 hover:text-amber-50 cursor-pointer disabled:opacity-60"
                   data-testid="link-payout-attention-submit"
                 >
-                  {onboard.isPending ? "Opening…" : "Fix now →"}
+                  {isOnboarding ? "Opening…" : "Fix now →"}
                 </button>
               </p>
             </motion.div>
@@ -455,63 +442,52 @@ export default function SubmitArtwork() {
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                <FormField
-                  control={form.control}
-                  name="charityId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/70">Select Charity (Optional)</FormLabel>
-                      <Select
-                        value={charitySelection}
-                        onValueChange={(val) => {
-                          setCharitySelection(val);
-                          if (val === "other") {
-                            field.onChange(undefined);
-                          } else if (val === "") {
-                            field.onChange(undefined);
-                          } else {
-                            field.onChange(val);
-                          }
-                        }}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-charity">
-                            <SelectValue placeholder="Choose a cause" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="max-h-72">
-                          {(() => {
-                            const groups: Record<string, { label: string; items: Array<{ id: number; name: string; category?: string }> }> = {
-                              global: { label: "Global & National Charities", items: [] },
-                              nyc_art: { label: "NYC Art Charities", items: [] },
-                              us_art: { label: "U.S. Art Charities", items: [] },
-                            };
-                            (charities ?? []).forEach(c => {
-                              const cat = (c as any).category || "global";
-                              if (groups[cat]) groups[cat].items.push(c);
-                              else groups.global.items.push(c);
-                            });
-                            return Object.entries(groups).map(([key, group]) => (
-                              group.items.length > 0 ? (
-                                <SelectGroup key={key}>
-                                  <SelectLabel className="text-xs font-semibold uppercase tracking-wider text-white/40">{group.label}</SelectLabel>
-                                  {group.items.map(c => (
-                                    <SelectItem key={c.id} value={c.id.toString()} data-testid={`charity-option-${c.id}`}>
-                                      {c.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              ) : null
-                            ));
-                          })()}
-                          <SelectItem value="other" data-testid="charity-option-other">Other (describe below)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem>
+                  <FormLabel className="text-white/70">Select Charity (Optional)</FormLabel>
+                  <Select
+                    value={charitySelection}
+                    onValueChange={(val) => {
+                      setCharitySelection(val);
+                      if (val === "other" || val === "") {
+                        form.setValue("charityId", undefined);
+                      } else {
+                        form.setValue("charityId", Number(val));
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-charity">
+                      <SelectValue placeholder="Choose a cause" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {(() => {
+                        const groups: Record<string, { label: string; items: Array<{ id: number; name: string; category?: string }> }> = {
+                          global: { label: "Global & National Charities", items: [] },
+                          nyc_art: { label: "NYC Art Charities", items: [] },
+                          us_art: { label: "U.S. Art Charities", items: [] },
+                        };
+                        (charities ?? []).forEach(c => {
+                          const cat = (c as any).category || "global";
+                          if (groups[cat]) groups[cat].items.push(c);
+                          else groups.global.items.push(c);
+                        });
+                        return Object.entries(groups).map(([key, group]) => (
+                          group.items.length > 0 ? (
+                            <SelectGroup key={key}>
+                              <SelectLabel className="text-xs font-semibold uppercase tracking-wider text-white/40">{group.label}</SelectLabel>
+                              {group.items.map(c => (
+                                <SelectItem key={c.id} value={c.id.toString()} data-testid={`charity-option-${c.id}`}>
+                                  {c.name}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          ) : null
+                        ));
+                      })()}
+                      <SelectItem value="other" data-testid="charity-option-other">Other (describe below)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
+                </FormItem>
                 {charitySelection === "other" && (
                   <FormField
                     control={form.control}
@@ -708,11 +684,11 @@ export default function SubmitArtwork() {
                     <Button
                       size="sm"
                       className="mt-3 rounded-full bg-white text-[#0a0a0f] hover:bg-white/90"
-                      onClick={() => onboard.mutate()}
-                      disabled={onboard.isPending}
+                      onClick={handleOnboardClick}
+                      disabled={isOnboarding}
                       data-testid="button-go-onboard"
                     >
-                      {onboard.isPending && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
+                      {isOnboarding && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
                       Set up payouts
                     </Button>
                   </div>
@@ -730,11 +706,11 @@ export default function SubmitArtwork() {
                       size="sm"
                       variant="outline"
                       className="mt-3 rounded-full border-amber-400/40 text-amber-200 hover:bg-amber-400/10"
-                      onClick={() => onboard.mutate()}
-                      disabled={onboard.isPending}
+                      onClick={handleOnboardClick}
+                      disabled={isOnboarding}
                       data-testid="button-fix-payout-attention"
                     >
-                      {onboard.isPending && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
+                      {isOnboarding && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
                       Fix now
                     </Button>
                   </div>
