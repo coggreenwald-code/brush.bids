@@ -12,7 +12,7 @@ import { useCreateArtwork } from "@/hooks/use-artworks";
 import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X, Wallet, AlertTriangle } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -40,6 +40,7 @@ export default function SubmitArtwork() {
     queryKey: ["/api/stripe/connect/status"],
     staleTime: 0,
     refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     enabled: !!user,
   });
   const needsConnect = !!user && (!connectStatus?.onboardingComplete || !connectStatus?.payoutsEnabled);
@@ -52,6 +53,7 @@ export default function SubmitArtwork() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const onboardTabRef = useRef<Window | null>(null);
 
   const onboard = useMutation({
     mutationFn: async () => {
@@ -64,11 +66,25 @@ export default function SubmitArtwork() {
       if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
       return body as { url: string };
     },
-    onSuccess: (data) => { window.location.href = data.url; },
+    onSuccess: (data) => {
+      if (onboardTabRef.current && !onboardTabRef.current.closed) {
+        onboardTabRef.current.location.href = data.url;
+      } else {
+        window.open(data.url, "_blank", "noopener,noreferrer");
+      }
+      onboardTabRef.current = null;
+    },
     onError: (err: Error) => {
+      onboardTabRef.current?.close();
+      onboardTabRef.current = null;
       toast({ title: "Couldn't start onboarding", description: err.message, variant: "destructive" });
     },
   });
+
+  const handleOnboardClick = () => {
+    onboardTabRef.current = window.open("", "_blank", "noopener,noreferrer");
+    onboard.mutate();
+  };
 
   const generateDescription = useMutation({
     mutationFn: async (data: { title: string; medium?: string }) => {
@@ -258,11 +274,15 @@ export default function SubmitArtwork() {
             <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
             <p className="text-sm text-amber-200/90">
               Your payout account isn't set up yet — you won't be able to receive earnings until it's ready.{" "}
-              <Link href="/dashboard#payouts">
-                <span className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup-submit">
-                  Finish setup in your dashboard →
-                </span>
-              </Link>
+              <button
+                type="button"
+                onClick={handleOnboardClick}
+                disabled={onboard.isPending}
+                className="underline underline-offset-2 hover:text-amber-100 cursor-pointer disabled:opacity-60"
+                data-testid="link-payout-setup-submit"
+              >
+                {onboard.isPending ? "Opening…" : "Finish setup →"}
+              </button>
             </p>
           </div>
         )}
