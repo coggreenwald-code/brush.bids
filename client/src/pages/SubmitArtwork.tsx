@@ -55,7 +55,10 @@ export default function SubmitArtwork() {
     refetchOnWindowFocus: true,
     enabled: !!user,
   });
-  const needsConnect = !!user && (payoutStatus === undefined || !payoutStatus.ready);
+  // Only block submission once we know for certain the payout isn't ready.
+  // While the status is still loading (undefined) we optimistically allow
+  // the form to be used — the server-side gate will reject the POST if needed.
+  const needsConnect = !!user && payoutStatus !== undefined && !payoutStatus.ready;
   const accountNeedsAttention = !!user && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
   const prevNeedsConnect = useRef<boolean | undefined>(undefined);
   useEffect(() => {

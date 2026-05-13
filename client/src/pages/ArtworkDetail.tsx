@@ -141,7 +141,8 @@ export default function ArtworkDetail() {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
-  const payoutSetupNeeded = isOwnArtwork && payoutStatus !== undefined && !payoutStatus.ready;
+  // Only surface the warning once we know for certain — don't block on loading state.
+  const payoutSetupNeeded = isOwnArtwork && !!payoutStatus && !payoutStatus.ready;
 
   const onboardTabRef = useRef<Window | null>(null);
   const onboard = useMutation({
