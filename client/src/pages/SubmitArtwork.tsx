@@ -16,7 +16,8 @@ import { useLocation } from "wouter";
 import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X, Wallet, AlertTriangle } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title too short"),
@@ -44,6 +45,16 @@ export default function SubmitArtwork() {
     enabled: !!user,
   });
   const needsConnect = !!user && (!connectStatus?.onboardingComplete || !connectStatus?.payoutsEnabled);
+  const prevNeedsConnect = useRef<boolean | undefined>(undefined);
+  useEffect(() => {
+    if (!connectStatus || !user) return;
+    if (prevNeedsConnect.current === true && needsConnect === false) {
+      toast({
+        title: "Payout account connected — you're all set to receive earnings!",
+      });
+    }
+    prevNeedsConnect.current = needsConnect;
+  }, [needsConnect, connectStatus, toast]);
   const { data: charities } = useCharities();
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -266,26 +277,32 @@ export default function SubmitArtwork() {
           <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
         </div>
 
-        {needsConnect && (
-          <div
-            className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
-            data-testid="banner-payout-setup-submit"
-          >
-            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
-            <p className="text-sm text-amber-200/90">
-              Your payout account isn't set up yet — you won't be able to receive earnings until it's ready.{" "}
-              <button
-                type="button"
-                onClick={handleOnboardClick}
-                disabled={onboard.isPending}
-                className="underline underline-offset-2 hover:text-amber-100 cursor-pointer disabled:opacity-60"
-                data-testid="link-payout-setup-submit"
-              >
-                {onboard.isPending ? "Opening…" : "Finish setup →"}
-              </button>
-            </p>
-          </div>
-        )}
+        <AnimatePresence>
+          {needsConnect && (
+            <motion.div
+              key="payout-banner"
+              initial={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, overflow: "hidden" }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+              data-testid="banner-payout-setup-submit"
+            >
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+              <p className="text-sm text-amber-200/90">
+                Your payout account isn't set up yet — you won't be able to receive earnings until it's ready.{" "}
+                <button
+                  type="button"
+                  onClick={handleOnboardClick}
+                  disabled={onboard.isPending}
+                  className="underline underline-offset-2 hover:text-amber-100 cursor-pointer disabled:opacity-60"
+                  data-testid="link-payout-setup-submit"
+                >
+                  {onboard.isPending ? "Opening…" : "Finish setup →"}
+                </button>
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="p-8 rounded-xl bg-white/[0.02] border border-white/5">
           <Form {...form}>
