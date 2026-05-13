@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Copy, Check, User, QrCode, Ruler, ArrowLeft } from "lucide-react";
+import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Copy, Check, User, QrCode, Ruler, ArrowLeft, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
@@ -122,6 +122,16 @@ export default function ArtworkDetail() {
     queryKey: ['/api/charities'],
     staleTime: 5 * 60 * 1000,
   });
+
+  const isOwnArtwork = !!user && !!artwork && user.id === artwork.artistId;
+  const { data: connectStatus } = useQuery<{ onboardingComplete: boolean; payoutsEnabled: boolean }>({
+    queryKey: ["/api/stripe/connect/status"],
+    enabled: isOwnArtwork,
+    staleTime: 0,
+    refetchOnMount: "always",
+  });
+  const payoutSetupNeeded = isOwnArtwork && connectStatus !== undefined &&
+    !(connectStatus.onboardingComplete && connectStatus.payoutsEnabled);
   const charityName = artwork?.charityId
     ? charities?.find(c => c.id === artwork.charityId)?.name
     : null;
@@ -238,6 +248,23 @@ export default function ArtworkDetail() {
             </span>
           </Link>
         </div>
+
+        {payoutSetupNeeded && (
+          <div
+            className="mb-8 flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+            data-testid="banner-payout-setup"
+          >
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+            <p className="text-sm text-amber-200/90">
+              Your payout account isn't set up yet — collectors can't bid on this artwork until it's ready.{" "}
+              <Link href="/dashboard">
+                <span className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup">
+                  Finish setup in your dashboard →
+                </span>
+              </Link>
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
           <div className="lg:col-span-7 space-y-8">
