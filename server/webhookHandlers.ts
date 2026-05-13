@@ -8,6 +8,7 @@ import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
 import { releaseLosingHoldsForArtwork } from './auctionScheduler';
 import { persistTaxFromCheckoutSession, persistTaxIfMissing } from './taxPersistence';
+import { sendPayoutReadyEmail } from './emailService';
 
 async function ensureBidAuthorized(opts: {
   artworkId: number;
@@ -234,8 +235,20 @@ async function handlePaymentIntentFailed(pi: Stripe.PaymentIntent) {
 async function handleAccountUpdated(account: Stripe.Account) {
   const user = await storage.getUserByStripeAccount(account.id);
   if (!user) return;
+
+  const wasPayoutsEnabled = user.stripePayoutsEnabled;
+  const nowPayoutsEnabled = !!account.payouts_enabled;
+
   await storage.updateUserStripeStatus(user.id, {
     onboardingComplete: !!account.details_submitted,
-    payoutsEnabled: !!account.payouts_enabled,
+    payoutsEnabled: nowPayoutsEnabled,
   });
+
+  if (!wasPayoutsEnabled && nowPayoutsEnabled) {
+    await sendPayoutReadyEmail({
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    }).catch(err => console.error("[email] Failed to send payout-ready notification:", err));
+  }
 }
