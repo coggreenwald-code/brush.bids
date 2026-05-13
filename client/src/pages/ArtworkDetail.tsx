@@ -257,7 +257,7 @@ export default function ArtworkDetail() {
             <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
             <p className="text-sm text-amber-200/90">
               Your payout account isn't set up yet — collectors can't bid on this artwork until it's ready.{" "}
-              <Link href="/dashboard">
+              <Link href="/dashboard#payouts">
                 <span className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup">
                   Finish setup in your dashboard →
                 </span>

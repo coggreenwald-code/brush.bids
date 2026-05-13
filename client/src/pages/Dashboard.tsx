@@ -313,7 +313,9 @@ export default function Dashboard() {
         </div>
 
         {(user.role === "artist" || user.role === "both") && (
-          <StripeConnectPanel />
+          <div id="payouts">
+            <StripeConnectPanel />
+          </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
