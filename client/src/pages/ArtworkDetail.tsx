@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtwork } from "@/hooks/use-artworks";
@@ -16,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Copy, Check, User, QrCode, Ruler, ArrowLeft, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import type { User as UserType } from "@shared/schema";
 import { QRCodeModal } from "@/components/QRCodeModal";
 
@@ -129,9 +129,40 @@ export default function ArtworkDetail() {
     enabled: isOwnArtwork,
     staleTime: 0,
     refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
   const payoutSetupNeeded = isOwnArtwork && connectStatus !== undefined &&
     !(connectStatus.onboardingComplete && connectStatus.payoutsEnabled);
+
+  const onboardTabRef = useRef<Window | null>(null);
+  const onboard = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/stripe/connect/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
+      return body as { url: string };
+    },
+    onSuccess: (data) => {
+      if (onboardTabRef.current && !onboardTabRef.current.closed) {
+        onboardTabRef.current.location.href = data.url;
+      } else {
+        window.open(data.url, "_blank", "noopener,noreferrer");
+      }
+      onboardTabRef.current = null;
+    },
+    onError: (err: Error) => {
+      onboardTabRef.current?.close();
+      onboardTabRef.current = null;
+      toast({ title: "Couldn't start onboarding", description: err.message, variant: "destructive" });
+    },
+  });
+  const handleOnboardClick = () => {
+    onboardTabRef.current = window.open("", "_blank", "noopener,noreferrer");
+    onboard.mutate();
+  };
   const charityName = artwork?.charityId
     ? charities?.find(c => c.id === artwork.charityId)?.name
     : null;
@@ -257,11 +288,14 @@ export default function ArtworkDetail() {
             <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
             <p className="text-sm text-amber-200/90">
               Your payout account isn't set up yet — collectors can't bid on this artwork until it's ready.{" "}
-              <Link href="/dashboard#payouts">
-                <span className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup">
-                  Finish setup in your dashboard →
-                </span>
-              </Link>
+              <button
+                onClick={handleOnboardClick}
+                disabled={onboard.isPending}
+                className="underline underline-offset-2 hover:text-amber-100 disabled:opacity-60"
+                data-testid="link-payout-setup"
+              >
+                {onboard.isPending ? "Opening…" : "Finish setup →"}
+              </button>
             </p>
           </div>
         )}
