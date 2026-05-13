@@ -314,10 +314,10 @@ export default function ArtworkDetail() {
                   <span>{(artwork as any).dimensions}</span>
                 </div>
               )}
-              {(artwork.charityId || (artwork as any).charityNote) && (
+              {(artwork.charityId || artwork.charityNote) && (
                 <div className="flex items-center gap-2 text-sm text-white/40" data-testid={`text-charity-${artwork.id}`}>
                   <Heart className="w-4 h-4 text-emerald-400/70" />
-                  <span>5% of sale goes to <span className="text-emerald-400/80 font-medium">{(artwork as any).charityNote || charityName || "a chosen charity"}</span></span>
+                  <span>5% of sale goes to <span className="text-emerald-400/80 font-medium">{artwork.charityNote || charityName || "a chosen charity"}</span></span>
                 </div>
               )}
             </div>
