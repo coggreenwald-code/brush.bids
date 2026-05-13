@@ -44,7 +44,8 @@ export default function SubmitArtwork() {
     refetchOnWindowFocus: true,
     enabled: !!user,
   });
-  const needsConnect = !!user && (!connectStatus?.onboardingComplete || !connectStatus?.payoutsEnabled);
+  const needsConnect = !!user && (connectStatus === undefined || !connectStatus.onboardingComplete);
+  const accountNeedsAttention = !!user && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
   const prevNeedsConnect = useRef<boolean | undefined>(undefined);
   useEffect(() => {
     if (!connectStatus || !user) return;
@@ -298,6 +299,30 @@ export default function SubmitArtwork() {
                   data-testid="link-payout-setup-submit"
                 >
                   {onboard.isPending ? "Opening…" : "Finish setup →"}
+                </button>
+              </p>
+            </motion.div>
+          )}
+          {accountNeedsAttention && (
+            <motion.div
+              key="payout-attention-banner"
+              initial={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, overflow: "hidden" }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="flex items-start gap-3 rounded-md border border-amber-400/40 bg-amber-400/10 px-4 py-3"
+              data-testid="banner-payout-attention-submit"
+            >
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-300" />
+              <p className="text-sm text-amber-100/90">
+                Your payout account needs attention — Stripe has restricted payouts and may require additional verification.{" "}
+                <button
+                  type="button"
+                  onClick={handleOnboardClick}
+                  disabled={onboard.isPending}
+                  className="underline underline-offset-2 hover:text-amber-50 cursor-pointer disabled:opacity-60"
+                  data-testid="link-payout-attention-submit"
+                >
+                  {onboard.isPending ? "Opening…" : "Fix now →"}
                 </button>
               </p>
             </motion.div>
@@ -689,6 +714,28 @@ export default function SubmitArtwork() {
                     >
                       {onboard.isPending && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
                       Set up payouts
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {accountNeedsAttention && (
+                <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4 flex items-start gap-3" data-testid="alert-payout-attention">
+                  <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-amber-200">Payout account needs attention</p>
+                    <p className="text-xs text-amber-200/60 mt-1">
+                      Stripe has restricted payouts on your account — you may need to provide additional verification. You can still submit, but fix this soon to ensure you receive earnings.
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-3 rounded-full border-amber-400/40 text-amber-200 hover:bg-amber-400/10"
+                      onClick={() => onboard.mutate()}
+                      disabled={onboard.isPending}
+                      data-testid="button-fix-payout-attention"
+                    >
+                      {onboard.isPending && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
+                      Fix now
                     </Button>
                   </div>
                 </div>

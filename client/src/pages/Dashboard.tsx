@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useArtworks } from "@/hooks/use-artworks";
@@ -265,8 +265,39 @@ export default function Dashboard() {
     staleTime: 0,
     refetchOnMount: "always",
   });
-  const payoutSetupNeeded = isArtist && connectStatus !== undefined &&
-    !(connectStatus.onboardingComplete && connectStatus.payoutsEnabled);
+  const payoutSetupNeeded = isArtist && connectStatus !== undefined && !connectStatus.onboardingComplete;
+  const payoutAccountNeedsAttention = isArtist && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
+
+  const attentionTabRef = useRef<Window | null>(null);
+  const onboardAttention = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/stripe/connect/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ origin: window.location.origin }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
+      return body as { url: string };
+    },
+    onSuccess: (data) => {
+      if (attentionTabRef.current && !attentionTabRef.current.closed) {
+        attentionTabRef.current.location.href = data.url;
+      } else {
+        window.open(data.url, "_blank", "noopener,noreferrer");
+      }
+      attentionTabRef.current = null;
+    },
+    onError: (err: Error) => {
+      attentionTabRef.current?.close();
+      attentionTabRef.current = null;
+      toast({ title: "Could not open Stripe", description: err.message, variant: "destructive" });
+    },
+  });
+  const handleAttentionFixClick = useCallback(() => {
+    attentionTabRef.current = window.open("about:blank", "_blank", "noopener,noreferrer");
+    onboardAttention.mutate();
+  }, [onboardAttention]);
 
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
   
@@ -383,6 +414,28 @@ export default function Dashboard() {
                         Finish setup above →
                       </a>
                     </p>
+                  </div>
+                )}
+                {payoutAccountNeedsAttention && (
+                  <div
+                    className="flex items-start gap-3 rounded-md border border-amber-400/40 bg-amber-400/10 px-4 py-3"
+                    data-testid="banner-payout-attention-artworks"
+                  >
+                    <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-300" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-amber-100/90">
+                        Your payout account needs attention — Stripe has restricted payouts and may require additional verification. Fix this soon to avoid payout delays.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleAttentionFixClick}
+                        disabled={onboardAttention.isPending}
+                        className="mt-1.5 text-sm underline underline-offset-2 text-amber-200 hover:text-amber-50 cursor-pointer disabled:opacity-60"
+                        data-testid="button-payout-attention-fix-artworks"
+                      >
+                        {onboardAttention.isPending ? "Opening…" : "Fix now →"}
+                      </button>
+                    </div>
                   </div>
                 )}
                 {isLoading ? (
