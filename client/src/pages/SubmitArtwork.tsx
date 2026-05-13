@@ -12,8 +12,8 @@ import { useCreateArtwork } from "@/hooks/use-artworks";
 import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { useLocation } from "wouter";
-import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X, Wallet } from "lucide-react";
+import { useLocation, Link } from "wouter";
+import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X, Wallet, AlertTriangle } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useRef, useCallback } from "react";
@@ -249,6 +249,23 @@ export default function SubmitArtwork() {
           <h1 className="text-3xl font-display font-bold text-white mt-1">Submit Artwork</h1>
           <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
         </div>
+
+        {needsConnect && (
+          <div
+            className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+            data-testid="banner-payout-setup-submit"
+          >
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+            <p className="text-sm text-amber-200/90">
+              Your payout account isn't set up yet — you won't be able to receive earnings until it's ready.{" "}
+              <Link href="/dashboard#payouts">
+                <span className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup-submit">
+                  Finish setup in your dashboard →
+                </span>
+              </Link>
+            </p>
+          </div>
+        )}
 
         <div className="p-8 rounded-xl bg-white/[0.02] border border-white/5">
           <Form {...form}>
