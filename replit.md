@@ -203,3 +203,14 @@ shared/           # Shared types, schemas, and route definitions
 - **Vite**: Frontend bundler with HMR
 - **esbuild**: Server bundler for production
 - **tsx**: TypeScript execution for development
+
+## Stripe Connect — Platform Owner Setup Checklist
+
+For Stripe Express onboarding to work in live mode, the platform owner must complete the following in the Stripe Dashboard before any artist can connect:
+
+1. **Activate your Stripe account** — Complete Stripe's standard business verification (identity, banking details, business description).
+2. **Enable Connect** — Go to Connect → Settings and ensure Connect is enabled for your account.
+3. **Complete your platform profile** — Under Connect → Settings → Platform Profile, fill in your business website, product description, and support contact. Stripe rejects account link creation if this is missing.
+4. **Set capabilities** — Confirm that `card_payments` and `transfers` capabilities are requested (already done in code at `server/routes.ts` `POST /api/stripe/connect/onboard`).
+5. **Test mode vs. live mode** — In test mode, onboarding links work regardless of profile completion. In live mode, all of the above must be done first.
+6. **Webhook** — The webhook is auto-configured by `stripe-replit-sync`. Ensure the Stripe connection in Replit is set to the correct mode (test/live) matching your active Stripe keys.

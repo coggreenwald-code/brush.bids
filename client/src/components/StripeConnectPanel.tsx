@@ -42,7 +42,14 @@ export default function StripeConnectPanel() {
         method: "POST",
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to start onboarding");
+      if (!res.ok) {
+        let message = "Failed to start onboarding";
+        try {
+          const body = await res.json();
+          if (body?.message) message = body.message;
+        } catch { /* non-JSON */ }
+        throw new Error(message);
+      }
       return res.json() as Promise<{ url: string }>;
     },
     onSuccess: ({ url }) => {

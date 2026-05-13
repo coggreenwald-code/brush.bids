@@ -684,7 +684,7 @@ export async function registerRoutes(
       }
     }
     try {
-      const { auctionDurationDays, charityId, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
+      const { auctionDurationDays, charityId, charityNote, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
       // Same payout-readiness gate as POST /api/artworks.
       const artist = await storage.getUser(currentUserId);
       if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
@@ -700,6 +700,7 @@ export async function registerRoutes(
         price: item.price || "0",
         auctionDurationDays,
         charityId,
+        charityNote: charityNote ?? null,
         reviewType,
         dimensions: item.dimensions,
       });
@@ -771,6 +772,11 @@ export async function registerRoutes(
       }
 
       const origin = getAppOrigin();
+      const isLocalDev = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+      if (!origin.startsWith('https://') && !isLocalDev) {
+        return res.status(500).json({ message: "Could not determine a valid app URL for Stripe onboarding. Please contact support." });
+      }
+
       const link = await stripe.accountLinks.create({
         account: accountId,
         refresh_url: `${origin}/dashboard?stripe=refresh`,
@@ -780,7 +786,18 @@ export async function registerRoutes(
       res.json({ url: link.url });
     } catch (err: any) {
       console.error("Stripe Connect onboarding failed:", err);
-      res.status(500).json({ message: err.message || "Failed to start onboarding" });
+      // Detect platform profile incomplete error from Stripe
+      const stripeCode = err?.code;
+      const stripeMessage = err?.message || "";
+      let userMessage = stripeMessage || "Failed to start onboarding";
+      if (stripeCode === 'platform_api_key_expired' || stripeCode === 'api_key_expired') {
+        userMessage = "Stripe API key has expired. Please update the Stripe connection.";
+      } else if (stripeCode === 'account_invalid' || stripeMessage.includes('platform profile')) {
+        userMessage = "Stripe Connect is not fully configured for this platform. The platform owner needs to complete the Stripe business profile and Connect settings in the Stripe Dashboard.";
+      } else if (stripeCode === 'live_mode_not_enabled' || stripeMessage.includes('live mode')) {
+        userMessage = "Stripe Connect is not yet enabled for live mode. The platform owner must activate the Stripe account and complete the business profile in the Stripe Dashboard.";
+      }
+      res.status(500).json({ message: userMessage, stripeCode: stripeCode || null });
     }
   });
 

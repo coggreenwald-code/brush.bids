@@ -119,6 +119,14 @@ export default function ArtworkDetail() {
     enabled: !!artwork?.artistId,
   });
 
+  const { data: charities } = useQuery<Array<{ id: number; name: string }>>({
+    queryKey: ['/api/charities'],
+    staleTime: 5 * 60 * 1000,
+  });
+  const charityName = artwork?.charityId
+    ? charities?.find(c => c.id === artwork.charityId)?.name
+    : null;
+
   const form = useForm({
     resolver: zodResolver(bidSchema),
     defaultValues: { amount: "" },
@@ -256,9 +264,9 @@ export default function ArtworkDetail() {
                   </div>
                 </div>
               </div>
-              {artwork.charityId && (
+              {(artwork.charityId || artwork.charityNote) && (
                 <div className="mt-5 pt-4 border-t border-white/5">
-                  <p className="text-sm text-white/40">Supporting: <span className="font-medium text-white/70">Arts Education Foundation</span></p>
+                  <p className="text-sm text-white/40">Supporting: <span className="font-medium text-white/70">{artwork.charityNote || charityName || "Chosen charity"}</span></p>
                 </div>
               )}
             </div>

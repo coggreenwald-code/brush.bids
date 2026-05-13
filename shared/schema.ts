@@ -31,6 +31,7 @@ export const artworks = pgTable("artworks", {
   reviewType: reviewTypeEnum("review_type").default("ai_instant").notNull(),
   views: integer("views").default(0).notNull(),
   dimensions: text("dimensions"),
+  charityNote: text("charity_note"),
 });
 
 export const portfolioItems = pgTable("portfolio_items", {

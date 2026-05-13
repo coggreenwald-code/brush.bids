@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useArtworks, useUpdateArtworkStatus, useAiReview, useDeleteArtwork, useUpdateFeedback } from "@/hooks/use-artworks";
+import { useCharities } from "@/hooks/use-charities";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ export function AdminTab() {
   const deleteArtwork = useDeleteArtwork();
   const updateFeedback = useUpdateFeedback();
   const { toast } = useToast();
+  const { data: charities } = useCharities();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -276,6 +278,10 @@ export function AdminTab() {
 
                     {artwork.dimensions && (
                       <p className="text-xs text-white/30">Dimensions: {artwork.dimensions}</p>
+                    )}
+
+                    {(artwork.charityId || artwork.charityNote) && (
+                      <p className="text-xs text-emerald-400/70">5% → {artwork.charityNote || charities?.find(c => c.id === artwork.charityId)?.name || "Chosen charity"}</p>
                     )}
 
                     {artwork.aiScore && !editingFeedback[artwork.id] ? (

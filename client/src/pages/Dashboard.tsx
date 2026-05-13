@@ -60,7 +60,7 @@ export default function Dashboard() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [newItem, setNewItem] = useState({ title: "", description: "", imageUrl: "", dimensions: "" });
   const [sellPrice, setSellPrice] = useState("");
-  const [convertOpts, setConvertOpts] = useState<{ auctionDurationDays: string; charityId: string; reviewType: "ai_instant" | "human_curator" }>({ auctionDurationDays: "7", charityId: "", reviewType: "ai_instant" });
+  const [convertOpts, setConvertOpts] = useState<{ auctionDurationDays: string; charityId: string; charityNote: string; reviewType: "ai_instant" | "human_curator" }>({ auctionDurationDays: "7", charityId: "", charityNote: "", reviewType: "ai_instant" });
 
   const { data: portfolioItems, isLoading: portfolioLoading } = useQuery<PortfolioItem[]>({
     queryKey: ['/api/portfolio', user?.id],
@@ -108,9 +108,11 @@ export default function Dashboard() {
 
   const convertToAuction = useMutation({
     mutationFn: async ({ id, opts }: { id: number; opts: typeof convertOpts }) => {
+      const isOther = opts.charityId === "other";
       const res = await apiRequest("POST", `/api/portfolio/${id}/convert-to-auction`, {
         auctionDurationDays: Number(opts.auctionDurationDays),
-        charityId: opts.charityId ? Number(opts.charityId) : undefined,
+        charityId: isOther ? undefined : (opts.charityId ? Number(opts.charityId) : undefined),
+        charityNote: isOther ? opts.charityNote : undefined,
         reviewType: opts.reviewType,
       });
       return res.json();
@@ -415,6 +417,9 @@ export default function Dashboard() {
                               <Clock className="w-3 h-3" />
                               <span>Auction active</span>
                             </div>
+                            {(artwork.charityId || artwork.charityNote) && (
+                              <p className="text-xs text-emerald-400/70 mt-1">5% → {artwork.charityNote || charities?.find(c => c.id === artwork.charityId)?.name || "Chosen charity"}</p>
+                            )}
                           </div>
                           <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
                             <div>
@@ -965,15 +970,28 @@ export default function Dashboard() {
             </div>
             <div>
               <Label className="text-white/60">Charity (Optional)</Label>
-              <Select value={convertOpts.charityId} onValueChange={(v) => setConvertOpts(p => ({ ...p, charityId: v }))}>
+              <Select value={convertOpts.charityId} onValueChange={(v) => setConvertOpts(p => ({ ...p, charityId: v, charityNote: v !== "other" ? "" : p.charityNote }))}>
                 <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-convert-charity"><SelectValue placeholder="Choose a cause" /></SelectTrigger>
                 <SelectContent className="bg-[#0d0d14] border-white/10 max-h-60">
                   {charities?.map(c => (
                     <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                   ))}
+                  <SelectItem value="other" data-testid="charity-option-other-dashboard">Other (describe below)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {convertOpts.charityId === "other" && (
+              <div>
+                <Label className="text-white/60">Where should the 5% go?</Label>
+                <input
+                  className="w-full mt-1 px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+                  placeholder="e.g. Local after-school art program"
+                  value={convertOpts.charityNote}
+                  onChange={(e) => setConvertOpts(p => ({ ...p, charityNote: e.target.value }))}
+                  data-testid="input-charity-note-dashboard"
+                />
+              </div>
+            )}
             <div>
               <Label className="text-white/60">Review Type</Label>
               <Select value={convertOpts.reviewType} onValueChange={(v: "ai_instant" | "human_curator") => setConvertOpts(p => ({ ...p, reviewType: v }))}>
@@ -984,7 +1002,7 @@ export default function Dashboard() {
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" disabled={convertToAuction.isPending} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
+            <Button className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90" disabled={convertToAuction.isPending || (convertOpts.charityId === "other" && !convertOpts.charityNote.trim())} onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })} data-testid="button-confirm-convert">
               {convertToAuction.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Submit for Review
             </Button>

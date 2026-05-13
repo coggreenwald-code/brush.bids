@@ -13,12 +13,10 @@ import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X } from "lucide-react";
+import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X, Wallet } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useRef, useCallback } from "react";
-import { Link } from "wouter";
-import { Wallet } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title too short"),
@@ -29,6 +27,7 @@ const formSchema = z.object({
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
   auctionDurationDays: z.coerce.number().refine(v => [1, 3, 5, 7].includes(v), { message: "Auction duration must be 1, 3, 5, or 7 days" }).default(7),
   charityId: z.coerce.number().optional(),
+  charityNote: z.string().max(200).optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
 });
 
@@ -48,10 +47,28 @@ export default function SubmitArtwork() {
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [charitySelection, setCharitySelection] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const onboard = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/stripe/connect/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ origin: window.location.origin }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
+      return body as { url: string };
+    },
+    onSuccess: (data) => { window.location.href = data.url; },
+    onError: (err: Error) => {
+      toast({ title: "Couldn't start onboarding", description: err.message, variant: "destructive" });
+    },
+  });
 
   const generateDescription = useMutation({
     mutationFn: async (data: { title: string; medium?: string }) => {
@@ -188,9 +205,16 @@ export default function SubmitArtwork() {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     const { dimensionLength, dimensionWidth, ...rest } = data;
+    const isOther = charitySelection === "other";
+    if (isOther && !rest.charityNote?.trim()) {
+      form.setError("charityNote", { message: "Please describe where the 5% should go" });
+      return;
+    }
     const dimensions = `${dimensionLength} x ${dimensionWidth} inches`;
     createArtwork.mutate({
       ...rest,
+      charityId: isOther ? undefined : rest.charityId,
+      charityNote: isOther ? rest.charityNote : undefined,
       artistId: user.id,
       price: data.price.toString(),
       dimensions,
@@ -351,14 +375,26 @@ export default function SubmitArtwork() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="charityId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-white/70">Select Charity (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                      <Select
+                        value={charitySelection}
+                        onValueChange={(val) => {
+                          setCharitySelection(val);
+                          if (val === "other") {
+                            field.onChange(undefined);
+                          } else if (val === "") {
+                            field.onChange(undefined);
+                          } else {
+                            field.onChange(val);
+                          }
+                        }}
+                      >
                         <FormControl>
                           <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-charity">
                             <SelectValue placeholder="Choose a cause" />
@@ -389,6 +425,7 @@ export default function SubmitArtwork() {
                               ) : null
                             ));
                           })()}
+                          <SelectItem value="other" data-testid="charity-option-other">Other (describe below)</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
@@ -396,6 +433,26 @@ export default function SubmitArtwork() {
                     </FormItem>
                   )}
                 />
+                {charitySelection === "other" && (
+                  <FormField
+                    control={form.control}
+                    name="charityNote"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white/70">Where should the 5% go?</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. Local after-school art program"
+                            className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                            {...field}
+                            data-testid="input-charity-note"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
 
               <FormField
@@ -569,11 +626,16 @@ export default function SubmitArtwork() {
                     <p className="text-xs text-white/60 mt-1">
                       You need to finish payout setup before submitting artwork. This is a one-time step that lets us send your share to your bank when you sell.
                     </p>
-                    <Link href="/dashboard">
-                      <Button size="sm" className="mt-3 rounded-full bg-white text-[#0a0a0f] hover:bg-white/90" data-testid="button-go-onboard">
-                        Set up payouts
-                      </Button>
-                    </Link>
+                    <Button
+                      size="sm"
+                      className="mt-3 rounded-full bg-white text-[#0a0a0f] hover:bg-white/90"
+                      onClick={() => onboard.mutate()}
+                      disabled={onboard.isPending}
+                      data-testid="button-go-onboard"
+                    >
+                      {onboard.isPending && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
+                      Set up payouts
+                    </Button>
                   </div>
                 </div>
               )}

@@ -49,7 +49,7 @@ export default function Portfolio() {
 
   const [newItem, setNewItem] = useState({ title: "", description: "", imageUrl: "", dimensions: "" });
   const [sellPrice, setSellPrice] = useState("");
-  const [convertOpts, setConvertOpts] = useState<{ auctionDurationDays: string; charityId: string; reviewType: "ai_instant" | "human_curator" }>({ auctionDurationDays: "7", charityId: "", reviewType: "ai_instant" });
+  const [convertOpts, setConvertOpts] = useState<{ auctionDurationDays: string; charityId: string; charityNote: string; reviewType: "ai_instant" | "human_curator" }>({ auctionDurationDays: "7", charityId: "", charityNote: "", reviewType: "ai_instant" });
 
   const { data: items, isLoading } = useQuery<PortfolioItem[]>({
     queryKey: ['/api/portfolio', user?.id],
@@ -97,9 +97,11 @@ export default function Portfolio() {
 
   const convertToAuction = useMutation({
     mutationFn: async ({ id, opts }: { id: number; opts: typeof convertOpts }) => {
+      const isOther = opts.charityId === "other";
       const res = await apiRequest("POST", `/api/portfolio/${id}/convert-to-auction`, {
         auctionDurationDays: Number(opts.auctionDurationDays),
-        charityId: opts.charityId ? Number(opts.charityId) : undefined,
+        charityId: isOther ? undefined : (opts.charityId ? Number(opts.charityId) : undefined),
+        charityNote: isOther ? opts.charityNote : undefined,
         reviewType: opts.reviewType,
       });
       return res.json();
@@ -385,15 +387,28 @@ export default function Portfolio() {
             </div>
             <div>
               <Label>Charity (Optional)</Label>
-              <Select value={convertOpts.charityId} onValueChange={(v) => setConvertOpts(p => ({ ...p, charityId: v }))}>
+              <Select value={convertOpts.charityId} onValueChange={(v) => setConvertOpts(p => ({ ...p, charityId: v, charityNote: v !== "other" ? "" : p.charityNote }))}>
                 <SelectTrigger data-testid="select-convert-charity"><SelectValue placeholder="Choose a cause" /></SelectTrigger>
                 <SelectContent className="max-h-60">
                   {charities?.map(c => (
                     <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                   ))}
+                  <SelectItem value="other" data-testid="charity-option-other-portfolio">Other (describe below)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {convertOpts.charityId === "other" && (
+              <div>
+                <Label>Where should the 5% go?</Label>
+                <input
+                  className="w-full mt-1 px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+                  placeholder="e.g. Local after-school art program"
+                  value={convertOpts.charityNote}
+                  onChange={(e) => setConvertOpts(p => ({ ...p, charityNote: e.target.value }))}
+                  data-testid="input-charity-note-portfolio"
+                />
+              </div>
+            )}
             <div>
               <Label>Review Type</Label>
               <Select value={convertOpts.reviewType} onValueChange={(v: "ai_instant" | "human_curator") => setConvertOpts(p => ({ ...p, reviewType: v }))}>
@@ -406,7 +421,7 @@ export default function Portfolio() {
             </div>
             <Button
               className="w-full rounded-full"
-              disabled={convertToAuction.isPending}
+              disabled={convertToAuction.isPending || (convertOpts.charityId === "other" && !convertOpts.charityNote.trim())}
               onClick={() => showConvertDialog && convertToAuction.mutate({ id: showConvertDialog.id, opts: convertOpts })}
               data-testid="button-confirm-convert"
             >
