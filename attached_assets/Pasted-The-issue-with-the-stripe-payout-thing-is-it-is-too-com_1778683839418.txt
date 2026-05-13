@@ -1,0 +1,11 @@
+The issue with the stripe payout thing is it is too complex. Setting it up should be easier for sellers or we will lose their attention too quickly making them less  inclined to set up an account. How can I sell on my replit-built website without making users have to set up these massive accounts and buyers just simply paying once their bid is accepted.10:47 AMClaude responded: This is a real product problem, not just a UX tweak.This is a real product problem, not just a UX tweak. The core tension is:
+Stripe Connect Express requires artists to go through full KYC (identity verification, bank details, SSN last 4, etc.) before they can receive payouts. That's Stripe's legal requirement for any marketplace doing split payments. You can't skip it.
+But you have options that dramatically reduce the friction:
+
+Option A: Platform collects everything, pays artists manually
+Remove Connect entirely. Buyers pay BrushBids directly (simple Stripe Checkout, no Connect). You collect the money, then manually send artists their cut via Venmo, PayPal, Zelle, or a bank transfer after each sale. Artists sign up with zero friction — no Stripe account needed. You just collect their PayPal/Venmo handle during onboarding.
+Tradeoff: You're manually moving money. Fine at low volume, annoying at scale. Also means you're holding artist funds, which has its own legal implications at larger scale.
+
+Option B: Delay Connect until first sale
+Artists submit and list with zero setup. Connect onboarding only gets triggered when they actually win a sale — at that point you email them "Congratulations, you sold! Set up your payout account to receive $X." People are far more motivated to complete a 5-minute form when there's real money waiting on the other side.
+This requires a small backend change: hold the payout in Stripe (funds sit in your platform balance), email the artist, and only release the transfer once they complete onboarding. Stripe supports this — you can create the Connect account and transfer funds after the fact.

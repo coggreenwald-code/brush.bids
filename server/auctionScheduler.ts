@@ -5,6 +5,8 @@
 import { storage } from "./storage";
 import { getUncachableStripeClient } from "./stripeClient";
 import { persistTaxIfMissing } from "./taxPersistence";
+import { resolvePayoutTarget } from "@shared/payoutHelpers";
+import { sendManualPayoutQueuedEmail } from "./emailService";
 
 let inFlight = false;
 const noWinnerLogged = new Set<number>();
@@ -83,14 +85,22 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
       const taxCents = Math.max(0, totalCents - bidCents);
       const baseFeeCents = Number(piBefore.metadata?.baseAppFeeCents || 0)
         || Math.round(bidCents * 0.25);
-      const captureFeeCents = Math.min(totalCents, baseFeeCents + taxCents);
-      await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId, {
-        application_fee_amount: captureFeeCents,
-      });
+      // For Connect bids the PI carries transfer_data and we bump the
+      // application_fee to keep platform-cut + tax. For manual-payout bids
+      // the funds land on the platform balance so capture takes no fee
+      // override (whole charge stays on platform; admin pays artist later).
+      const isManualPayout = (piBefore.metadata?.payoutKind === "manual") || !piBefore.transfer_data;
+      const captureArgs: any = isManualPayout
+        ? {}
+        : { application_fee_amount: Math.min(totalCents, baseFeeCents + taxCents) };
+      await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId, captureArgs);
       await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId);
       await storage.markBidCaptured(currentWinner.stripePaymentIntentId);
       await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
-      console.log(`[scheduler] captured winning bid ${currentWinner.id} for artwork ${artworkId} (bid ${bidCents}c + tax ${taxCents}c)`);
+      if (isManualPayout) {
+        await queueManualPayoutForBid(currentWinner, artwork, bidCents);
+      }
+      console.log(`[scheduler] captured winning bid ${currentWinner.id} for artwork ${artworkId} (bid ${bidCents}c + tax ${taxCents}c, ${isManualPayout ? "manual payout queued" : "connect transfer"})`);
       break;
     } catch (err: any) {
       if (err?.code !== "payment_intent_unexpected_state") throw err;
@@ -101,6 +111,11 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
         await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId);
         await storage.markBidCaptured(currentWinner.stripePaymentIntentId);
         await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
+        const isManualPayout = (pi.metadata?.payoutKind === "manual") || !pi.transfer_data;
+        if (isManualPayout) {
+          const bidCents = Math.round(Number(currentWinner.amount) * 100);
+          await queueManualPayoutForBid(currentWinner, artwork, bidCents);
+        }
         break;
       }
       console.warn(`[scheduler] bid ${currentWinner.id} not capturable (${pi.status}); falling back`);
@@ -123,6 +138,68 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
     }
   }
   return true;
+}
+
+// Insert a Pending Payout row (idempotent on bid id) for a manual-payout sale,
+// snapshotting the artist's current handle so later edits don't change history.
+// The amount queued is the artist's pre-tax share after the platform's cut and
+// any promotion boost — charity (5%) is held back too and the admin can decide
+// how to disburse it later.
+async function queueManualPayoutForBid(
+  bid: { id: number; bidderId: string; amount: string },
+  artwork: { id: number; artistId: string; promotionPercentage: string | number | null },
+  bidCents: number,
+): Promise<void> {
+  try {
+    const existing = await storage.getPayoutByBidId(bid.id);
+    if (existing) return;
+    const artist = await storage.getUser(artwork.artistId);
+    if (!artist) {
+      console.error(`[scheduler] cannot queue payout for bid ${bid.id} — artist ${artwork.artistId} missing`);
+      return;
+    }
+    // NOTE: we DON'T short-circuit on the artist's *current* Stripe Connect
+    // readiness — by the time settlement runs, the funds for this bid are
+    // already on platform balance (the PI was created with `payoutKind=manual`
+    // and no `transfer_data`). Even if the artist has since connected Stripe,
+    // we still owe them this sale through the manual rail; future bids will
+    // use Connect automatically.
+    const target = resolvePayoutTarget(artist);
+    if (!target || target.kind !== "manual") {
+      // Artist has no manual handle on file at all (and presumably became
+      // Connect-ready after the bid was authorized). Fall back to the parent
+      // path or fail loudly so the admin can chase it down — never silently
+      // drop a captured sale.
+      console.error(`[scheduler] manual payout queue: bid ${bid.id} captured but artist ${artist.id} has no manual target — needs admin intervention`);
+      return;
+    }
+    const promotionPct = Number(artwork.promotionPercentage || 0);
+    // Base split: 75% artist - boost%. Charity (5%) stays on platform balance
+    // until the admin disburses it manually.
+    const artistShareRatio = Math.max(0, (75 - promotionPct) / 100);
+    const amountDollars = ((bidCents * artistShareRatio) / 100).toFixed(2);
+    await storage.createPayout({
+      bidId: bid.id,
+      artworkId: artwork.id,
+      artistId: artist.id,
+      amount: amountDollars,
+      method: target.method,
+      handle: target.handle,
+      recipientEmail: target.recipientEmail,
+      forMinor: target.forMinor,
+    });
+    sendManualPayoutQueuedEmail({
+      artist: { id: artist.id, email: artist.email, firstName: artist.firstName, lastName: artist.lastName },
+      parentEmail: artist.parentGuardianEmail,
+      artworkTitle: (artwork as any).title || "your artwork",
+      amount: amountDollars,
+      method: target.method,
+      handle: target.handle,
+      forMinor: target.forMinor,
+    }).catch(err => console.error("[scheduler] manual-payout email failed:", err));
+  } catch (err) {
+    console.error(`[scheduler] failed to queue manual payout for bid ${bid.id}:`, err);
+  }
 }
 
 let timer: NodeJS.Timeout | null = null;

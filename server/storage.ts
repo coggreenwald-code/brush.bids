@@ -1,14 +1,32 @@
 import { db } from "./db";
 import {
-  users, artworks, bids, charities, portfolioItems, emailLog,
+  users, artworks, bids, charities, portfolioItems, emailLog, payouts,
   type User,
   type Artwork, type InsertArtwork,
   type Bid, type InsertBid,
   type Charity, type InsertCharity,
   type PortfolioItem, type InsertPortfolioItem,
   type EmailLog,
+  type Payout, type InsertPayout,
 } from "@shared/schema";
 import { eq, desc, sql, and, lte, isNull, ne, inArray } from "drizzle-orm";
+
+export type PayoutSettingsUpdate = {
+  dateOfBirth?: string | null;
+  payoutMethod?: "paypal" | "venmo" | "zelle" | null;
+  payoutHandle?: string | null;
+  parentGuardianEmail?: string | null;
+  parentPayoutMethod?: "paypal" | "venmo" | "zelle" | null;
+  parentPayoutHandle?: string | null;
+  parentTermsAccepted?: boolean;
+};
+
+export type PendingPayoutRow = Payout & {
+  artistFirstName: string | null;
+  artistLastName: string | null;
+  artistEmail: string | null;
+  artworkTitle: string;
+};
 
 export type HoldStatus = "pending" | "authorized" | "captured" | "canceled" | "failed";
 
@@ -61,11 +79,19 @@ export interface IStorage {
   updateUserBio(id: string, bio: string): Promise<User>;
   updateUserName(id: string, firstName: string, lastName: string): Promise<User>;
   updateUserProfileImage(id: string, profileImageUrl: string): Promise<User>;
-  completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string): Promise<User>;
+  completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string, payout?: PayoutSettingsUpdate): Promise<User>;
+  updateUserPayoutSettings(id: string, settings: PayoutSettingsUpdate): Promise<User>;
+  markAdultUpgradeNotified(id: string): Promise<void>;
 
   setUserStripeAccount(id: string, stripeAccountId: string): Promise<User>;
   updateUserStripeStatus(id: string, opts: { onboardingComplete?: boolean; payoutsEnabled?: boolean }): Promise<User>;
   getUserByStripeAccount(stripeAccountId: string): Promise<User | undefined>;
+
+  createPayout(payout: InsertPayout): Promise<Payout>;
+  getPayoutByBidId(bidId: number): Promise<Payout | undefined>;
+  getPayout(id: number): Promise<Payout | undefined>;
+  getPayouts(status?: "pending" | "paid" | "skipped"): Promise<PendingPayoutRow[]>;
+  markPayoutPaid(id: number, adminId: string, notes?: string): Promise<Payout | undefined>;
 
   getArtworks(status?: "pending" | "approved" | "rejected", artistId?: string): Promise<Artwork[]>;
   getArtwork(id: number): Promise<Artwork | undefined>;
@@ -135,12 +161,72 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string): Promise<User> {
+  async completeOnboarding(id: string, role: "artist" | "buyer" | "both", firstName?: string, lastName?: string, payout?: PayoutSettingsUpdate): Promise<User> {
     const updateData: any = { role, hasCompletedOnboarding: new Date(), updatedAt: new Date() };
     if (firstName) updateData.firstName = firstName;
     if (lastName) updateData.lastName = lastName;
+    Object.assign(updateData, payoutFieldsToColumns(payout));
     const [user] = await db.update(users).set(updateData).where(eq(users.id, id)).returning();
     return user;
+  }
+
+  async updateUserPayoutSettings(id: string, settings: PayoutSettingsUpdate): Promise<User> {
+    const updateData: any = { updatedAt: new Date(), ...payoutFieldsToColumns(settings) };
+    const [user] = await db.update(users).set(updateData).where(eq(users.id, id)).returning();
+    return user;
+  }
+
+  async markAdultUpgradeNotified(id: string): Promise<void> {
+    await db.update(users)
+      .set({ adultUpgradeNotifiedAt: new Date(), updatedAt: new Date() })
+      .where(eq(users.id, id));
+  }
+
+  async createPayout(payout: InsertPayout): Promise<Payout> {
+    const [created] = await db.insert(payouts).values(payout).returning();
+    return created;
+  }
+
+  async getPayoutByBidId(bidId: number): Promise<Payout | undefined> {
+    const [row] = await db.select().from(payouts).where(eq(payouts.bidId, bidId));
+    return row;
+  }
+
+  async getPayout(id: number): Promise<Payout | undefined> {
+    const [row] = await db.select().from(payouts).where(eq(payouts.id, id));
+    return row;
+  }
+
+  async getPayouts(status?: "pending" | "paid" | "skipped"): Promise<PendingPayoutRow[]> {
+    const conds: any[] = [];
+    if (status) conds.push(eq(payouts.status, status));
+    const rows = await db
+      .select({
+        payout: payouts,
+        artistFirstName: users.firstName,
+        artistLastName: users.lastName,
+        artistEmail: users.email,
+        artworkTitle: artworks.title,
+      })
+      .from(payouts)
+      .leftJoin(users, eq(payouts.artistId, users.id))
+      .leftJoin(artworks, eq(payouts.artworkId, artworks.id))
+      .where(conds.length ? and(...conds) : undefined as any)
+      .orderBy(desc(payouts.createdAt));
+    return rows.map(r => ({
+      ...r.payout,
+      artistFirstName: r.artistFirstName,
+      artistLastName: r.artistLastName,
+      artistEmail: r.artistEmail,
+      artworkTitle: r.artworkTitle ?? "(deleted)",
+    }));
+  }
+
+  async markPayoutPaid(id: number, adminId: string, notes?: string): Promise<Payout | undefined> {
+    const updates: any = { status: "paid", paidAt: new Date(), paidByAdminId: adminId };
+    if (notes !== undefined) updates.notes = notes;
+    const [updated] = await db.update(payouts).set(updates).where(eq(payouts.id, id)).returning();
+    return updated;
   }
 
   async updateUserName(id: string, firstName: string, lastName: string): Promise<User> {
@@ -582,3 +668,21 @@ export class DatabaseStorage implements IStorage {
 }
 
 export const storage = new DatabaseStorage();
+
+// Map the inbound payout-settings shape to the actual column names. Centralized
+// so both `completeOnboarding` and `updateUserPayoutSettings` stay in sync, and
+// so we can convert the boolean `parentTermsAccepted` flag into a timestamp.
+function payoutFieldsToColumns(p?: PayoutSettingsUpdate): Record<string, unknown> {
+  if (!p) return {};
+  const out: Record<string, unknown> = {};
+  if (p.dateOfBirth !== undefined) out.dateOfBirth = p.dateOfBirth;
+  if (p.payoutMethod !== undefined) out.payoutMethod = p.payoutMethod;
+  if (p.payoutHandle !== undefined) out.payoutHandle = p.payoutHandle;
+  if (p.parentGuardianEmail !== undefined) out.parentGuardianEmail = p.parentGuardianEmail;
+  if (p.parentPayoutMethod !== undefined) out.parentPayoutMethod = p.parentPayoutMethod;
+  if (p.parentPayoutHandle !== undefined) out.parentPayoutHandle = p.parentPayoutHandle;
+  if (p.parentTermsAccepted !== undefined) {
+    out.parentTermsAcceptedAt = p.parentTermsAccepted ? new Date() : null;
+  }
+  return out;
+}

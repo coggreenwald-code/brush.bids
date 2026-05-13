@@ -31,6 +31,19 @@ Key features:
 - Internal linking between About, FAQ, and Gallery pages for SEO authority distribution
 - Stripe Tax marketplace-facilitator flow: Checkout collects US shipping address, `automatic_tax` enabled, tax added on top of bid (`tax_behavior: 'exclusive'`), tax persisted on bid row (taxAmount/taxRate/taxJurisdiction/taxableAmount + ship-to address), application_fee_amount recomputed at capture so platform retains pre-tax cut + tax (artist payout stays based on pre-tax bid). Admin "Tax Collected" tab shows by-state and by-month breakdown with CSV export at `/api/admin/tax-report.csv`. FAQ + Dashboard explain that BrushBids files; artists never handle sales tax.
 
+### Hybrid Payouts (Stripe Connect optional)
+- Artists are NOT required to onboard Stripe Connect to list. They pick a manual payout handle (PayPal / Venmo / Zelle) on the Dashboard `PayoutMethodPanel` and can list immediately.
+- Stripe Connect remains an optional upgrade — when an artist completes Connect onboarding (`stripePayoutsEnabled === true`), future winning bids automatically transfer to their connected account; their PayPal/Venmo/Zelle handle becomes a backup.
+- Minor protection: artists with `dateOfBirth` indicating they're under 18 must enter a `parentGuardianEmail` + parent payout handle and check the "parent accepted seller terms" box. Earnings get queued to the parent's handle until the artist turns 18.
+- Adult-upgrade hook: the first time an artist who originally onboarded as a minor logs in after their 18th birthday, `/api/auth/user` sends a one-time `sendAdultUpgradeEmail` and stamps `adultUpgradeNotifiedAt`. The Dashboard banner (`adultUpgradeAvailable` flag from `/api/users/me/payout-status`) prompts them to switch to their own handle.
+- Bid checkout branches on Connect readiness: Connect-ready artists get `transfer_data` + `application_fee_amount` so funds flow directly to their account. Manual-payout artists' bids charge fully to the platform balance (`payoutKind: 'manual'` PI metadata) and the scheduler inserts a `payouts` row when the auction settles, snapshotting method/handle/recipientEmail/forMinor.
+- `payouts` table fields: `bidId` (unique, idempotent), `artworkId`, `artistId`, `amount` (artist's pre-tax share = bid * (75% - boost%) / 100; charity 5% held back too), `method`, `handle`, `recipientEmail`, `forMinor`, `status` (pending/paid/skipped), `paidAt`, `paidByAdminId`, `notes`.
+- Admin "Pending Payouts" tab (`AdminPayoutsTab`) lists pending/paid rows, deep-links to PayPal.me / venmo.com where possible, and exposes "Mark paid" action via `POST /api/admin/payouts/:id/mark-paid`.
+- Emails: `sendManualPayoutQueuedEmail` notifies artist (and parent if minor) on settlement; `sendAdultUpgradeEmail` is the one-time 18th-birthday prompt.
+- Helpers in `shared/payoutHelpers.ts`: `ageInYears`, `isMinor`, `hasStripeConnectReady`, `hasReadyPayout`, `resolvePayoutTarget` (returns `{ kind: 'stripe' } | { kind: 'manual', method, handle, recipientEmail, forMinor }`).
+- WelcomeModal collects `dateOfBirth` for artists/both at signup; full payout details (handle, parent fields) configured later on Dashboard.
+- All listing gates (`POST /api/artworks`, bid checkout, portfolio convert-to-auction) now use `hasReadyPayout(user)` instead of the old Stripe-only `stripeOnboardingComplete && stripePayoutsEnabled` check.
+
 ### Anti-Sniping Auction System
 - Artworks have a configurable auction duration (1, 3, 5, 7, 14, or 30 days)
 - Auction timer starts when artwork is approved by admin

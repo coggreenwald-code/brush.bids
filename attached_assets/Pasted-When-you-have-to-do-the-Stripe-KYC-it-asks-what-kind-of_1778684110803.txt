@@ -1,0 +1,60 @@
+When you have to do the Stripe KYC it asks what kind of business you are. Also we are putting a lot of artists who are minors up so will this be a concern for parents
+
+10:52 AM
+Claude responded: Both of these are real concerns worth thinking through carefully.
+Both of these are real concerns worth thinking through carefully.
+
+The "what kind of business" question in Stripe KYC
+
+For student artists, they should select Individual / Sole Proprietor, not any business type. It just asks for their name, address, SSN last 4, and date of birth. That's it. No business registration, no EIN, nothing complicated. The form looks scarier than it is.
+
+Minors — this is the more serious issue
+
+Yes, this is a genuine legal and practical problem. A few things to know:
+
+Stripe's policy: Stripe requires account holders to be 18 or older. A 16-year-old cannot legally create their own Stripe Express account. If a minor tries and enters their real birthdate, Stripe will reject them.
+
+Contracts: Minors cannot enter into binding contracts in most US states, which means their agreement to Stripe's TOS and potentially to your seller terms is legally unenforceable without parental consent.
+
+What this means for BrushBids: If a significant portion of your artists are under 18, Option A from my last message isn't just a convenience — it's basically a legal necessity in the near term. You'd collect a parent's PayPal or bank details for payouts instead, and parents sign off on their child selling on the platform.
+
+What you should actually do:
+
+During artist onboarding, add an age gate. If the artist is under 18, require a parent/guardian email and have them agree to the seller terms on the minor's behalf. Payouts go to the parent's PayPal/Venmo. This is clean, defensible, and actually a selling point to parents who are protective of their kids online.
+
+Bottom line: The manual payout route (Option A) isn't just simpler — for a platform built around student artists, many of whom may be minors, it's the right call legally until you're at a scale where the legal infrastructure to handle minor accounts properly is worth building out. Want me to build that into the onboarding flow?
+
+You said: I would also like to add that once the birthdate changes, then the system will treat the former minor as an adult individual
+I would also like to add that once the birthdate changes, then the system will treat the former minor as an adult individual
+
+10:54 AM
+Claude responded: Good thinking.
+Good thinking. Here's how that should work end to end:
+
+The flow:
+
+When an artist registers, they enter their birthdate. The system stores it and checks it on every login (or daily in the background). The moment they turn 18, their account automatically upgrades — they get a notification saying they can now set up direct Stripe payouts if they want, and the payout method field opens up to include that option alongside PayPal/Venmo.
+
+Nothing breaks for them in the meantime. While under 18, payouts go to the parent PayPal/Venmo on file. On their 18th birthday (or the next time they log in after it), the system recognizes the change and prompts them to optionally upgrade.
+
+What needs to be built:
+
+Database changes:
+
+Add dateOfBirth to the users table
+Add parentGuardianEmail and payoutEmail (replaces the Connect requirement)
+Add isMinor as a computed field (or just derive it from DOB on the fly)
+Onboarding modal changes:
+
+Add a birthdate field
+If under 18: ask for parent/guardian email and their PayPal/Venmo for payouts, show a checkbox that a parent must agree to the seller terms
+If 18+: ask for their own PayPal/Venmo (and eventually Stripe option)
+Backend logic:
+
+A daily job (or on-login check) that compares dateOfBirth to today
+When someone crosses 18, flip their status and send a "you're now an adult account" email prompting them to update payout preferences if they want
+Payout flow:
+
+When a sale completes, look at isMinor at time of payout
+If minor: send the cut to parentPayoutEmail
+If adult: send to their payoutEmail (or Stripe if they've set that up)

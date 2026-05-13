@@ -1,7 +1,12 @@
 import { sql } from "drizzle-orm";
-import { boolean, index, jsonb, pgTable, timestamp, varchar, text, pgEnum } from "drizzle-orm/pg-core";
+import { boolean, date, index, jsonb, pgTable, timestamp, varchar, text, pgEnum } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["artist", "buyer", "both", "admin"]);
+
+// Manual-payout method an artist (or their guardian) chose at signup. Stripe
+// Connect lives in its own dedicated columns and is treated as an *additional*
+// optional path; "stripe" is intentionally NOT in this enum.
+export const payoutMethodEnum = pgEnum("payout_method", ["paypal", "venmo", "zelle"]);
 
 // Session storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
@@ -27,9 +32,27 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   hasCompletedOnboarding: timestamp("has_completed_onboarding"),
+  // Optional Stripe Connect path. Artists may upgrade to direct payouts after
+  // their first sale or whenever they like; until then we use the manual
+  // payoutMethod/payoutHandle below.
   stripeAccountId: varchar("stripe_account_id"),
   stripeOnboardingComplete: boolean("stripe_onboarding_complete").default(false).notNull(),
   stripePayoutsEnabled: boolean("stripe_payouts_enabled").default(false).notNull(),
+  // Hybrid payout fields. We default new artists to a manual handle (PayPal /
+  // Venmo / Zelle) so a Stripe Connect account isn't required to list.
+  dateOfBirth: date("date_of_birth"),
+  payoutMethod: payoutMethodEnum("payout_method"),
+  payoutHandle: text("payout_handle"),
+  // Minor (under 18) protection. Earnings get sent to the parent/guardian's
+  // payout method until the artist turns 18 and either upgrades to Stripe or
+  // sets their own handle.
+  parentGuardianEmail: text("parent_guardian_email"),
+  parentPayoutMethod: payoutMethodEnum("parent_payout_method"),
+  parentPayoutHandle: text("parent_payout_handle"),
+  parentTermsAcceptedAt: timestamp("parent_terms_accepted_at"),
+  // Set when we email the artist after they cross their 18th birthday so we
+  // don't spam them on every login.
+  adultUpgradeNotifiedAt: timestamp("adult_upgrade_notified_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

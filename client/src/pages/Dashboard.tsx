@@ -5,6 +5,7 @@ import { useArtworks } from "@/hooks/use-artworks";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StripeConnectPanel from "@/components/StripeConnectPanel";
+import PayoutMethodPanel from "@/components/PayoutMethodPanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -259,6 +260,9 @@ export default function Dashboard() {
   });
 
   const isArtist = user?.role === "artist" || user?.role === "both";
+  // Connect status remains around so the optional Stripe upgrade panel can
+  // show "needs attention" for artists who already started Stripe onboarding,
+  // but it no longer drives whether the artist can list — that's payoutStatus.
   const { data: connectStatus } = useQuery<{ hasAccount: boolean; onboardingComplete: boolean; payoutsEnabled: boolean }>({
     queryKey: ["/api/stripe/connect/status"],
     enabled: !!user && isArtist,
@@ -266,19 +270,24 @@ export default function Dashboard() {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
-  const payoutSetupNeeded = isArtist && connectStatus !== undefined && !connectStatus.onboardingComplete;
+  const { data: payoutStatus } = useQuery<{ ready: boolean; isMinor: boolean; method: string | null; handle: string | null; forMinor: boolean; adultUpgradeAvailable: boolean }>({
+    queryKey: ["/api/users/me/payout-status"],
+    enabled: !!user && isArtist,
+    staleTime: 0,
+  });
+  const payoutSetupNeeded = isArtist && payoutStatus !== undefined && !payoutStatus.ready;
+  // Stripe-only "account restricted" banner. Only relevant if the artist
+  // actually started Stripe onboarding.
   const payoutAccountNeedsAttention = isArtist && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
 
-  const prevNeedsConnect = useRef<boolean | undefined>(undefined);
+  const prevNeedsPayout = useRef<boolean | undefined>(undefined);
   useEffect(() => {
-    if (!connectStatus || !user) return;
-    if (prevNeedsConnect.current === true && !payoutSetupNeeded) {
-      toast({
-        title: "Payout account connected — you're all set to receive earnings!",
-      });
+    if (!payoutStatus || !user) return;
+    if (prevNeedsPayout.current === true && payoutStatus.ready) {
+      toast({ title: "Payout details saved — you're all set to receive earnings!" });
     }
-    prevNeedsConnect.current = payoutSetupNeeded;
-  }, [payoutSetupNeeded, connectStatus, user, toast]);
+    prevNeedsPayout.current = !payoutStatus.ready;
+  }, [payoutStatus, user, toast]);
 
   const attentionTabRef = useRef<Window | null>(null);
   const onboardAttention = useMutation({
@@ -367,6 +376,7 @@ export default function Dashboard() {
 
         {(user.role === "artist" || user.role === "both") && (
           <div id="payouts">
+            <PayoutMethodPanel />
             <StripeConnectPanel />
           </div>
         )}

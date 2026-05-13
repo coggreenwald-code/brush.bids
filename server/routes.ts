@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
+import { hasStripeConnectReady, hasReadyPayout, isMinor, resolvePayoutTarget, ageInYears } from "@shared/payoutHelpers";
+import { sendAdultUpgradeEmail } from "./emailService";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
 import { getUncachableStripeClient, getStripePublishableKey, getAppOrigin } from "./stripeClient";
@@ -104,11 +106,15 @@ export async function registerRoutes(
           field: "auctionDurationDays",
         });
       }
-      // Payout-readiness gate: don't accept holds we can't pay out on.
+      // Payout-readiness gate: artists need EITHER Stripe Connect ready OR a
+      // manual payout handle (PayPal/Venmo/Zelle). Minors must instead have a
+      // parent/guardian's payout details + accepted seller terms.
       const artist = await storage.getUser(userId);
-      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
+      if (!artist || !hasReadyPayout(artist)) {
         return res.status(403).json({
-          message: "Please finish Stripe payout setup on your Dashboard before submitting artwork.",
+          message: isMinor(artist || ({} as any))
+            ? "Please add your parent or guardian's payout details (and have them accept the seller terms) on your Dashboard before submitting artwork."
+            : "Please add a payout method (PayPal, Venmo, or Zelle) on your Dashboard before submitting artwork.",
         });
       }
       const artwork = await storage.createArtwork(input);
@@ -311,13 +317,17 @@ export async function registerRoutes(
         return res.status(400).json({ message: `Bid must be higher than the current price of $${currentHighest}` });
       }
 
-      // Artist must have Connect onboarding complete AND payouts enabled.
+      // Artist must have at least one working payout path — Stripe Connect
+      // ready, OR a manual handle (or parent handle for minors). For non-
+      // Connect artists we collect funds onto the platform balance and pay
+      // them out off-Stripe via the admin Pending Payouts queue.
       const artist = await storage.getUser(artwork.artistId);
-      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
+      if (!artist || !hasReadyPayout(artist)) {
         return res.status(400).json({
           message: "This artist has not completed payout setup yet. Please try again later.",
         });
       }
+      const useConnect = hasStripeConnectReady(artist);
 
       const stripe = await getUncachableStripeClient();
       const amountCents = Math.round(Number(input.amount) * 100);
@@ -362,18 +372,29 @@ export async function registerRoutes(
         }],
         payment_intent_data: {
           capture_method: 'manual',
-          // appFeeCents covers ONLY the platform's pre-tax cut. The auction
-          // scheduler updates application_fee_amount at capture time to also
-          // retain the collected tax on the platform account (the artist
-          // payout stays based on the pre-tax bid).
-          application_fee_amount: appFeeCents,
-          transfer_data: { destination: artist.stripeAccountId },
+          // For Connect artists: appFeeCents is ONLY the platform's pre-tax
+          // cut, and the scheduler bumps application_fee_amount at capture
+          // time to also retain the collected tax (artist payout stays based
+          // on the pre-tax bid).
+          //
+          // For manual-payout (non-Connect) artists: we omit transfer_data
+          // entirely so the full charge lands on the platform balance, and
+          // the admin pays the artist their share off-Stripe. We still
+          // remember baseAppFeeCents so the scheduler can compute their
+          // queued payout amount.
+          ...(useConnect
+            ? {
+                application_fee_amount: appFeeCents,
+                transfer_data: { destination: artist.stripeAccountId! },
+              }
+            : {}),
           metadata: {
             kind: 'bid_hold',
             artworkId: String(artwork.id),
             bidderId,
             bidAmount: String(input.amount),
             baseAppFeeCents: String(appFeeCents),
+            payoutKind: useConnect ? 'connect' : 'manual',
           },
         },
         metadata: {
@@ -382,6 +403,7 @@ export async function registerRoutes(
           bidderId,
           bidAmount: String(input.amount),
           baseAppFeeCents: String(appFeeCents),
+          payoutKind: useConnect ? 'connect' : 'manual',
         },
         // Bound to min(auctionEnd, now+24h), clamped to Stripe's 30-min min.
         expires_at: Math.max(
@@ -587,8 +609,25 @@ export async function registerRoutes(
     }
 
     try {
-      const { role, firstName, lastName } = api.users.completeOnboarding.input.parse(req.body);
-      const user = await storage.completeOnboarding(userId, role, firstName, lastName);
+      const parsed = api.users.completeOnboarding.input.parse(req.body);
+      const { role, firstName, lastName, ...payoutFields } = parsed;
+      // Apply the same payout invariants as PATCH (artists need DOB; minors
+      // need parent path only; adults need own or parent). Onboarding usually
+      // sends only DOB so most calls pass through unchanged, but this closes
+      // the bypass where a client posts a fully-formed minor with their own
+      // payoutHandle to the onboarding endpoint.
+      const wantsArtist = role === "artist" || role === "both";
+      if (wantsArtist) {
+        if (!payoutFields.dateOfBirth) {
+          return res.status(400).json({ message: "Date of birth is required for artists.", field: "dateOfBirth" });
+        }
+        const age = ageInYears(payoutFields.dateOfBirth);
+        const minorEff = age !== null && age < 18;
+        if (minorEff && (payoutFields.payoutMethod || payoutFields.payoutHandle)) {
+          return res.status(400).json({ message: "Under-18 artists must route payouts through a parent or guardian.", field: "payoutMethod" });
+        }
+      }
+      const user = await storage.completeOnboarding(userId, role, firstName, lastName, payoutFields);
       res.json(user);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -599,6 +638,144 @@ export async function registerRoutes(
       }
       throw err;
     }
+  });
+
+  // Update payout settings (manual handle, parent details, DOB) any time.
+  // Server-side cross-field invariants (don't trust the UI):
+  //   - dateOfBirth, once set, can't be cleared.
+  //   - Minors (resolved from the merged DOB) must have parent email + method
+  //     + handle + accepted terms; their own method/handle is rejected.
+  //   - Adults can clear the parent path only if they have their own handle.
+  app.patch(api.users.updatePayoutSettings.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).claims?.sub || (req.user as any).id;
+    if (req.params.id !== userId) {
+      return res.status(403).json({ message: "You can only update your own payout settings" });
+    }
+    try {
+      const input = api.users.updatePayoutSettings.input.parse(req.body);
+      const existing = await storage.getUser(userId);
+      if (!existing) return res.status(404).json({ message: "User not found" });
+
+      // Effective field values after the patch is applied (ignoring undefined).
+      const eff = {
+        dateOfBirth: (input.dateOfBirth !== undefined ? input.dateOfBirth : (existing.dateOfBirth as any)) || null,
+        payoutMethod: input.payoutMethod !== undefined ? input.payoutMethod : existing.payoutMethod,
+        payoutHandle: input.payoutHandle !== undefined ? input.payoutHandle : existing.payoutHandle,
+        parentGuardianEmail: input.parentGuardianEmail !== undefined ? input.parentGuardianEmail : existing.parentGuardianEmail,
+        parentPayoutMethod: input.parentPayoutMethod !== undefined ? input.parentPayoutMethod : existing.parentPayoutMethod,
+        parentPayoutHandle: input.parentPayoutHandle !== undefined ? input.parentPayoutHandle : existing.parentPayoutHandle,
+        parentTermsAcceptedAt: input.parentTermsAccepted !== undefined
+          ? (input.parentTermsAccepted ? new Date() : null)
+          : existing.parentTermsAcceptedAt,
+      };
+
+      // Don't let an artist clear a previously-known DOB. (Schema only allows
+      // string|undefined so this is mostly defensive against future changes.)
+      if (existing.dateOfBirth && (input.dateOfBirth as any) === null) {
+        return res.status(400).json({ message: "Date of birth cannot be cleared once set." });
+      }
+
+      const isArtist = existing.role === "artist" || existing.role === "both";
+      if (isArtist) {
+        if (!eff.dateOfBirth) {
+          return res.status(400).json({ message: "Date of birth is required for artists.", field: "dateOfBirth" });
+        }
+        const age = ageInYears(eff.dateOfBirth as any);
+        const minorEff = age !== null && age < 18;
+        const parentReady = !!(eff.parentGuardianEmail && eff.parentPayoutMethod && eff.parentPayoutHandle && eff.parentTermsAcceptedAt);
+        const ownReady = !!(eff.payoutMethod && eff.payoutHandle);
+
+        if (minorEff) {
+          // Minors must use the parent path. Reject their own handle outright
+          // so a 16-year-old can't simply patch payoutHandle and bypass.
+          if (eff.payoutMethod || eff.payoutHandle) {
+            return res.status(400).json({ message: "Under-18 artists must route payouts through a parent or guardian.", field: "payoutMethod" });
+          }
+          if (!parentReady) {
+            return res.status(400).json({
+              message: "Parent or guardian email, payout method, handle, and accepted terms are all required for under-18 artists.",
+              field: "parentPayoutHandle",
+            });
+          }
+        } else {
+          // Adults can clear the parent path only if their own handle is set.
+          if (!ownReady && !parentReady) {
+            return res.status(400).json({ message: "Provide a payout method and handle.", field: "payoutHandle" });
+          }
+          // If they ARE clearing the parent path, require own handle.
+          const clearingParent = (input.parentPayoutHandle === null) || (input.parentPayoutMethod === null) || (input.parentGuardianEmail === null) || (input.parentTermsAccepted === false);
+          if (clearingParent && !ownReady) {
+            return res.status(400).json({ message: "Add your own payout method before removing the parent payout.", field: "payoutHandle" });
+          }
+        }
+      }
+
+      const user = await storage.updateUserPayoutSettings(userId, input);
+      res.json(user);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      throw err;
+    }
+  });
+
+  // Lightweight payout-readiness probe used by the frontend (gallery submit
+  // page, dashboard banner) so we don't have to recompute hasReadyPayout in
+  // multiple places.
+  app.get(api.users.payoutStatus.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).claims?.sub || (req.user as any).id;
+    const user = await storage.getUser(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const target = resolvePayoutTarget(user);
+    const minor = isMinor(user);
+    const age = ageInYears(user.dateOfBirth as any);
+    res.json({
+      ready: hasReadyPayout(user),
+      isMinor: minor,
+      method: target?.kind === "stripe" ? "stripe" : (target?.kind === "manual" ? target.method : null),
+      handle: target?.kind === "manual" ? target.handle : null,
+      forMinor: target?.kind === "manual" ? target.forMinor : false,
+      // Show "you just turned 18, want your own payout?" prompt to artists who
+      // currently route through a parent. The auth-route hook handles the
+      // one-time email; this flag drives the dashboard banner.
+      adultUpgradeAvailable: !!(age !== null && age >= 18 && user.parentTermsAcceptedAt && !user.payoutHandle),
+    });
+  });
+
+  // Admin Pending Payouts queue (for non-Connect artists). Lists won bids
+  // whose funds are sitting on the platform balance and awaits the admin
+  // sending PayPal/Venmo/Zelle off-platform.
+  app.get("/api/admin/payouts", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const adminId = (req.user as any).claims?.sub || (req.user as any).id;
+    const admin = await storage.getUser(adminId);
+    if (!admin || admin.role !== "admin") return res.status(403).json({ message: "Admin access required" });
+    const status = (req.query.status as "pending" | "paid" | "skipped" | undefined);
+    const rows = await storage.getPayouts(status ?? "pending");
+    res.json(rows);
+  });
+
+  app.post("/api/admin/payouts/:id/mark-paid", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const adminId = (req.user as any).claims?.sub || (req.user as any).id;
+    const admin = await storage.getUser(adminId);
+    if (!admin || admin.role !== "admin") return res.status(403).json({ message: "Admin access required" });
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ message: "Invalid payout id" });
+    // mark-paid is only valid from "pending" — replays return 409 so we don't
+    // overwrite the original paidAt/paidByAdminId stamps.
+    const current = await storage.getPayout(id);
+    if (!current) return res.status(404).json({ message: "Payout not found" });
+    if (current.status !== "pending") {
+      return res.status(409).json({ message: `Payout is already ${current.status}.` });
+    }
+    const notes = typeof req.body?.notes === "string" ? req.body.notes : undefined;
+    const updated = await storage.markPayoutPaid(id, adminId, notes);
+    if (!updated) return res.status(404).json({ message: "Payout not found" });
+    res.json(updated);
   });
 
   // My Bids (user's bids)
@@ -687,9 +864,11 @@ export async function registerRoutes(
       const { auctionDurationDays, charityId, charityNote, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
       // Same payout-readiness gate as POST /api/artworks.
       const artist = await storage.getUser(currentUserId);
-      if (!artist?.stripeAccountId || !artist.stripeOnboardingComplete || !artist.stripePayoutsEnabled) {
+      if (!artist || !hasReadyPayout(artist)) {
         return res.status(403).json({
-          message: "Please finish Stripe payout setup on your Dashboard before listing this artwork.",
+          message: isMinor(artist || ({} as any))
+            ? "Please add your parent or guardian's payout details on your Dashboard before listing this artwork."
+            : "Please add a payout method on your Dashboard before listing this artwork.",
         });
       }
       const artwork = await storage.createArtwork({

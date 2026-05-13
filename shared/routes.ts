@@ -1,5 +1,29 @@
 import { z } from 'zod';
-import { insertArtworkSchema, insertBidSchema, insertPortfolioItemSchema, artworks, bids, users, charities, portfolioItems } from './schema';
+import { insertArtworkSchema, insertBidSchema, insertPortfolioItemSchema, artworks, bids, users, charities, portfolioItems, payouts } from './schema';
+
+// Hybrid-payout reusable schemas. Re-used by completeOnboarding (initial sign-
+// up) and the dedicated PATCH endpoint (later edits from the dashboard).
+const payoutMethodValues = ["paypal", "venmo", "zelle"] as const;
+// Strict calendar validation: reject regex-valid but impossible dates like
+// 2026-99-99 so an attacker can't bypass minor checks by sending garbage that
+// makes ageInYears() return null.
+const dateOfBirthSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD").refine((s) => {
+  const [y, m, d] = s.split("-").map(Number);
+  if (y < 1900 || y > 2100) return false;
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d
+    && dt.getTime() <= Date.now();
+}, "Enter a valid date of birth.");
+export const payoutSettingsInputSchema = z.object({
+  // YYYY-MM-DD; required so we can compute minor status reliably.
+  dateOfBirth: dateOfBirthSchema.optional(),
+  payoutMethod: z.enum(payoutMethodValues).nullable().optional(),
+  payoutHandle: z.string().min(1).max(120).nullable().optional(),
+  parentGuardianEmail: z.string().email().nullable().optional(),
+  parentPayoutMethod: z.enum(payoutMethodValues).nullable().optional(),
+  parentPayoutHandle: z.string().min(1).max(120).nullable().optional(),
+  parentTermsAccepted: z.boolean().optional(),
+});
 
 export const errorSchemas = {
   validation: z.object({
@@ -157,10 +181,34 @@ export const api = {
         role: z.enum(["artist", "buyer", "both"]),
         firstName: z.string().min(1).optional(),
         lastName: z.string().min(1).optional(),
-      }),
+      }).merge(payoutSettingsInputSchema),
       responses: {
         200: z.custom<typeof users.$inferSelect>(),
         403: z.object({ message: z.string() }),
+      },
+    },
+    updatePayoutSettings: {
+      method: 'PATCH' as const,
+      path: '/api/users/:id/payout-settings',
+      input: payoutSettingsInputSchema,
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        400: errorSchemas.validation,
+        403: z.object({ message: z.string() }),
+      },
+    },
+    payoutStatus: {
+      method: 'GET' as const,
+      path: '/api/users/me/payout-status',
+      responses: {
+        200: z.object({
+          ready: z.boolean(),
+          isMinor: z.boolean(),
+          method: z.enum(["stripe", "paypal", "venmo", "zelle"]).nullable(),
+          handle: z.string().nullable(),
+          forMinor: z.boolean(),
+          adultUpgradeAvailable: z.boolean(),
+        }),
       },
     },
     updateName: {

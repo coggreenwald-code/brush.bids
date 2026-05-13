@@ -1,14 +1,19 @@
 import { pgTable, text, serial, integer, boolean, timestamp, decimal, pgEnum, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { users, roleEnum } from "./models/auth";
+import { users, roleEnum, payoutMethodEnum } from "./models/auth";
 
 export * from "./models/auth";
 export * from "./models/chat";
+export * from "./payoutHelpers";
 
 export const statusEnum = pgEnum("status", ["pending", "approved", "rejected"]);
 export const reviewTypeEnum = pgEnum("review_type", ["ai_instant", "human_curator"]);
 export const holdStatusEnum = pgEnum("hold_status", ["pending", "authorized", "captured", "canceled", "failed"]);
+// Manual-payout queue states. We only insert payout rows for artists who don't
+// have Stripe Connect ready — Connect transfers happen automatically inside
+// Stripe and don't need their own row.
+export const payoutStatusEnum = pgEnum("payout_status", ["pending", "paid", "skipped"]);
 
 export const artworks = pgTable("artworks", {
   id: serial("id").primaryKey(),
@@ -79,6 +84,34 @@ export const bids = pgTable("bids", {
   index("idx_bids_captured_at").on(table.capturedAt),
 ]);
 
+// Manual payout queue. One row per won bid where the artist does NOT have
+// Stripe Connect ready (so the funds landed on the platform balance and the
+// admin needs to send the artist their share off-platform via PayPal/Venmo/
+// Zelle). Bid id is unique to keep this idempotent against scheduler retries.
+export const payouts = pgTable("payouts", {
+  id: serial("id").primaryKey(),
+  bidId: integer("bid_id").references(() => bids.id).notNull().unique(),
+  artworkId: integer("artwork_id").references(() => artworks.id).notNull(),
+  artistId: varchar("artist_id").references(() => users.id).notNull(),
+  // Net amount we owe the artist in dollars (bid - platform cut, charity is
+  // also paid out manually so it's NOT subtracted here — admin can decide).
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  // Snapshot of the chosen payout method/handle at the time of settlement so
+  // the admin payout queue is stable even if the artist later edits it.
+  method: payoutMethodEnum("method").notNull(),
+  handle: text("handle").notNull(),
+  recipientEmail: text("recipient_email"),
+  forMinor: boolean("for_minor").default(false).notNull(),
+  status: payoutStatusEnum("status").default("pending").notNull(),
+  paidAt: timestamp("paid_at"),
+  paidByAdminId: varchar("paid_by_admin_id").references(() => users.id),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_payouts_status").on(table.status),
+  index("idx_payouts_artist").on(table.artistId),
+]);
+
 export const charities = pgTable("charities", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -104,6 +137,7 @@ export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true,
 export const insertBidSchema = createInsertSchema(bids).omit({ id: true, createdAt: true, holdStatus: true, stripeCheckoutSessionId: true, stripePaymentIntentId: true });
 export const insertCharitySchema = createInsertSchema(charities).omit({ id: true });
 export const insertPortfolioItemSchema = createInsertSchema(portfolioItems).omit({ id: true, createdAt: true, listedForSale: true, listedAt: true });
+export const insertPayoutSchema = createInsertSchema(payouts).omit({ id: true, createdAt: true, status: true, paidAt: true, paidByAdminId: true });
 
 // Types
 export type Artwork = typeof artworks.$inferSelect;
@@ -114,3 +148,5 @@ export type Charity = typeof charities.$inferSelect;
 export type InsertCharity = z.infer<typeof insertCharitySchema>;
 export type PortfolioItem = typeof portfolioItems.$inferSelect;
 export type InsertPortfolioItem = z.infer<typeof insertPortfolioItemSchema>;
+export type Payout = typeof payouts.$inferSelect;
+export type InsertPayout = z.infer<typeof insertPayoutSchema>;

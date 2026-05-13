@@ -161,3 +161,97 @@ export async function sendPayoutRestrictedEmail(artist: {
   await storage.insertEmailLog({ userId: artist.id, emailType: "payout_restricted", recipientEmail: artist.email })
     .catch(err => console.error("[email] Failed to write email log:", err));
 }
+
+// Sent when an artist (or their parent) wins-out a manual-payout sale and we
+// queue the off-Stripe transfer in the admin Pending Payouts tab. The artist
+// always gets a copy; if it's a minor, the parent/guardian also gets one.
+export async function sendManualPayoutQueuedEmail(opts: {
+  artist: { id: string; email: string | null | undefined; firstName: string | null | undefined; lastName: string | null | undefined };
+  parentEmail?: string | null;
+  artworkTitle: string;
+  amount: string;
+  method: "paypal" | "venmo" | "zelle";
+  handle: string;
+  forMinor: boolean;
+}): Promise<void> {
+  const recipients = [opts.artist.email, opts.forMinor ? opts.parentEmail : null].filter(Boolean) as string[];
+  if (recipients.length === 0) {
+    console.log("[email] Manual-payout-queued notification skipped — no recipients");
+    return;
+  }
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log(
+      "[email] Manual-payout-queued notification skipped — SMTP not configured. Would have emailed: " +
+      recipients.join(", ")
+    );
+    return;
+  }
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const name = [opts.artist.firstName, opts.artist.lastName].filter(Boolean).join(" ") || "Artist";
+  const methodLabel = opts.method.charAt(0).toUpperCase() + opts.method.slice(1);
+  const text = [
+    `Hi ${name},`,
+    "",
+    `Great news — your artwork "${opts.artworkTitle}" sold on BrushBids!`,
+    "",
+    `Your payout of $${opts.amount} will be sent to your ${methodLabel} (${opts.handle})`,
+    "by the BrushBids team within 3 business days.",
+    opts.forMinor ? "(Because you're under 18, this goes to your parent or guardian's account on file.)" : "",
+    "",
+    "Want faster, automatic payouts? You can connect a Stripe account anytime",
+    "from your dashboard and future sales will be paid out instantly.",
+    "",
+    "Thanks for being part of BrushBids.",
+    "— The BrushBids Team",
+  ].filter(Boolean).join("\n");
+  await transporter.sendMail({
+    from: `"BrushBids" <${from}>`,
+    to: recipients.join(", "),
+    subject: `Your BrushBids sale — payout of $${opts.amount} queued`,
+    text,
+  });
+  console.log(`[email] Manual-payout-queued notification sent to ${recipients.join(", ")}`);
+  await storage.insertEmailLog({ userId: opts.artist.id, emailType: "manual_payout_queued", recipientEmail: recipients[0] })
+    .catch(err => console.error("[email] Failed to write email log:", err));
+}
+
+// One-time email sent the first time an artist who originally signed up as a
+// minor logs in after their 18th birthday, prompting them to switch payouts
+// over to themselves.
+export async function sendAdultUpgradeEmail(artist: {
+  id: string;
+  email: string | null | undefined;
+  firstName: string | null | undefined;
+  lastName: string | null | undefined;
+}): Promise<void> {
+  if (!artist.email) return;
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log(`[email] Adult-upgrade notification skipped — SMTP not configured. Would have emailed: ${artist.email}`);
+    return;
+  }
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const name = [artist.firstName, artist.lastName].filter(Boolean).join(" ") || "Artist";
+  const dashboardUrl = process.env.APP_URL ? `${process.env.APP_URL}/dashboard` : "https://brushbids.com/dashboard";
+  await transporter.sendMail({
+    from: `"BrushBids" <${from}>`,
+    to: artist.email,
+    subject: "Happy 18th — you can now manage your own BrushBids payouts",
+    text: [
+      `Hi ${name},`,
+      "",
+      "Happy 18th birthday! Now that you're an adult, you can switch your BrushBids",
+      "earnings over to your own payout account instead of your parent or guardian's.",
+      "",
+      "You can either add your own PayPal/Venmo/Zelle handle, or connect Stripe for",
+      "automatic payouts, on your dashboard:",
+      dashboardUrl,
+      "",
+      "— The BrushBids Team",
+    ].join("\n"),
+  });
+  console.log(`[email] Adult-upgrade notification sent to ${artist.email}`);
+  await storage.insertEmailLog({ userId: artist.id, emailType: "adult_upgrade", recipientEmail: artist.email })
+    .catch(err => console.error("[email] Failed to write email log:", err));
+}

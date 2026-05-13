@@ -44,12 +44,18 @@ export function WelcomeModal({ isOpen, userId, existingFirstName, existingLastNa
   const [selectedRole, setSelectedRole] = useState<RoleOption | null>(null);
   const [firstName, setFirstName] = useState(existingFirstName || "");
   const [lastName, setLastName] = useState(existingLastName || "");
+  // We collect DOB up-front so we know whether to route earnings through a
+  // parent/guardian once the artist starts listing. Full payout details
+  // (PayPal/Venmo/Zelle handle, parent fields if minor) are configured later
+  // on the Dashboard via PayoutMethodPanel.
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const { toast } = useToast();
 
   const needsName = !existingFirstName || !existingLastName;
+  const wantsArtist = selectedRole === "artist" || selectedRole === "both";
 
   const completeOnboardingMutation = useMutation({
-    mutationFn: async (data: { role: RoleOption; firstName?: string; lastName?: string }) => {
+    mutationFn: async (data: { role: RoleOption; firstName?: string; lastName?: string; dateOfBirth?: string }) => {
       const res = await apiRequest("POST", `/api/users/${userId}/complete-onboarding`, data);
       return res.json();
     },
@@ -72,14 +78,17 @@ export function WelcomeModal({ isOpen, userId, existingFirstName, existingLastNa
 
   const handleContinue = () => {
     if (selectedRole) {
-      const data: { role: RoleOption; firstName?: string; lastName?: string } = { role: selectedRole };
+      const data: { role: RoleOption; firstName?: string; lastName?: string; dateOfBirth?: string } = { role: selectedRole };
       if (needsName && firstName.trim()) data.firstName = firstName.trim();
       if (needsName && lastName.trim()) data.lastName = lastName.trim();
+      if (wantsArtist && dateOfBirth) data.dateOfBirth = dateOfBirth;
       completeOnboardingMutation.mutate(data);
     }
   };
 
-  const canContinue = selectedRole && (!needsName || (firstName.trim() && lastName.trim()));
+  const canContinue = selectedRole
+    && (!needsName || (firstName.trim() && lastName.trim()))
+    && (!wantsArtist || !!dateOfBirth);
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -118,6 +127,23 @@ export function WelcomeModal({ isOpen, userId, existingFirstName, existingLastNa
           </div>
         )}
         
+        {wantsArtist && (
+          <div className="mt-4 space-y-2">
+            <Label htmlFor="dateOfBirth" className="text-white/60">Date of birth</Label>
+            <Input
+              id="dateOfBirth"
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              className="bg-white/5 border-white/10 text-white focus-visible:ring-[#A78BFA]"
+              data-testid="input-onboarding-dob"
+            />
+            <p className="text-xs text-white/40">
+              Required for artists. If you're under 18, your earnings will be sent to a parent or guardian.
+            </p>
+          </div>
+        )}
+
         <div className={`space-y-3 ${needsName ? 'mt-4' : 'mt-4'}`}>
           {roleOptions.map((option) => {
             const Icon = option.icon;

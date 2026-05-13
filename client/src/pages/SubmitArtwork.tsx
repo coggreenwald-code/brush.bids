@@ -37,6 +37,17 @@ export default function SubmitArtwork() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createArtwork = useCreateArtwork();
+  // Hybrid gate: artist can list as long as they have *any* payout target —
+  // Stripe Connect ready OR a manual handle (or parent handle for minors).
+  // Stripe-specific status is only used to surface the "account restricted"
+  // warning for artists who already started Stripe onboarding.
+  const { data: payoutStatus } = useQuery<{ ready: boolean; isMinor: boolean; method: string | null }>({
+    queryKey: ["/api/users/me/payout-status"],
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    enabled: !!user,
+  });
   const { data: connectStatus } = useQuery<{ hasAccount: boolean; onboardingComplete: boolean; payoutsEnabled: boolean }>({
     queryKey: ["/api/stripe/connect/status"],
     staleTime: 0,
@@ -44,18 +55,18 @@ export default function SubmitArtwork() {
     refetchOnWindowFocus: true,
     enabled: !!user,
   });
-  const needsConnect = !!user && (connectStatus === undefined || !connectStatus.onboardingComplete);
+  const needsConnect = !!user && (payoutStatus === undefined || !payoutStatus.ready);
   const accountNeedsAttention = !!user && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
   const prevNeedsConnect = useRef<boolean | undefined>(undefined);
   useEffect(() => {
-    if (!connectStatus || !user) return;
+    if (!payoutStatus || !user) return;
     if (prevNeedsConnect.current === true && needsConnect === false) {
       toast({
-        title: "Payout account connected — you're all set to receive earnings!",
+        title: "Payout account ready — you're all set to receive earnings!",
       });
     }
     prevNeedsConnect.current = needsConnect;
-  }, [needsConnect, connectStatus, toast]);
+  }, [needsConnect, payoutStatus, toast]);
   const { data: charities } = useCharities();
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);

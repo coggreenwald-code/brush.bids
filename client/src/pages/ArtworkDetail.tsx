@@ -124,6 +124,16 @@ export default function ArtworkDetail() {
   });
 
   const isOwnArtwork = !!user && !!artwork && user.id === artwork.artistId;
+  // Hybrid payout-readiness check: any payout target works (Connect ready or
+  // a manual handle / parent handle for minors). Stripe-only status is still
+  // queried so we can surface the "account restricted" warning later.
+  const { data: payoutStatus } = useQuery<{ ready: boolean }>({
+    queryKey: ["/api/users/me/payout-status"],
+    enabled: isOwnArtwork,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
   const { data: connectStatus } = useQuery<{ onboardingComplete: boolean; payoutsEnabled: boolean }>({
     queryKey: ["/api/stripe/connect/status"],
     enabled: isOwnArtwork,
@@ -131,8 +141,7 @@ export default function ArtworkDetail() {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
-  const payoutSetupNeeded = isOwnArtwork && connectStatus !== undefined &&
-    !(connectStatus.onboardingComplete && connectStatus.payoutsEnabled);
+  const payoutSetupNeeded = isOwnArtwork && payoutStatus !== undefined && !payoutStatus.ready;
 
   const onboardTabRef = useRef<Window | null>(null);
   const onboard = useMutation({

@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { AdminTab } from "@/components/AdminTab";
 import { TaxReportTab } from "@/components/TaxReportTab";
 import { EmailLogTab } from "@/components/EmailLogTab";
+import { AdminPayoutsTab } from "@/components/AdminPayoutsTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle } from "lucide-react";
 
@@ -35,11 +36,15 @@ export default function Admin() {
         <Tabs defaultValue="curation" className="w-full">
           <TabsList className="bg-white/[0.03] border border-white/5">
             <TabsTrigger value="curation" data-testid="tab-curation">Curation</TabsTrigger>
+            <TabsTrigger value="payouts" data-testid="tab-payouts">Pending Payouts</TabsTrigger>
             <TabsTrigger value="tax" data-testid="tab-tax">Tax Collected</TabsTrigger>
             <TabsTrigger value="email-log" data-testid="tab-email-log">Email Log</TabsTrigger>
           </TabsList>
           <TabsContent value="curation" className="mt-6">
             <AdminTab />
+          </TabsContent>
+          <TabsContent value="payouts" className="mt-6">
+            <AdminPayoutsTab />
           </TabsContent>
           <TabsContent value="tax" className="mt-6">
             <TaxReportTab />
