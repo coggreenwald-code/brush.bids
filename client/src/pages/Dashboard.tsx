@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useArtworks } from "@/hooks/use-artworks";
@@ -264,9 +264,21 @@ export default function Dashboard() {
     enabled: !!user && isArtist,
     staleTime: 0,
     refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
   const payoutSetupNeeded = isArtist && connectStatus !== undefined && !connectStatus.onboardingComplete;
   const payoutAccountNeedsAttention = isArtist && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
+
+  const prevNeedsConnect = useRef<boolean | undefined>(undefined);
+  useEffect(() => {
+    if (!connectStatus || !user) return;
+    if (prevNeedsConnect.current === true && !payoutSetupNeeded) {
+      toast({
+        title: "Payout account connected — you're all set to receive earnings!",
+      });
+    }
+    prevNeedsConnect.current = payoutSetupNeeded;
+  }, [payoutSetupNeeded, connectStatus, user, toast]);
 
   const attentionTabRef = useRef<Window | null>(null);
   const onboardAttention = useMutation({
