@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { storage } from "./storage";
 
 function getTransporter() {
   const host = process.env.SMTP_HOST;
@@ -17,6 +18,7 @@ function getTransporter() {
 }
 
 export async function sendPayoutReadyEmail(artist: {
+  id: string;
   email: string | null | undefined;
   firstName: string | null | undefined;
   lastName: string | null | undefined;
@@ -78,9 +80,12 @@ export async function sendPayoutReadyEmail(artist: {
   });
 
   console.log(`[email] Payout-ready notification sent to ${artist.email}`);
+  await storage.insertEmailLog({ userId: artist.id, emailType: "payout_ready", recipientEmail: artist.email })
+    .catch(err => console.error("[email] Failed to write email log:", err));
 }
 
 export async function sendPayoutRestrictedEmail(artist: {
+  id: string;
   email: string | null | undefined;
   firstName: string | null | undefined;
   lastName: string | null | undefined;
@@ -153,4 +158,6 @@ export async function sendPayoutRestrictedEmail(artist: {
   });
 
   console.log(`[email] Payout-restricted notification sent to ${artist.email}`);
+  await storage.insertEmailLog({ userId: artist.id, emailType: "payout_restricted", recipientEmail: artist.email })
+    .catch(err => console.error("[email] Failed to write email log:", err));
 }

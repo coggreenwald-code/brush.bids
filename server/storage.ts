@@ -1,11 +1,12 @@
 import { db } from "./db";
 import {
-  users, artworks, bids, charities, portfolioItems,
+  users, artworks, bids, charities, portfolioItems, emailLog,
   type User,
   type Artwork, type InsertArtwork,
   type Bid, type InsertBid,
   type Charity, type InsertCharity,
-  type PortfolioItem, type InsertPortfolioItem
+  type PortfolioItem, type InsertPortfolioItem,
+  type EmailLog,
 } from "@shared/schema";
 import { eq, desc, sql, and, lte, isNull, ne, inArray } from "drizzle-orm";
 
@@ -118,6 +119,9 @@ export interface IStorage {
   createPortfolioItem(item: InsertPortfolioItem): Promise<PortfolioItem>;
   listPortfolioItemForSale(id: number, price: number): Promise<PortfolioItem>;
   deletePortfolioItem(id: number): Promise<void>;
+
+  insertEmailLog(log: { userId: string; emailType: string; recipientEmail: string }): Promise<void>;
+  getEmailLogs(limit?: number): Promise<Array<EmailLog & { userFirstName: string | null; userLastName: string | null; username: string | null }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -551,6 +555,29 @@ export class DatabaseStorage implements IStorage {
 
   async deletePortfolioItem(id: number): Promise<void> {
     await db.delete(portfolioItems).where(eq(portfolioItems.id, id));
+  }
+
+  async insertEmailLog(log: { userId: string; emailType: string; recipientEmail: string }): Promise<void> {
+    await db.insert(emailLog).values(log);
+  }
+
+  async getEmailLogs(limit = 200): Promise<Array<EmailLog & { userFirstName: string | null; userLastName: string | null; username: string | null }>> {
+    const rows = await db
+      .select({
+        id: emailLog.id,
+        userId: emailLog.userId,
+        emailType: emailLog.emailType,
+        recipientEmail: emailLog.recipientEmail,
+        sentAt: emailLog.sentAt,
+        userFirstName: users.firstName,
+        userLastName: users.lastName,
+        username: users.username,
+      })
+      .from(emailLog)
+      .leftJoin(users, eq(emailLog.userId, users.id))
+      .orderBy(desc(emailLog.sentAt))
+      .limit(limit);
+    return rows;
   }
 }
 

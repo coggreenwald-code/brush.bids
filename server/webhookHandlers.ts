@@ -246,6 +246,7 @@ async function handleAccountUpdated(account: Stripe.Account) {
 
   if (!wasPayoutsEnabled && nowPayoutsEnabled) {
     await sendPayoutReadyEmail({
+      id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -254,6 +255,7 @@ async function handleAccountUpdated(account: Stripe.Account) {
 
   if (wasPayoutsEnabled && !nowPayoutsEnabled) {
     await sendPayoutRestrictedEmail({
+      id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,

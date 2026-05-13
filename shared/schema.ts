@@ -88,6 +88,16 @@ export const charities = pgTable("charities", {
   featured: boolean("featured").default(false).notNull(),
 });
 
+export const emailLog = pgTable("email_log", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  emailType: text("email_type").notNull(),
+  recipientEmail: text("recipient_email").notNull(),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
+});
+
+export type EmailLog = typeof emailLog.$inferSelect;
+
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true, createdAt: true, endTime: true, aiScore: true, aiFeedback: true, status: true });

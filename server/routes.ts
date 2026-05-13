@@ -955,6 +955,18 @@ export async function registerRoutes(
     }
   });
 
+  // ─── Admin: Account-health email log ─────────────────────────────────────
+  app.get("/api/admin/email-logs", async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const logs = await storage.getEmailLogs(200);
+      res.json(logs);
+    } catch (err: any) {
+      console.error("Email log fetch failed:", err);
+      res.status(500).json({ message: err.message || "Failed to load email log" });
+    }
+  });
+
   // ─── Stripe Payment Routes ───────────────────────────────────────────────
   app.get("/api/stripe/publishable-key", async (req, res) => {
     try {
