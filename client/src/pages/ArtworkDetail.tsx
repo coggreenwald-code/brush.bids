@@ -82,6 +82,7 @@ function CountdownTimer({ endDate }: { endDate: Date }) {
 }
 
 import { SEOHead } from "@/components/SEOHead";
+import { ShippingRateModal } from "@/components/ShippingRateModal";
 
 export default function ArtworkDetail() {
   const [match, params] = useRoute("/artwork/:id");
@@ -94,6 +95,8 @@ export default function ArtworkDetail() {
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [showShipping, setShowShipping] = useState(false);
+  const [pendingBidAmount, setPendingBidAmount] = useState<number>(0);
 
   const [pendingBidSuccess, setPendingBidSuccess] = useState(false);
 
@@ -211,36 +214,30 @@ export default function ArtworkDetail() {
       })();
   const isAuctionEnded = auctionEndDate <= new Date();
 
-  const onSubmit = (data: { amount: string }) => {
-    const amount = Number(data.amount);
-    if (amount <= currentPrice) {
-      form.setError("amount", { message: `Bid must be higher than current price ($${currentPrice})` });
-      return;
-    }
-    
-    if (!user) {
-      toast({ title: "Please login", description: "You must be logged in to place a bid", variant: "destructive" });
-      return;
-    }
-
+  const doPlaceBid = (amount: number, shipping: {
+    toStreet: string; toCity: string; toState: string; toZip: string;
+    carrier: string; service: string; shippingAmount: number;
+  } | null) => {
     placeBid.mutate({
       artworkId: artwork.id,
-      bidderId: user.id as unknown as string,
+      bidderId: user!.id as unknown as string,
       amount: amount.toString(),
-    }, {
+      ...(shipping ? {
+        shippingStreet: shipping.toStreet,
+        shippingCity: shipping.toCity,
+        shippingState: shipping.toState,
+        shippingPostalCode: shipping.toZip,
+        shippingCountry: "US",
+        shippingCarrier: shipping.carrier,
+        shippingService: shipping.service,
+        shippingAmount: shipping.shippingAmount.toString(),
+      } : {}),
+    } as any, {
       onSuccess: (data: { checkoutUrl?: string; auctionExtended?: boolean } | undefined) => {
-        // If the server returned a checkoutUrl, the hook redirects automatically.
-        // Otherwise (rare) we just notify the user the bid was recorded.
         if (data?.checkoutUrl) {
-          toast({
-            title: "Securing your bid...",
-            description: "Redirecting to checkout to authorize a card hold for $" + amount,
-          });
+          toast({ title: "Securing your bid…", description: "Redirecting to checkout to authorize a card hold for $" + amount });
         } else if (data?.auctionExtended) {
-          toast({
-            title: "Bid Placed + Time Extended!",
-            description: `You bid $${amount}. The auction was extended by 2 minutes due to last-minute bidding.`,
-          });
+          toast({ title: "Bid Placed + Time Extended!", description: `You bid $${amount}. The auction was extended by 2 minutes.` });
         } else {
           toast({ title: "Bid Placed!", description: `You successfully bid $${amount}` });
         }
@@ -250,6 +247,25 @@ export default function ArtworkDetail() {
         toast({ title: "Bid failed", description: err.message, variant: "destructive" });
       },
     });
+  };
+
+  const onSubmit = (data: { amount: string }) => {
+    const amount = Number(data.amount);
+    if (amount <= currentPrice) {
+      form.setError("amount", { message: `Bid must be higher than current price ($${currentPrice})` });
+      return;
+    }
+    if (!user) {
+      toast({ title: "Please login", description: "You must be logged in to place a bid", variant: "destructive" });
+      return;
+    }
+    setPendingBidAmount(amount);
+    setShowShipping(true);
+  };
+
+  const handleShippingConfirm = (shipping: Parameters<typeof doPlaceBid>[1]) => {
+    setShowShipping(false);
+    doPlaceBid(pendingBidAmount, shipping);
   };
 
   const handleCopyLink = () => {
@@ -604,6 +620,16 @@ export default function ArtworkDetail() {
           onClose={() => setShowQR(false)}
           artworkTitle={artwork.title}
           artworkId={artwork.id}
+        />
+      )}
+
+      {artwork && (
+        <ShippingRateModal
+          open={showShipping}
+          artworkId={artwork.id}
+          bidAmount={pendingBidAmount}
+          onConfirm={handleShippingConfirm}
+          onCancel={() => setShowShipping(false)}
         />
       )}
 

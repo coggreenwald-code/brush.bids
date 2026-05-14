@@ -105,8 +105,8 @@ export default function PayoutMethodPanel() {
             </Badge>
           )}
           {status && !status.ready && (
-            <Badge variant="outline" className="ml-2 border-amber-500/40 text-amber-300">
-              <AlertCircle className="w-3 h-3 mr-1" /> Setup needed
+            <Badge variant="outline" className="ml-2 border-white/20 text-white/50">
+              <AlertCircle className="w-3 h-3 mr-1" /> Optional
             </Badge>
           )}
         </CardTitle>
@@ -119,8 +119,7 @@ export default function PayoutMethodPanel() {
           </p>
         ) : (
           <p className="text-sm text-white/60">
-            Tell us where to send your earnings when an artwork sells. You can always upgrade to
-            automatic Stripe payouts later — for now, PayPal, Venmo, or Zelle works fine.
+            Set up your payout method to receive earnings when your artwork sells. You can submit and list artwork right away — add your PayPal, Venmo, or Zelle details here and we'll send your share once a sale is complete.
           </p>
         )}
 

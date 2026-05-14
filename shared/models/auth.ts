@@ -53,6 +53,12 @@ export const users = pgTable("users", {
   // Set when we email the artist after they cross their 18th birthday so we
   // don't spam them on every login.
   adultUpgradeNotifiedAt: timestamp("adult_upgrade_notified_at"),
+  // Ship-from address for EasyPost rate calculation. Artists set this on the
+  // Dashboard; without it we can't quote live carrier rates for their artwork.
+  shipFromStreet: text("ship_from_street"),
+  shipFromCity: text("ship_from_city"),
+  shipFromState: varchar("ship_from_state", { length: 2 }),
+  shipFromZip: varchar("ship_from_zip", { length: 10 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -37,6 +37,8 @@ export const artworks = pgTable("artworks", {
   views: integer("views").default(0).notNull(),
   dimensions: text("dimensions"),
   charityNote: text("charity_note"),
+  // Weight in ounces — required for live shipping rate quotes via EasyPost.
+  weightOz: integer("weight_oz"),
 });
 
 export const portfolioItems = pgTable("portfolio_items", {
@@ -73,9 +75,16 @@ export const bids = pgTable("bids", {
   // Falls back to the Checkout Session id, which uniquely identifies the same
   // taxable event in the Stripe Tax dashboard.
   stripeTaxTransactionId: text("stripe_tax_transaction_id"),
+  // Buyer shipping address (full, captured before checkout for rate calculation)
+  shippingStreet: text("shipping_street"),
+  shippingCity: text("shipping_city"),
   shippingState: text("shipping_state"),
   shippingPostalCode: text("shipping_postal_code"),
-  shippingCity: text("shipping_city"),
+  shippingCountry: text("shipping_country"),
+  // Selected shipping option from EasyPost rate quote
+  shippingCarrier: text("shipping_carrier"),
+  shippingService: text("shipping_service"),
+  shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }),
   capturedAt: timestamp("captured_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
@@ -96,10 +105,11 @@ export const payouts = pgTable("payouts", {
   // Net amount we owe the artist in dollars (bid - platform cut, charity is
   // also paid out manually so it's NOT subtracted here — admin can decide).
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  // Snapshot of the chosen payout method/handle at the time of settlement so
-  // the admin payout queue is stable even if the artist later edits it.
-  method: payoutMethodEnum("method").notNull(),
-  handle: text("handle").notNull(),
+  // Snapshot of the chosen payout method/handle at settlement. NULL when the
+  // artist hasn't configured a payout method yet — admin must chase them up
+  // before dispersing funds.
+  method: payoutMethodEnum("method"),
+  handle: text("handle"),
   recipientEmail: text("recipient_email"),
   forMinor: boolean("for_minor").default(false).notNull(),
   status: payoutStatusEnum("status").default("pending").notNull(),

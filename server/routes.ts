@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
 import { hasStripeConnectReady, hasReadyPayout, isMinor, resolvePayoutTarget, ageInYears } from "@shared/payoutHelpers";
+import { getEasyPostRates } from "./easypost";
 import { sendAdultUpgradeEmail } from "./emailService";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
@@ -104,17 +105,6 @@ export async function registerRoutes(
         return res.status(400).json({
           message: "Auction duration must be 1, 3, 5, or 7 days.",
           field: "auctionDurationDays",
-        });
-      }
-      // Payout-readiness gate: artists need EITHER Stripe Connect ready OR a
-      // manual payout handle (PayPal/Venmo/Zelle). Minors must instead have a
-      // parent/guardian's payout details + accepted seller terms.
-      const artist = await storage.getUser(userId);
-      if (!artist || !hasReadyPayout(artist)) {
-        return res.status(403).json({
-          message: isMinor(artist || ({} as any))
-            ? "Please add your parent or guardian's payout details (and have them accept the seller terms) on your Dashboard before submitting artwork."
-            : "Please add a payout method (PayPal, Venmo, or Zelle) on your Dashboard before submitting artwork.",
         });
       }
       const artwork = await storage.createArtwork(input);
@@ -317,16 +307,12 @@ export async function registerRoutes(
         return res.status(400).json({ message: `Bid must be higher than the current price of $${currentHighest}` });
       }
 
-      // Artist must have at least one working payout path — Stripe Connect
-      // ready, OR a manual handle (or parent handle for minors). For non-
-      // Connect artists we collect funds onto the platform balance and pay
-      // them out off-Stripe via the admin Pending Payouts queue.
+      // Look up the artist to decide whether to use Stripe Connect (automatic
+      // transfer) or the manual payout queue. No gate here — artists can list
+      // and receive bids before setting up a payout method; funds are held on
+      // the platform balance and paid out once they configure their handle.
       const artist = await storage.getUser(artwork.artistId);
-      if (!artist || !hasReadyPayout(artist)) {
-        return res.status(400).json({
-          message: "This artist has not completed payout setup yet. Please try again later.",
-        });
-      }
+      if (!artist) return res.status(404).json({ message: "Artist not found" });
       const useConnect = hasStripeConnectReady(artist);
 
       const stripe = await getUncachableStripeClient();
@@ -778,6 +764,67 @@ export async function registerRoutes(
     res.json(updated);
   });
 
+  // Ship-from address — artists set their origin address on the Dashboard so
+  // we can quote live EasyPost rates for their artworks.
+  app.patch("/api/users/me/ship-from", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const userId = (req.user as any).claims?.sub || (req.user as any).id;
+    const schema = z.object({
+      shipFromStreet: z.string().min(3),
+      shipFromCity: z.string().min(2),
+      shipFromState: z.string().length(2, "Use 2-letter state code, e.g. NY"),
+      shipFromZip: z.string().min(5),
+    });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+    const user = await storage.updateUserShipFrom(userId, parsed.data);
+    res.json(user);
+  });
+
+  // Live shipping rate quotes via EasyPost. Called from the bidding UI before
+  // Stripe Checkout is created so the buyer can pick carrier and speed.
+  app.get("/api/shipping/rates", async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    const schema = z.object({
+      artworkId: z.coerce.number(),
+      toStreet: z.string().min(3),
+      toCity: z.string().min(2),
+      toState: z.string().length(2),
+      toZip: z.string().min(5),
+    });
+    const parsed = schema.safeParse(req.query);
+    if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+    const { artworkId, toStreet, toCity, toState, toZip } = parsed.data;
+
+    const artwork = await storage.getArtwork(artworkId);
+    if (!artwork) return res.status(404).json({ message: "Artwork not found" });
+
+    const artist = await storage.getUser(artwork.artistId);
+    if (!artist?.shipFromStreet || !artist?.shipFromCity || !artist?.shipFromState || !artist?.shipFromZip) {
+      return res.status(422).json({ message: "Artist has not set up a shipping address yet. Shipping rates unavailable." });
+    }
+
+    const weightOz = (artwork as any).weightOz || 32;
+
+    try {
+      const rates = await getEasyPostRates({
+        fromStreet: artist.shipFromStreet,
+        fromCity: artist.shipFromCity,
+        fromState: artist.shipFromState,
+        fromZip: artist.shipFromZip,
+        toStreet,
+        toCity,
+        toState,
+        toZip,
+        weightOz,
+      });
+      res.json(rates);
+    } catch (err: any) {
+      console.error("[easypost] rate fetch failed:", err.message);
+      res.status(502).json({ message: err.message });
+    }
+  });
+
   // My Bids (user's bids)
   app.get("/api/my-bids", async (req, res) => {
     if (!req.user) {
@@ -862,15 +909,6 @@ export async function registerRoutes(
     }
     try {
       const { auctionDurationDays, charityId, charityNote, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
-      // Same payout-readiness gate as POST /api/artworks.
-      const artist = await storage.getUser(currentUserId);
-      if (!artist || !hasReadyPayout(artist)) {
-        return res.status(403).json({
-          message: isMinor(artist || ({} as any))
-            ? "Please add your parent or guardian's payout details on your Dashboard before listing this artwork."
-            : "Please add a payout method on your Dashboard before listing this artwork.",
-        });
-      }
       const artwork = await storage.createArtwork({
         title: item.title,
         description: item.description || "",

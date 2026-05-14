@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode, Trash2, ArrowRight, ImagePlus, FolderOpen, AlertTriangle } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode, Trash2, ArrowRight, ImagePlus, FolderOpen, AlertTriangle, MapPin } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
 import { QRCodeModal } from "@/components/QRCodeModal";
@@ -50,6 +50,11 @@ export default function Dashboard() {
   const [editingName, setEditingName] = useState(false);
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
+  const [editingShipFrom, setEditingShipFrom] = useState(false);
+  const [shipFromStreet, setShipFromStreet] = useState((user as any)?.shipFromStreet || "");
+  const [shipFromCity, setShipFromCity] = useState((user as any)?.shipFromCity || "");
+  const [shipFromState, setShipFromState] = useState((user as any)?.shipFromState || "");
+  const [shipFromZip, setShipFromZip] = useState((user as any)?.shipFromZip || "");
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: charities } = useCharities();
@@ -166,6 +171,21 @@ export default function Dashboard() {
         description: "Could not save your bio. Please try again.",
         variant: "destructive",
       });
+    },
+  });
+
+  const updateShipFromMutation = useMutation({
+    mutationFn: async (data: { shipFromStreet: string; shipFromCity: string; shipFromState: string; shipFromZip: string }) => {
+      const res = await apiRequest("PATCH", "/api/users/me/ship-from", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Shipping address saved" });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      setEditingShipFrom(false);
+    },
+    onError: () => {
+      toast({ title: "Could not save address", description: "Please try again.", variant: "destructive" });
     },
   });
 
@@ -426,14 +446,14 @@ export default function Dashboard() {
               <TabsContent value="artworks" className="space-y-6">
                 {payoutSetupNeeded && (
                   <div
-                    className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+                    className="flex items-start gap-3 rounded-md border border-violet-500/20 bg-violet-500/5 px-4 py-3"
                     data-testid="banner-payout-setup-artworks"
                   >
-                    <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
-                    <p className="text-sm text-amber-200/90">
-                      Your payout account isn't set up yet — collectors can't bid on your artworks until it's ready.{" "}
-                      <a href="#payouts" className="underline underline-offset-2 hover:text-amber-100 cursor-pointer" data-testid="link-payout-setup-artworks">
-                        Finish setup above →
+                    <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-violet-400" />
+                    <p className="text-sm text-violet-200/80">
+                      Add your payout details above so we can send your share when an artwork sells. You can list and receive bids right now — funds are held safely until you're ready.{" "}
+                      <a href="#payouts" className="underline underline-offset-2 hover:text-violet-100 cursor-pointer" data-testid="link-payout-setup-artworks">
+                        Set up payouts →
                       </a>
                     </p>
                   </div>
@@ -901,6 +921,101 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+
+            {(user.role === "artist" || user.role === "both") && (
+              <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5" data-testid="card-ship-from">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-white font-semibold flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-[#34D399]" /> Ship-From Address
+                  </h3>
+                  {!editingShipFrom && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-white/50"
+                      onClick={() => {
+                        setShipFromStreet((user as any)?.shipFromStreet || "");
+                        setShipFromCity((user as any)?.shipFromCity || "");
+                        setShipFromState((user as any)?.shipFromState || "");
+                        setShipFromZip((user as any)?.shipFromZip || "");
+                        setEditingShipFrom(true);
+                      }}
+                      data-testid="button-edit-ship-from"
+                    >
+                      <Pencil className="w-3 h-3 mr-1" /> Edit
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-white/40 mb-3">Used to calculate real-time shipping rates for buyers at checkout.</p>
+                {editingShipFrom ? (
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="Street address"
+                      value={shipFromStreet}
+                      onChange={(e) => setShipFromStreet(e.target.value)}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                      data-testid="input-ship-from-street"
+                    />
+                    <div className="grid grid-cols-3 gap-2">
+                      <Input
+                        placeholder="City"
+                        value={shipFromCity}
+                        onChange={(e) => setShipFromCity(e.target.value)}
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 col-span-1"
+                        data-testid="input-ship-from-city"
+                      />
+                      <Input
+                        placeholder="State (e.g. CA)"
+                        value={shipFromState}
+                        onChange={(e) => setShipFromState(e.target.value.toUpperCase().slice(0, 2))}
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                        data-testid="input-ship-from-state"
+                        maxLength={2}
+                      />
+                      <Input
+                        placeholder="ZIP"
+                        value={shipFromZip}
+                        onChange={(e) => setShipFromZip(e.target.value.slice(0, 10))}
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                        data-testid="input-ship-from-zip"
+                        maxLength={10}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full border-white/10 text-white/60"
+                        onClick={() => setEditingShipFrom(false)}
+                        data-testid="button-cancel-ship-from"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="rounded-full bg-white text-[#0a0a0f] hover:bg-white/90"
+                        onClick={() => updateShipFromMutation.mutate({ shipFromStreet, shipFromCity, shipFromState, shipFromZip })}
+                        disabled={updateShipFromMutation.isPending || !shipFromStreet.trim() || !shipFromCity.trim() || !shipFromState.trim() || !shipFromZip.trim()}
+                        data-testid="button-save-ship-from"
+                      >
+                        {updateShipFromMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 mr-1" />}
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {(user as any)?.shipFromStreet ? (
+                      <p className="text-sm text-white/60" data-testid="text-ship-from-display">
+                        {(user as any).shipFromStreet}, {(user as any).shipFromCity}, {(user as any).shipFromState} {(user as any).shipFromZip}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-white/30 italic">No address saved yet. Add one so buyers see live shipping rates.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="bg-white/[0.02] border border-white/5 rounded-lg p-5">
               <h3 className="text-white font-semibold flex items-center gap-2 mb-3">

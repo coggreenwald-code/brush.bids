@@ -6,7 +6,7 @@ import { storage } from "./storage";
 import { getUncachableStripeClient } from "./stripeClient";
 import { persistTaxIfMissing } from "./taxPersistence";
 import { resolvePayoutTarget } from "@shared/payoutHelpers";
-import { sendManualPayoutQueuedEmail } from "./emailService";
+import { sendManualPayoutQueuedEmail, sendPayoutSetupNeededEmail } from "./emailService";
 
 let inFlight = false;
 const noWinnerLogged = new Set<number>();
@@ -165,12 +165,10 @@ async function queueManualPayoutForBid(
     // we still owe them this sale through the manual rail; future bids will
     // use Connect automatically.
     const target = resolvePayoutTarget(artist);
-    if (!target || target.kind !== "manual") {
-      // Artist has no manual handle on file at all (and presumably became
-      // Connect-ready after the bid was authorized). Fall back to the parent
-      // path or fail loudly so the admin can chase it down — never silently
-      // drop a captured sale.
-      console.error(`[scheduler] manual payout queue: bid ${bid.id} captured but artist ${artist.id} has no manual target — needs admin intervention`);
+    // If artist has Stripe Connect ready (shouldn't happen for a manual-payout
+    // PI, but guard anyway). Log and return — the transfer already happened.
+    if (target && target.kind !== "manual") {
+      console.error(`[scheduler] manual payout queue: bid ${bid.id} — artist ${artist.id} has Connect, skipping manual row`);
       return;
     }
     const promotionPct = Number(artwork.promotionPercentage || 0);
@@ -178,25 +176,39 @@ async function queueManualPayoutForBid(
     // until the admin disburses it manually.
     const artistShareRatio = Math.max(0, (75 - promotionPct) / 100);
     const amountDollars = ((bidCents * artistShareRatio) / 100).toFixed(2);
+
+    // Create the payout row whether or not the artist has a handle on file.
+    // If method/handle are null the admin queue will show "Awaiting artist
+    // setup" and the artist will be emailed to configure their method.
     await storage.createPayout({
       bidId: bid.id,
       artworkId: artwork.id,
       artistId: artist.id,
       amount: amountDollars,
-      method: target.method,
-      handle: target.handle,
-      recipientEmail: target.recipientEmail,
-      forMinor: target.forMinor,
-    });
-    sendManualPayoutQueuedEmail({
-      artist: { id: artist.id, email: artist.email, firstName: artist.firstName, lastName: artist.lastName },
-      parentEmail: artist.parentGuardianEmail,
-      artworkTitle: (artwork as any).title || "your artwork",
-      amount: amountDollars,
-      method: target.method,
-      handle: target.handle,
-      forMinor: target.forMinor,
-    }).catch(err => console.error("[scheduler] manual-payout email failed:", err));
+      method: target?.method ?? null,
+      handle: target?.handle ?? null,
+      recipientEmail: target?.recipientEmail ?? artist.email,
+      forMinor: target?.forMinor ?? false,
+    } as any);
+
+    if (!target) {
+      // No payout method configured — email artist to set one up.
+      sendPayoutSetupNeededEmail({
+        artist: { id: artist.id, email: artist.email, firstName: artist.firstName, lastName: artist.lastName },
+        artworkTitle: (artwork as any).title || "your artwork",
+        amount: amountDollars,
+      }).catch(err => console.error("[scheduler] payout-setup-needed email failed:", err));
+    } else {
+      sendManualPayoutQueuedEmail({
+        artist: { id: artist.id, email: artist.email, firstName: artist.firstName, lastName: artist.lastName },
+        parentEmail: artist.parentGuardianEmail,
+        artworkTitle: (artwork as any).title || "your artwork",
+        amount: amountDollars,
+        method: target.method,
+        handle: target.handle,
+        forMinor: target.forMinor,
+      }).catch(err => console.error("[scheduler] manual-payout email failed:", err));
+    }
   } catch (err) {
     console.error(`[scheduler] failed to queue manual payout for bid ${bid.id}:`, err);
   }

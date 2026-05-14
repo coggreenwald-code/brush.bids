@@ -255,3 +255,54 @@ export async function sendAdultUpgradeEmail(artist: {
   await storage.insertEmailLog({ userId: artist.id, emailType: "adult_upgrade", recipientEmail: artist.email })
     .catch(err => console.error("[email] Failed to write email log:", err));
 }
+
+// Sent when an artwork sells but the artist hasn't set up a payout method yet.
+// Prompts them to add PayPal/Venmo/Zelle (or Stripe) so the admin can disburse.
+export async function sendPayoutSetupNeededEmail(opts: {
+  artist: { id: string; email: string | null | undefined; firstName: string | null | undefined; lastName: string | null | undefined };
+  artworkTitle: string;
+  amount: string;
+}): Promise<void> {
+  const { artist, artworkTitle, amount } = opts;
+  if (!artist.email) {
+    console.log("[email] Payout-setup-needed notification skipped — artist has no email");
+    return;
+  }
+
+  const transporter = getTransporter();
+  const dashboardUrl = `${process.env.APP_ORIGIN || "https://brushbids.com"}/dashboard`;
+  const name = artist.firstName || "Artist";
+
+  if (!transporter) {
+    console.log(
+      `[email] Payout-setup-needed notification skipped — SMTP not configured. ` +
+      `Would have emailed: ${artist.email} — artwork "${artworkTitle}" sold for $${amount}`
+    );
+    return;
+  }
+
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  await transporter.sendMail({
+    from,
+    to: artist.email,
+    subject: `Your artwork sold — set up your payout to receive $${amount}`,
+    text: [
+      `Hi ${name},`,
+      "",
+      `Great news — your artwork "${artworkTitle}" sold! Your earnings of $${amount} are`,
+      "being held safely by BrushBids.",
+      "",
+      "To receive your money, please add a payout method (PayPal, Venmo, or Zelle)",
+      "on your Dashboard. It only takes a minute:",
+      dashboardUrl,
+      "",
+      "Once you've added your handle, an admin will send your funds within 3–5",
+      "business days. If you have any questions, reply to this email.",
+      "",
+      "— The BrushBids Team",
+    ].join("\n"),
+  });
+  console.log(`[email] Payout-setup-needed notification sent to ${artist.email}`);
+  await storage.insertEmailLog({ userId: artist.id, emailType: "payout_setup_needed", recipientEmail: artist.email })
+    .catch(err => console.error("[email] Failed to write email log:", err));
+}

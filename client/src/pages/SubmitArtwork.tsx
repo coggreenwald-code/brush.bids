@@ -13,11 +13,10 @@ import { useCharities } from "@/hooks/use-charities";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X, Wallet, AlertTriangle } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Loader2, UploadCloud, Sparkles, Camera, ImagePlus, Zap, Clock, X } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useState, useRef, useCallback, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useState, useRef, useCallback } from "react";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title too short"),
@@ -26,6 +25,7 @@ const formSchema = z.object({
   price: z.coerce.number().min(1, "Price must be positive"),
   dimensionLength: z.coerce.number().min(0.1, "Length is required"),
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
+  weightOz: z.coerce.number().min(1, "Weight is required").optional(),
   auctionDurationDays: z.coerce.number().refine(v => [1, 3, 5, 7].includes(v), { message: "Auction duration must be 1, 3, 5, or 7 days" }).default(7),
   charityId: z.coerce.number().optional(),
   charityNote: z.string().max(200).optional(),
@@ -37,39 +37,6 @@ export default function SubmitArtwork() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createArtwork = useCreateArtwork();
-  // Hybrid gate: artist can list as long as they have *any* payout target —
-  // Stripe Connect ready OR a manual handle (or parent handle for minors).
-  // Stripe-specific status is only used to surface the "account restricted"
-  // warning for artists who already started Stripe onboarding.
-  const { data: payoutStatus } = useQuery<{ ready: boolean; isMinor: boolean; method: string | null }>({
-    queryKey: ["/api/users/me/payout-status"],
-    staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    enabled: !!user,
-  });
-  const { data: connectStatus } = useQuery<{ hasAccount: boolean; onboardingComplete: boolean; payoutsEnabled: boolean }>({
-    queryKey: ["/api/stripe/connect/status"],
-    staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    enabled: !!user,
-  });
-  // Only block submission once we know for certain the payout isn't ready.
-  // While the status is still loading (undefined) we optimistically allow
-  // the form to be used — the server-side gate will reject the POST if needed.
-  const needsConnect = !!user && payoutStatus !== undefined && !payoutStatus.ready;
-  const accountNeedsAttention = !!user && connectStatus !== undefined && connectStatus.onboardingComplete && !connectStatus.payoutsEnabled;
-  const prevNeedsConnect = useRef<boolean | undefined>(undefined);
-  useEffect(() => {
-    if (!payoutStatus || !user) return;
-    if (prevNeedsConnect.current === true && needsConnect === false) {
-      toast({
-        title: "Payout account ready — you're all set to receive earnings!",
-      });
-    }
-    prevNeedsConnect.current = needsConnect;
-  }, [needsConnect, payoutStatus, toast]);
   const { data: charities } = useCharities();
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -79,25 +46,6 @@ export default function SubmitArtwork() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [isOnboarding, setIsOnboarding] = useState(false);
-
-  const handleOnboardClick = async () => {
-    setIsOnboarding(true);
-    try {
-      const res = await fetch("/api/stripe/connect/onboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ origin: window.location.origin }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.message || "Failed to start onboarding");
-      window.open(body.url, "_blank", "noopener,noreferrer");
-    } catch (err: any) {
-      toast({ title: "Couldn't start onboarding", description: err.message, variant: "destructive" });
-    } finally {
-      setIsOnboarding(false);
-    }
-  };
 
   const generateDescription = useMutation({
     mutationFn: async (data: { title: string; medium?: string }) => {
@@ -279,56 +227,6 @@ export default function SubmitArtwork() {
           <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
         </div>
 
-        <AnimatePresence>
-          {needsConnect && (
-            <motion.div
-              key="payout-banner"
-              initial={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, overflow: "hidden" }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="flex items-start gap-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-4 py-3"
-              data-testid="banner-payout-setup-submit"
-            >
-              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
-              <p className="text-sm text-amber-200/90">
-                Your payout account isn't set up yet — you won't be able to receive earnings until it's ready.{" "}
-                <button
-                  type="button"
-                  onClick={handleOnboardClick}
-                  disabled={isOnboarding}
-                  className="underline underline-offset-2 hover:text-amber-100 cursor-pointer disabled:opacity-60"
-                  data-testid="link-payout-setup-submit"
-                >
-                  {isOnboarding ? "Opening…" : "Finish setup →"}
-                </button>
-              </p>
-            </motion.div>
-          )}
-          {accountNeedsAttention && (
-            <motion.div
-              key="payout-attention-banner"
-              initial={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, overflow: "hidden" }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="flex items-start gap-3 rounded-md border border-amber-400/40 bg-amber-400/10 px-4 py-3"
-              data-testid="banner-payout-attention-submit"
-            >
-              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-300" />
-              <p className="text-sm text-amber-100/90">
-                Your payout account needs attention — Stripe has restricted payouts and may require additional verification.{" "}
-                <button
-                  type="button"
-                  onClick={handleOnboardClick}
-                  disabled={isOnboarding}
-                  className="underline underline-offset-2 hover:text-amber-50 cursor-pointer disabled:opacity-60"
-                  data-testid="link-payout-attention-submit"
-                >
-                  {isOnboarding ? "Opening…" : "Fix now →"}
-                </button>
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <div className="p-8 rounded-xl bg-white/[0.02] border border-white/5">
           <Form {...form}>
@@ -425,7 +323,7 @@ export default function SubmitArtwork() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="dimensionLength"
@@ -449,6 +347,21 @@ export default function SubmitArtwork() {
                       <FormControl>
                         <Input type="number" step="0.1" placeholder="36" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-dimension-width" />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="weightOz"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white/70">Weight (oz)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="1" placeholder="32" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-weight-oz" />
+                      </FormControl>
+                      <FormDescription className="text-white/30">Used to quote shipping rates.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -687,55 +600,11 @@ export default function SubmitArtwork() {
                 )}
               />
 
-              {needsConnect && (
-                <div className="rounded-xl border border-[#A78BFA]/20 bg-[#A78BFA]/5 p-4 flex items-start gap-3" data-testid="alert-connect-required">
-                  <Wallet className="w-5 h-5 text-[#A78BFA] mt-0.5 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-white">Connect Stripe to receive payouts</p>
-                    <p className="text-xs text-white/60 mt-1">
-                      You need to finish payout setup before submitting artwork. This is a one-time step that lets us send your share to your bank when you sell.
-                    </p>
-                    <Button
-                      size="sm"
-                      className="mt-3 rounded-full bg-white text-[#0a0a0f] hover:bg-white/90"
-                      onClick={handleOnboardClick}
-                      disabled={isOnboarding}
-                      data-testid="button-go-onboard"
-                    >
-                      {isOnboarding && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
-                      Set up payouts
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {accountNeedsAttention && (
-                <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4 flex items-start gap-3" data-testid="alert-payout-attention">
-                  <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-amber-200">Payout account needs attention</p>
-                    <p className="text-xs text-amber-200/60 mt-1">
-                      Stripe has restricted payouts on your account — you may need to provide additional verification. You can still submit, but fix this soon to ensure you receive earnings.
-                    </p>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="mt-3 rounded-full border-amber-400/40 text-amber-200 hover:bg-amber-400/10"
-                      onClick={handleOnboardClick}
-                      disabled={isOnboarding}
-                      data-testid="button-fix-payout-attention"
-                    >
-                      {isOnboarding && <Loader2 className="w-3 h-3 animate-spin mr-1" />}
-                      Fix now
-                    </Button>
-                  </div>
-                </div>
-              )}
-
               <Button
                 type="submit"
                 size="lg"
                 className="w-full rounded-full bg-white text-[#0a0a0f] font-semibold hover:bg-white/90"
-                disabled={createArtwork.isPending || needsConnect}
+                disabled={createArtwork.isPending}
                 data-testid="button-submit-artwork"
               >
                 {createArtwork.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
