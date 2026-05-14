@@ -34,7 +34,7 @@ export default function Admin() {
           <h1 className="text-3xl font-display font-bold text-white mt-1" data-testid="text-admin-title">Admin Portal</h1>
         </div>
         <Tabs defaultValue="curation" className="w-full">
-          <TabsList className="bg-white/[0.03] border border-white/5">
+          <TabsList className="bg-white/[0.03] border border-white/5 max-sm:mx-3 max-sm:w-[calc(100%-1.5rem)] max-sm:flex-wrap max-sm:gap-1">
             <TabsTrigger value="curation" data-testid="tab-curation">Curation</TabsTrigger>
             <TabsTrigger value="payouts" data-testid="tab-payouts">Pending Payouts</TabsTrigger>
             <TabsTrigger value="tax" data-testid="tab-tax">Tax Collected</TabsTrigger>

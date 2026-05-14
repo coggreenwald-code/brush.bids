@@ -215,7 +215,7 @@ export function AdminTab() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 flex-wrap h-auto" style={{ marginLeft: "10px" }}>
+        <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 flex-wrap h-auto max-sm:mx-3 max-sm:ml-0 max-sm:w-[calc(100%-1.5rem)] max-sm:gap-1" style={{ marginLeft: "10px" }}>
           <TabsTrigger value="pending" data-testid="tab-admin-pending" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-3 py-1.5 text-sm">
             Pending ({pendingCount})
           </TabsTrigger>

@@ -434,12 +434,12 @@ export default function Dashboard() {
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="artworks">
               <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-                <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1">
-                  <TabsTrigger value="artworks" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">My Artworks</TabsTrigger>
-                  <TabsTrigger value="portfolio" data-testid="tab-portfolio" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">
+                <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 max-sm:mx-3 max-sm:w-[calc(100%-1.5rem)] max-sm:justify-between">
+                  <TabsTrigger value="artworks" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">My Artworks</TabsTrigger>
+                  <TabsTrigger value="portfolio" data-testid="tab-portfolio" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">
                     <FolderOpen className="w-4 h-4 mr-1" /> Portfolio
                   </TabsTrigger>
-                  <TabsTrigger value="sold" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm">Sold History</TabsTrigger>
+                  <TabsTrigger value="sold" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">Sold History</TabsTrigger>
                 </TabsList>
               </div>
               

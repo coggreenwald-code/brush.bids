@@ -171,7 +171,7 @@ export default function MyBids() {
         )}
 
         <Tabs defaultValue="active">
-          <TabsList>
+          <TabsList className="max-sm:mx-3 max-sm:w-[calc(100%-1.5rem)] max-sm:flex-wrap max-sm:gap-1">
             <TabsTrigger value="active" data-testid="tab-active-bids">
               Active ({isLoading ? "-" : activeBids.length})
             </TabsTrigger>
