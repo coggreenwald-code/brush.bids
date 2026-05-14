@@ -341,6 +341,15 @@ export default function Dashboard() {
   }, [onboardAttention]);
 
   const myArtworks = artworks?.filter(a => a.artistId === user?.id) || [];
+
+  const { data: myBids } = useQuery<{ id: number }[]>({
+    queryKey: ["/api/my-bids"],
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
+  const hasArtworks = myArtworks.length > 0;
+  const hasBids = (myBids?.length ?? 0) > 0;
   
   const soldArtworks = myArtworks.filter(a => a.paidAt);
   const totalEarnings = soldArtworks.reduce((sum, a) => {
@@ -1033,7 +1042,8 @@ export default function Dashboard() {
                     size="sm"
                     className={`rounded-full ${user?.role === "artist" ? "bg-white text-[#0a0a0f] hover:bg-white/90" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("artist")}
-                    disabled={updateRoleMutation.isPending || user?.role === "artist"}
+                    disabled={updateRoleMutation.isPending || user?.role === "artist" || hasBids}
+                    title={hasBids ? "You've placed bids, so you can't switch to Artist only — choose Both instead." : undefined}
                     data-testid="button-role-artist"
                   >
                     <Palette className="w-4 h-4 mr-1" /> Artist
@@ -1043,7 +1053,8 @@ export default function Dashboard() {
                     size="sm"
                     className={`rounded-full ${user?.role === "buyer" ? "bg-white text-[#0a0a0f] hover:bg-white/90" : "border-white/10 text-white/60"}`}
                     onClick={() => updateRoleMutation.mutate("buyer")}
-                    disabled={updateRoleMutation.isPending || user?.role === "buyer"}
+                    disabled={updateRoleMutation.isPending || user?.role === "buyer" || hasArtworks}
+                    title={hasArtworks ? "You've submitted artworks, so you can't switch to Collector only — choose Both instead." : undefined}
                     data-testid="button-role-collector"
                   >
                     <ShoppingBag className="w-4 h-4 mr-1" /> Collector
@@ -1059,6 +1070,15 @@ export default function Dashboard() {
                     <Sparkles className="w-4 h-4 mr-1" /> Both
                   </Button>
                 </div>
+                {(hasArtworks || hasBids) && (
+                  <p className="text-xs text-white/40">
+                    {hasArtworks && hasBids
+                      ? "You have submitted artworks and placed bids, so only the Both role is available."
+                      : hasArtworks
+                      ? "You've submitted artworks, so Collector-only is unavailable. You can switch to Both."
+                      : "You've placed bids, so Artist-only is unavailable. You can switch to Both."}
+                  </p>
+                )}
                 {updateRoleMutation.isPending && (
                   <div className="flex items-center gap-2 text-sm text-white/40">
                     <Loader2 className="w-4 h-4 animate-spin" /> Updating...
