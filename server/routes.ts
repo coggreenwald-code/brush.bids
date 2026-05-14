@@ -1232,6 +1232,12 @@ Sitemap: https://brushbids.com/sitemap.xml
 `);
   });
 
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    res.setHeader("X-Robots-Tag", "index, follow");
+    next();
+  });
+
   app.get("/sitemap.xml", async (_req, res) => {
     const approvedArtworks = await storage.getArtworks("approved");
     const staticPages = [
