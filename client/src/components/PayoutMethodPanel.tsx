@@ -94,8 +94,10 @@ export default function PayoutMethodPanel() {
 
   const isStripe = status?.method === "stripe";
 
+  const compact = !!status?.ready;
+
   return (
-    <Card className="bg-white/[0.02] border-white/5" data-testid="card-payout-method">
+    <Card className={`bg-white/[0.02] border-white/5 ${compact ? "md:max-w-2xl" : ""}`} data-testid="card-payout-method">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
           <Wallet className="w-5 h-5 text-[#A78BFA]" /> Payout details
@@ -111,25 +113,25 @@ export default function PayoutMethodPanel() {
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className={`${compact ? "space-y-3" : "space-y-4"} ${compact ? "pt-2" : ""}`}>
         {isStripe ? (
-          <p className="text-sm text-white/70">
+          <p className={`text-sm text-white/70 ${compact ? "max-w-xl" : ""}`}>
             You're set up with Stripe — payouts go directly to your connected bank account on each sale.
             You can add a backup PayPal/Venmo/Zelle handle below if you'd like.
           </p>
         ) : (
-          <p className="text-sm text-white/60">
+          <p className={`text-sm text-white/60 ${compact ? "max-w-xl" : ""}`}>
             Set up your payout method to receive earnings when your artwork sells. You can submit and list artwork right away — add your PayPal, Venmo, or Zelle details here and we'll send your share once a sale is complete.
           </p>
         )}
 
         {status?.adultUpgradeAvailable && (
-          <div className="rounded-lg border border-[#A78BFA]/40 bg-[#A78BFA]/10 p-3 text-sm text-white">
+          <div className={`rounded-lg border border-[#A78BFA]/40 bg-[#A78BFA]/10 p-3 text-sm text-white ${compact ? "max-w-xl" : ""}`}>
             You're 18 now — you can switch payouts to your own account below instead of your parent or guardian's.
           </div>
         )}
 
-        <div className="space-y-2">
+        <div className={`space-y-2 ${compact ? "md:max-w-sm" : ""}`}>
           <Label htmlFor="payout-dob" className="text-white/60">Date of birth</Label>
           <Input
             id="payout-dob"
@@ -145,7 +147,7 @@ export default function PayoutMethodPanel() {
         </div>
 
         {!minor && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 ${compact ? "md:max-w-2xl" : ""}`}>
             <div className="space-y-2">
               <Label className="text-white/60">Method</Label>
               <Select value={method} onValueChange={(v) => setMethod(v as PayoutMethod)}>
@@ -173,7 +175,7 @@ export default function PayoutMethodPanel() {
         )}
 
         {minor && (
-          <div className="space-y-3 rounded-lg border border-white/10 bg-white/[0.02] p-4">
+          <div className={`space-y-3 rounded-lg border border-white/10 bg-white/[0.02] p-4 ${compact ? "md:max-w-2xl" : ""}`}>
             <p className="text-sm text-white/80 font-medium">Parent / guardian payout</p>
             <p className="text-xs text-white/50">
               Because you're under 18, your earnings will be sent to your parent or guardian's account
@@ -239,6 +241,12 @@ export default function PayoutMethodPanel() {
         >
           {save.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : "Save payout details"}
         </Button>
+
+        {compact && (
+          <div className="pt-2 text-xs text-white/35">
+            You can change payout details any time.
+          </div>
+        )}
       </CardContent>
     </Card>
   );
