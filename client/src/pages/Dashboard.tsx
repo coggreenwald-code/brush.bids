@@ -24,6 +24,7 @@ import { useCharities } from "@/hooks/use-charities";
 import type { Artwork, PortfolioItem } from "@shared/schema";
 import { SEOHead } from "@/components/SEOHead";
 import { handleArtworkImageError } from "@/lib/imageFallback";
+import { ReuploadImageButton } from "@/components/ReuploadImageButton";
 
 function SaleCountdown({ listedAt }: { listedAt: string }) {
   const endDate = new Date(new Date(listedAt).getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -564,6 +565,13 @@ export default function Dashboard() {
                               <div className="font-bold text-emerald-400">${Number(artwork.price).toLocaleString()}</div>
                             </div>
                             <div className="flex gap-2 flex-wrap">
+                              {!artwork.paidAt && (
+                                <ReuploadImageButton
+                                  artworkId={artwork.id}
+                                  label=""
+                                  className="border-white/10 text-white/70 hover:text-white rounded-full"
+                                />
+                              )}
                               {artwork.status === 'approved' && !artwork.paidAt && (
                                 <>
                                   <Button 

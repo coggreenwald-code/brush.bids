@@ -132,6 +132,18 @@ export const api = {
         400: errorSchemas.validation,
       },
     },
+    updateImage: {
+      method: 'PATCH' as const,
+      path: '/api/artworks/:id/image',
+      input: z.object({
+        imageUrl: z.string().min(1),
+      }),
+      responses: {
+        200: z.custom<typeof artworks.$inferSelect>(),
+        403: z.object({ message: z.string() }),
+        404: errorSchemas.notFound,
+      },
+    },
     delete: {
       method: 'DELETE' as const,
       path: '/api/artworks/:id',

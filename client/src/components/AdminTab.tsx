@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useArtworks, useUpdateArtworkStatus, useAiReview, useDeleteArtwork, useUpdateFeedback } from "@/hooks/use-artworks";
 import { useCharities } from "@/hooks/use-charities";
 import { handleArtworkImageError } from "@/lib/imageFallback";
+import { ReuploadImageButton } from "@/components/ReuploadImageButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -286,8 +287,15 @@ export function AdminTab() {
             <div className="space-y-4">
               {filteredArtworks.map((artwork) => (
                 <div key={artwork.id} className="p-4 md:p-5 flex flex-col md:flex-row gap-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors" data-testid={`card-admin-artwork-${artwork.id}`}>
-                  <div className="w-full md:w-80 aspect-square bg-white/5 rounded-lg overflow-hidden shrink-0">
-                    <img src={artwork.imageUrl} alt={artwork.title} onError={handleArtworkImageError} className="w-full h-full object-cover" />
+                  <div className="w-full md:w-80 shrink-0 space-y-2">
+                    <div className="w-full aspect-square bg-white/5 rounded-lg overflow-hidden">
+                      <img src={artwork.imageUrl} alt={artwork.title} onError={handleArtworkImageError} className="w-full h-full object-cover" />
+                    </div>
+                    <ReuploadImageButton
+                      artworkId={artwork.id}
+                      label="Replace image"
+                      className="w-full border-white/10 text-white/70 hover:text-white"
+                    />
                   </div>
 
                   <div className="flex-1 space-y-3 min-w-0">

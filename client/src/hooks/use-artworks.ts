@@ -113,6 +113,44 @@ export function useUpdateFeedback() {
   });
 }
 
+export function useUpdateArtworkImage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, file }: { id: number; file: File }) => {
+      const formData = new FormData();
+      formData.append("image", file);
+      const uploadRes = await fetch(api.artworks.upload.path, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      const { imageUrl } = await uploadRes.json();
+
+      const url = buildUrl(api.artworks.updateImage.path, { id });
+      const res = await fetch(url, {
+        method: api.artworks.updateImage.method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        let message = "Failed to update artwork image";
+        try {
+          const body = await res.json();
+          if (body?.message) message = body.message;
+        } catch {/* ignore */}
+        throw new Error(message);
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.artworks.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.artworks.get.path] });
+    },
+  });
+}
+
 export function useAiReview() {
   const queryClient = useQueryClient();
   return useMutation({

@@ -97,6 +97,7 @@ export interface IStorage {
   getArtwork(id: number): Promise<Artwork | undefined>;
   createArtwork(artwork: InsertArtwork): Promise<Artwork>;
   updateArtworkStatus(id: number, status: "pending" | "approved" | "rejected", feedback?: string, score?: number): Promise<Artwork>;
+  updateArtworkImage(id: number, imageUrl: string): Promise<Artwork>;
   setArtworkCheckoutSession(id: number, stripeSessionId: string, expectedPaidBy: string): Promise<Artwork>;
   markArtworkPaid(id: number, paidBy?: string): Promise<Artwork | null>;
   getArtworkBySessionId(sessionId: string): Promise<Artwork | undefined>;
@@ -312,6 +313,11 @@ export class DatabaseStorage implements IStorage {
       updates.endTime = endTime;
     }
     const [updated] = await db.update(artworks).set(updates).where(eq(artworks.id, id)).returning();
+    return updated;
+  }
+
+  async updateArtworkImage(id: number, imageUrl: string): Promise<Artwork> {
+    const [updated] = await db.update(artworks).set({ imageUrl }).where(eq(artworks.id, id)).returning();
     return updated;
   }
 

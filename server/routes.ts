@@ -450,6 +450,30 @@ export async function registerRoutes(
     }
   });
 
+  app.patch(api.artworks.updateImage.path, async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+    try {
+      const { imageUrl } = api.artworks.updateImage.input.parse(req.body);
+      const id = Number(req.params.id);
+      const artwork = await storage.getArtwork(id);
+      if (!artwork) return res.status(404).json({ message: "Artwork not found" });
+      const userId = (req.user as any).claims?.sub || (req.user as any).id;
+      const requester = await storage.getUser(userId);
+      const isOwner = artwork.artistId === userId;
+      const isAdmin = requester?.role === "admin";
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({ message: "Only the artist or an admin can replace this image" });
+      }
+      const updated = await storage.updateArtworkImage(id, imageUrl);
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
   app.post(api.artworks.upload.path, (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authenticated" });
