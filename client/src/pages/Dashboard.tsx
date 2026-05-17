@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCharities } from "@/hooks/use-charities";
 import type { Artwork, PortfolioItem } from "@shared/schema";
 import { SEOHead } from "@/components/SEOHead";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 
 function SaleCountdown({ listedAt }: { listedAt: string }) {
   const endDate = new Date(new Date(listedAt).getTime() + 14 * 24 * 60 * 60 * 1000);
@@ -516,6 +517,7 @@ export default function Dashboard() {
                             <img 
                               src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800"} 
                               alt={artwork.title} 
+                              onError={handleArtworkImageError}
                               className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                             />
                           </Link>
@@ -622,7 +624,7 @@ export default function Dashboard() {
                     {portfolioItems.map((item) => (
                       <div key={item.id} className="bg-[#0d0d14] border border-white/5 rounded-lg overflow-visible group" data-testid={`portfolio-item-${item.id}`}>
                         <div className="aspect-square overflow-hidden bg-white/[0.02] relative rounded-t-lg">
-                          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                          <img src={item.imageUrl} alt={item.title} onError={handleArtworkImageError} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                           {item.listedForSale && (
                             <Badge className="absolute top-2 right-2 bg-emerald-500 text-white" data-testid={`badge-listed-${item.id}`}>
                               <DollarSign className="w-3 h-3 mr-1" /> Listed

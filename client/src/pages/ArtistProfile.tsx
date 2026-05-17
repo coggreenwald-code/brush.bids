@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -119,6 +120,7 @@ export default function ArtistProfile() {
                       <img 
                         src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=400"} 
                         alt={artwork.title}
+                        onError={handleArtworkImageError}
                         className="w-full h-full object-cover"
                       />
                       {artwork.promotionPercentage && artwork.promotionPercentage > 0 && (
@@ -147,6 +149,7 @@ export default function ArtistProfile() {
                       <img 
                         src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=400"} 
                         alt={artwork.title}
+                        onError={handleArtworkImageError}
                         className="w-full h-full object-cover grayscale"
                       />
                       <Badge className="absolute top-2 right-2 bg-emerald-500 text-white">Sold</Badge>
@@ -176,7 +179,7 @@ export default function ArtistProfile() {
               {portfolioItems.map((item) => (
                 <div key={item.id} className="overflow-visible rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors" data-testid={`card-portfolio-${item.id}`}>
                   <div className="aspect-square bg-white/5 relative rounded-t-xl overflow-hidden">
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                    <img src={item.imageUrl} alt={item.title} onError={handleArtworkImageError} className="w-full h-full object-cover" />
                     {item.listedForSale && (
                       <Badge className="absolute top-2 right-2 bg-[#A78BFA] text-[#0a0a0f]">For Sale</Badge>
                     )}

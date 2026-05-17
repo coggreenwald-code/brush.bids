@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { type Artwork, type User } from "@shared/schema";
 import { Rocket, Clock } from "lucide-react";
 import { useCharities } from "@/hooks/use-charities";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 
 function getAuctionEndDate(artwork: Artwork): Date {
   if (artwork.endTime) return new Date(artwork.endTime);
@@ -41,6 +42,7 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
           <img
             src={displayImage}
             alt={artwork.title}
+            onError={handleArtworkImageError}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
 

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -211,6 +212,7 @@ export default function MyBids() {
                         <img 
                           src={bid.artwork?.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                           alt={bid.artwork?.title || "Artwork"} 
+                          onError={handleArtworkImageError}
                           className="w-full h-full object-cover" 
                         />
                       </div>
@@ -261,6 +263,7 @@ export default function MyBids() {
                         <img 
                           src={bid.artwork?.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                           alt={bid.artwork?.title || "Artwork"} 
+                          onError={handleArtworkImageError}
                           className="w-full h-full object-cover" 
                         />
                       </div>
@@ -316,6 +319,7 @@ export default function MyBids() {
                         <img 
                           src={bid.artwork?.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                           alt={bid.artwork?.title || "Artwork"} 
+                          onError={handleArtworkImageError}
                           className="w-full h-full object-cover" 
                         />
                       </div>

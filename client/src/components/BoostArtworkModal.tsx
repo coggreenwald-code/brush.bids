@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { type Artwork } from "@shared/schema";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -115,6 +116,7 @@ export function BoostArtworkModal({ artwork, open, onOpenChange }: BoostArtworkM
           <div className="bg-[#12121e] rounded-lg p-4 border border-white/10">
             <div className="flex items-center gap-3">
               <img 
+                onError={handleArtworkImageError}
                 src={artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=200"} 
                 alt={artwork.title}
                 className="w-16 h-16 rounded-lg object-cover"

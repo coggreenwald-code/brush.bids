@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtwork } from "@/hooks/use-artworks";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { useBids, usePlaceBid } from "@/hooks/use-bids";
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -329,7 +330,7 @@ export default function ArtworkDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
           <div className="lg:col-span-7 space-y-8">
             <div className="relative rounded-md overflow-hidden bg-white/[0.02] aspect-[4/5]">
-              <img src={displayImage} alt={artwork.title} className="w-full h-full object-cover" data-testid="img-artwork" />
+              <img src={displayImage} alt={artwork.title} onError={handleArtworkImageError} className="w-full h-full object-cover" data-testid="img-artwork" />
             </div>
 
             <div className="bg-white/[0.02] border border-white/5 rounded-md p-6">

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -166,7 +167,7 @@ export default function Portfolio() {
             {items.map((item) => (
               <Card key={item.id} className="overflow-hidden group" data-testid={`portfolio-item-${item.id}`}>
                 <div className="aspect-square overflow-hidden bg-muted relative">
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                  <img src={item.imageUrl} alt={item.title} onError={handleArtworkImageError} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                   {item.listedForSale && (
                     <Badge className="absolute top-2 right-2 bg-[#B8965A]" data-testid={`badge-listed-${item.id}`}>
                       <DollarSign className="w-3 h-3 mr-1" /> Listed

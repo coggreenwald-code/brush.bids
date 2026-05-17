@@ -1,6 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useArtworks } from "@/hooks/use-artworks";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { ArrowRight, Sparkles, Upload, Palette, Eye, DollarSign, Heart, Award, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
@@ -307,6 +308,7 @@ export default function Home() {
                           <img
                             src={artwork.imageUrl}
                             alt={artwork.title}
+                            onError={handleArtworkImageError}
                             className="w-full h-full object-cover"
                             draggable={false}
                             loading="lazy"
@@ -337,6 +339,7 @@ export default function Home() {
                           <img
                             src={artwork.imageUrl}
                             alt=""
+                            onError={handleArtworkImageError}
                             className="w-full object-cover object-bottom"
                             style={{ height: `${coverSize}px` }}
                             draggable={false}

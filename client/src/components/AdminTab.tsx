@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useArtworks, useUpdateArtworkStatus, useAiReview, useDeleteArtwork, useUpdateFeedback } from "@/hooks/use-artworks";
 import { useCharities } from "@/hooks/use-charities";
+import { handleArtworkImageError } from "@/lib/imageFallback";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -245,7 +246,7 @@ export function AdminTab() {
               {otherCharityArtworks.map((artwork) => (
                 <div key={artwork.id} className="p-4 flex flex-col sm:flex-row gap-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 transition-colors" data-testid={`card-charity-note-${artwork.id}`}>
                   <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden shrink-0">
-                    <img src={artwork.imageUrl} alt={artwork.title} className="w-full h-full object-cover" />
+                    <img src={artwork.imageUrl} alt={artwork.title} onError={handleArtworkImageError} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-start justify-between gap-2 flex-wrap">
@@ -286,7 +287,7 @@ export function AdminTab() {
               {filteredArtworks.map((artwork) => (
                 <div key={artwork.id} className="p-4 md:p-5 flex flex-col md:flex-row gap-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors" data-testid={`card-admin-artwork-${artwork.id}`}>
                   <div className="w-full md:w-80 aspect-square bg-white/5 rounded-lg overflow-hidden shrink-0">
-                    <img src={artwork.imageUrl} alt={artwork.title} className="w-full h-full object-cover" />
+                    <img src={artwork.imageUrl} alt={artwork.title} onError={handleArtworkImageError} className="w-full h-full object-cover" />
                   </div>
 
                   <div className="flex-1 space-y-3 min-w-0">
