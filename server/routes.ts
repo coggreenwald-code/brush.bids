@@ -23,13 +23,7 @@ const allowedMimeTypes = new Set([
 ]);
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, uploadDir),
-    filename: (_req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + path.extname(file.originalname));
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const extAllowed = /\.(jpg|jpeg|png|gif|webp|bmp|tiff)$/i;
@@ -465,10 +459,12 @@ export async function registerRoutes(
     if (!req.file) {
       return res.status(400).json({ message: "No image file provided" });
     }
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const base64 = req.file.buffer.toString("base64");
+    const imageUrl = `data:${req.file.mimetype};base64,${base64}`;
     res.json({ imageUrl });
   });
 
+  // Serve any legacy on-disk uploads so old artwork images still load
   app.use("/uploads", (await import("express")).default.static(uploadDir));
 
   // Users

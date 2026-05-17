@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
-import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode, Trash2, ArrowRight, ImagePlus, FolderOpen, AlertTriangle, MapPin } from "lucide-react";
+import { Plus, DollarSign, Palette, TrendingUp, Rocket, Sparkles, Clock, User, Loader2, Check, Settings, ShoppingBag, Pencil, QrCode, Trash2, ArrowRight, ImagePlus, FolderOpen, AlertTriangle, MapPin, Wallet, CheckCircle2, CreditCard } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BoostArtworkModal } from "@/components/BoostArtworkModal";
 import { QRCodeModal } from "@/components/QRCodeModal";
@@ -451,6 +451,9 @@ export default function Dashboard() {
                     <FolderOpen className="w-4 h-4 mr-1" /> Portfolio
                   </TabsTrigger>
                   <TabsTrigger value="sold" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">Sold History</TabsTrigger>
+                  <TabsTrigger value="payment" data-testid="tab-payment" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">
+                    <CreditCard className="w-4 h-4 mr-1" /> Payment
+                  </TabsTrigger>
                 </TabsList>
               </div>
               
@@ -675,6 +678,85 @@ export default function Dashboard() {
                 <div className="text-center py-12 text-white/40">
                   Transaction history will appear here.
                 </div>
+              </TabsContent>
+
+              <TabsContent value="payment" className="space-y-4" data-testid="tabcontent-payment">
+                {!payoutStatus ? (
+                  <div className="flex justify-center py-12"><Loader2 className="animate-spin w-6 h-6 text-[#A78BFA]" /></div>
+                ) : !payoutStatus.ready ? (
+                  <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center space-y-3">
+                    <div className="w-12 h-12 mx-auto rounded-full bg-[#A78BFA]/10 flex items-center justify-center">
+                      <Wallet className="w-6 h-6 text-[#A78BFA]" />
+                    </div>
+                    <p className="text-white font-medium">No payment details saved yet</p>
+                    <p className="text-sm text-white/40">Set up your payout method in the settings panel so we know where to send your earnings.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                      <p className="text-sm text-emerald-300 font-medium">Payout details saved — you're all set to receive earnings.</p>
+                    </div>
+
+                    {payoutStatus.method === "stripe" ? (
+                      <div className="rounded-xl bg-white/[0.03] border border-white/10 p-5 space-y-3" data-testid="payment-details-stripe">
+                        <div className="flex items-center gap-2 text-white font-semibold">
+                          <Wallet className="w-4 h-4 text-[#A78BFA]" /> Stripe Connect
+                        </div>
+                        <p className="text-sm text-white/60">Your Stripe account is connected. Earnings are sent automatically to your bank after each sale.</p>
+                        <Badge className="bg-emerald-500/15 text-emerald-300 border-emerald-500/30">Active</Badge>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl bg-white/[0.03] border border-white/10 p-5 space-y-4" data-testid="payment-details-manual">
+                        <div className="flex items-center gap-2 text-white font-semibold">
+                          <CreditCard className="w-4 h-4 text-[#A78BFA]" /> Manual Payout
+                        </div>
+                        {payoutStatus.forMinor ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between py-2 border-b border-white/5">
+                              <span className="text-sm text-white/50">Account type</span>
+                              <span className="text-sm text-white">Under 18 — parent/guardian</span>
+                            </div>
+                            {(user as any)?.parentGuardianEmail && (
+                              <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                <span className="text-sm text-white/50">Parent email</span>
+                                <span className="text-sm text-white font-mono">{(user as any).parentGuardianEmail}</span>
+                              </div>
+                            )}
+                            {(user as any)?.parentPayoutMethod && (
+                              <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                <span className="text-sm text-white/50">Parent method</span>
+                                <span className="text-sm text-white capitalize">{(user as any).parentPayoutMethod}</span>
+                              </div>
+                            )}
+                            {(user as any)?.parentPayoutHandle && (
+                              <div className="flex items-center justify-between py-2">
+                                <span className="text-sm text-white/50">Parent handle</span>
+                                <span className="text-sm text-white font-mono">{(user as any).parentPayoutHandle}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {payoutStatus.method && (
+                              <div className="flex items-center justify-between py-2 border-b border-white/5">
+                                <span className="text-sm text-white/50">Method</span>
+                                <span className="text-sm text-white capitalize">{payoutStatus.method}</span>
+                              </div>
+                            )}
+                            {payoutStatus.handle && (
+                              <div className="flex items-center justify-between py-2">
+                                <span className="text-sm text-white/50">Handle / email</span>
+                                <span className="text-sm text-white font-mono">{payoutStatus.handle}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <p className="text-xs text-white/35">We'll send your share here after each successful sale. You can update these details in Settings at any time.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>
