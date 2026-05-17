@@ -15,7 +15,12 @@ export function QRCodeModal({ isOpen, onClose, artworkTitle, artworkId }: QRCode
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
 
-  const artworkUrl = `${window.location.origin}/artwork/${artworkId}`;
+  const isLiveSite =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "brushbids.com" ||
+      window.location.hostname === "www.brushbids.com");
+  const origin = isLiveSite ? window.location.origin : "https://brushbids.com";
+  const artworkUrl = `${origin}/artwork/${artworkId}`;
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
