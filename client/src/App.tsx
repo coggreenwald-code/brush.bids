@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Switch, Route, Redirect } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,6 +19,7 @@ import Contact from "@/pages/Contact";
 import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
+import HeroPreview from "@/pages/HeroPreview";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { SignupPopup } from "@/components/SignupPopup";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/my-bids" component={MyBids} />
       <Route path="/portfolio"><Redirect to="/dashboard" /></Route>
       <Route path="/auth" component={Auth} />
+      <Route path="/hero-preview" component={HeroPreview} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -96,17 +98,35 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AppShell() {
+  const [location] = useLocation();
+  const isIsolatedPreview = location === "/hero-preview";
+
+  if (isIsolatedPreview) {
+    return (
+      <>
+        <Toaster />
+        <HeroPreview />
+      </>
+    );
+  }
+
+  return (
+    <SmoothScroll>
+      <Toaster />
+      <OnboardingWrapper>
+        <Router />
+      </OnboardingWrapper>
+      <SignupPopup />
+    </SmoothScroll>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <SmoothScroll>
-          <Toaster />
-          <OnboardingWrapper>
-            <Router />
-          </OnboardingWrapper>
-          <SignupPopup />
-        </SmoothScroll>
+        <AppShell />
       </TooltipProvider>
     </QueryClientProvider>
   );

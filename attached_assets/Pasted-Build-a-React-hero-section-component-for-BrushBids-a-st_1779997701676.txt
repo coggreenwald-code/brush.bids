@@ -1,0 +1,54 @@
+Build a React hero section component for BrushBids, a student art auction platform. This is the first thing visitors see — it needs to feel premium, immersive, and alive.
+Tech: React + TypeScript, Three.js via @react-three/fiber and @react-three/drei, Framer Motion for text animations, Tailwind CSS.
+Visual concept:
+Full-viewport hero with a dark cream background (#f5f0e8). Split layout:
+LEFT SIDE (text content, 55% width):
+
+Small eyebrow: "CURATOR-APPROVED STUDENT MARKETPLACE" in #c8401a, uppercase, 12px, with a short horizontal line before it
+Giant stacked headline using "Bebas Neue" font (Google Fonts):
+Line 1: "BID ON" in #0e0c0a
+Line 2: "original" in "DM Serif Display" italic, #c8401a
+Line 3: "STUDENT ART" in #0e0c0a
+Body text in "DM Sans" 300 weight, #7a7060: "Every piece on BrushBids is hand-selected by our curatorial team. Discover emerging student artists. Bid live. Own something real. 10% of every sale goes to charity."
+Two CTAs side by side:
+
+"EXPLORE AUCTIONS" — large rectangular button, #0e0c0a bg, #f5f0e8 text, hover → #c8401a bg
+"How it works →" — plain text link, #7a7060, arrow animates right on hover
+
+
+Stats row below a thin border: "2.4K Active bidders" | "840+ Artists" | "$1.2M Art sold" — numbers in Bebas Neue 42px, labels in uppercase 12px #7a7060. Numbers should count up from 0 when the component mounts using Framer Motion's useMotionValue and animate.
+
+All left-side text should stagger in on load: eyebrow first (0ms), then headline lines (100ms, 200ms, 300ms), then body (400ms), CTAs (500ms), stats (600ms). Use Framer Motion variants with fadeInUp (y: 30 → 0, opacity: 0 → 1, duration: 0.6s, ease: easeOut).
+RIGHT SIDE (3D canvas, 45% width):
+Create a Three.js scene with @react-three/fiber showing 3-4 floating picture frames in 3D space:
+
+Each frame is a thin rectangular box (BoxGeometry) with a gold/bronze material (#b8860b, metalness: 0.7, roughness: 0.3)
+Inside each frame, a flat plane with a colorful abstract texture (use drei's GradientTexture or simple colored planes: #c8401a, #e8a020, #0e0c0a, #7a7060)
+Frames float at different positions, rotations, and depths
+They gently bob up/down (sine wave, 0.3 amplitude) and slowly rotate (0.1 rad/s)
+On mouse move across the hero: frames shift position with parallax (closer frames move more, farther ones move less) — use useFrame with lerped mouse position
+Soft ambient light + one directional light casting subtle shadows
+Background: transparent (shows the page cream color through)
+Add drei's Float component around each frame for organic drift
+Add a subtle Environment preset ("studio" or "apartment") for realistic reflections on the metallic frames
+
+FLOATING BADGE (positioned absolute, bottom-left of the 3D area):
+
+Background #e8a020, padding 16px 24px
+Top line: "CURRENT BID" in 10px uppercase, rgba(14,12,10,0.6)
+Bottom line: "$3,200" in Bebas Neue 26px, #0e0c0a
+Animate in from left with a slight delay (800ms)
+
+LIVE TAG (positioned absolute, top-right of the 3D area):
+
+Background rgba(245,240,232,0.95), padding 12px 18px
+Pulsing red dot (8px circle, #c8401a, CSS pulse animation) + "LIVE AUCTION NOW" in 12px uppercase
+
+ON MOBILE (under 768px):
+
+Stack vertically, text on top, 3D canvas below (or replace with a static gradient/image for performance)
+Reduce headline font size
+Stats in 2-column grid
+
+Export as a default React component: export default function HeroSection()
+Do NOT use Inter, Roboto, or any system fonts. Do NOT use purple gradients. This should feel like a high-end art gallery website, not a SaaS landing page.
