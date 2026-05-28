@@ -1,0 +1,234 @@
+Completely redesign the BrushBids homepage as a bold, modern, interactive student art auction website with a cool blue/purple/gray palette and an immersive scroll-driven hero that zooms from a satellite view of The Metropolitan Museum of Art into an interactive 3D gallery wall showcasing featured auction pieces.
+This should feel like a premium gallery experience — not a generic marketplace. The page needs to make visitors think "this is legit" within 2 seconds.
+
+TECH STACK
+
+React + TypeScript (already in the project)
+Tailwind CSS for utility styling
+Framer Motion for scroll animations and transitions (npm install framer-motion)
+Three.js + @react-three/fiber + @react-three/drei for the 3D gallery wall (npm install three @react-three/fiber @react-three/drei)
+GSAP + ScrollTrigger for the scroll-pinned hero image sequence (npm install gsap)
+Use existing project structure — update the homepage component only. Do NOT touch backend or API routes.
+
+
+COLOR PALETTE (mandatory — use these EXACT values as CSS variables or Tailwind config)
+css:root {
+  --ink: #0a0a14;
+  --cream: #f0f0f6;
+  --warm: #e0e0ec;
+  --accent: #6c3ce0;
+  --accent2: #3b82f6;
+  --muted: #6b6b80;
+  --border: rgba(10,10,20,0.10);
+  --glow-purple: rgba(108,60,224,0.15);
+  --glow-blue: rgba(59,130,246,0.15);
+}
+Tailwind extend config:
+jscolors: {
+  ink: '#0a0a14',
+  cream: '#f0f0f6',
+  warm: '#e0e0ec',
+  accent: '#6c3ce0',
+  accent2: '#3b82f6',
+  muted: '#6b6b80',
+}
+DO NOT use any warm tones (red, orange, amber, gold). The entire site is cool-toned: purples, blues, grays, and navy. Every element, badge, button, and highlight must use the palette above.
+
+TYPOGRAPHY (Google Fonts — import all three)
+
+Display / headings: "Bebas Neue" — big, bold, uppercase, used for hero headline, stat numbers, bid amounts, section titles
+Serif accent: "DM Serif Display" — used only in italic for stylistic emphasis words like "original", "lots", "works"
+Body: "DM Sans" — weights 300 (body text), 400 (regular), 500 (labels/buttons)
+
+NEVER use Inter, Roboto, Arial, Space Grotesk, or system fonts anywhere.
+
+PAGE STRUCTURE (7 sections, top to bottom)
+
+SECTION 1 — NAVIGATION (sticky, glassmorphism)
+Fixed top nav bar:
+
+Background: rgba(240,240,246,0.8) with backdrop-filter: blur(16px) and a subtle bottom border
+Left: BrushBids logo in Bebas Neue — "Brush" in --ink, "Bids" in --accent (#6c3ce0)
+Center: nav links — "Auctions" | "How It Works" | "Artists" | "About" — uppercase, 13px, letter-spacing 0.06em, --muted color, hover to --ink
+Right: two buttons — "Log In" (ghost/outline, 1px --ink border, hover fills --ink with --cream text) + "Start Bidding" (solid --accent bg, white text, hover darkens to #5a2cc0)
+On scroll: reduce padding from 20px to 12px with a smooth transition
+
+Mobile (under 768px): hide center links, show hamburger menu icon, slide-out panel on tap.
+
+SECTION 2 — HERO (immersive scroll-driven experience)
+This is the centrepiece of the entire page. It has TWO phases stitched together seamlessly:
+PHASE 1: Scroll-pinned satellite-to-interior zoom (GSAP ScrollTrigger)
+Pin the hero viewport to full screen height. As the user scrolls, crossfade through 5 images. The section should take approximately 4x the viewport height of scroll distance to complete.
+Image sequence (crossfade based on scroll progress):
+Frame 1 (scroll 0-20%): Satellite/aerial view of Manhattan showing The Met area
+
+Use: https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1600&q=80&auto=format&fit=crop
+Overlay text centered, Bebas Neue, large (clamp 48px-80px): "WHERE ART FINDS ITS NEXT HOME"
+Below in DM Sans 300, 18px, --muted on a semi-transparent dark scrim: "BrushBids — Curator-approved student art auctions"
+
+Frame 2 (scroll 20-40%): Closer aerial of a grand museum building
+
+Use: https://images.unsplash.com/photo-1575505586569-646b2ca898fc?w=1600&q=80&auto=format&fit=crop
+No text — subtle Ken Burns zoom (scale 1.0 to 1.05 during this frame)
+
+Frame 3 (scroll 40-55%): Museum entrance / grand facade with columns
+
+Use: https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=1600&q=80&auto=format&fit=crop
+Text fades in at bottom: "STEP INSIDE" in --accent2, uppercase, 12px, letter-spacing 0.2em
+
+Frame 4 (scroll 55-70%): Museum interior hallway / grand corridor
+
+Use: https://images.unsplash.com/photo-1564399263809-d2e89a3280a6?w=1600&q=80&auto=format&fit=crop
+Slight vignette overlay darkening edges
+
+Frame 5 (scroll 70-90%): Gallery wall with paintings — crossfades into Phase 2
+
+Use: https://images.unsplash.com/photo-1577720643272-265f09367456?w=1600&q=80&auto=format&fit=crop
+Fades to --ink background as it hands off to the 3D scene
+
+Between each frame: smooth crossfade (opacity 0 to 1 of next while previous fades). Each image has a subtle slow zoom (1.0 to 1.03) during its active range for cinematic parallax.
+Scroll progress indicator: thin vertical line on right side (2px wide, --accent color) that fills top-to-bottom as user scrolls. Fades out when Phase 1 ends.
+PHASE 2: Interactive 3D gallery wall (@react-three/fiber)
+Once scroll sequence completes, unpin and reveal a full-width 3D gallery:
+Scene:
+
+Camera facing a museum wall (large plane, MeshStandardMaterial, color #e8e8f0, roughness 0.9)
+5 paintings in asymmetric museum-style arrangement:
+
+1 large center painting (40% wall width)
+2 medium flanking (offset above-left and below-right)
+2 smaller at far edges
+
+
+Frame material: dark slate, MeshStandardMaterial, roughness 0.5, metalness 0.3, color #2a2a3a
+Canvas textures: Unsplash artwork images via useTexture from drei
+Lighting: ambient (0.4) + 2 spotlights angled down (0.8), soft shadows
+Optional polished floor: dark reflective plane, color #0a0a14, roughness 0.2
+
+Interactivity:
+
+Mouse move: subtle camera sway (plus/minus 2 degrees), damped with lerp. NOT OrbitControls
+Hover on painting: painting pops forward (translateZ +0.3, 0.3s ease), purple glow appears behind frame, HTML overlay fades in below showing:
+
+Artist name (DM Sans 500, 14px, white)
+Title (DM Serif Display italic, 18px, white)
+Current bid (Bebas Neue, 24px, --accent2)
+"Place Bid" button (small, --accent bg, white text)
+
+
+Hover off: painting slides back, overlay fades out
+Use drei Html component for overlays to track 3D position
+
+Height: approximately 80vh. Use Suspense with a loading fallback (pulsing BrushBids logo).
+Mobile (under 768px): replace entire 3D scene with a static grid of 5 artwork cards with the same info. Do NOT render Three.js on mobile.
+
+SECTION 3 — SCROLLING TICKER (horizontal marquee)
+
+Background: --ink
+Continuously scrolling left, CSS animation 28s linear infinite
+Content separated by purple dots in --accent:
+"Crimson Flow" by M. Ashby — $4,800 | "Urban Dusk" by T. Nakamura — $2,100 | "Layers III" by C. Osei — $6,500 | "Still Life No. 7" by R. Brandt — $1,750 | 10% OF EVERY SALE TO CHARITY
+Text: 13px uppercase, letter-spacing 0.1em, color rgba(240,240,246,0.6)
+Artist names in --accent2 (blue), amounts in white, charity callout in --accent (purple)
+Duplicate content 3x for seamless loop
+
+
+SECTION 4 — FEATURED AUCTIONS (interactive card grid)
+Background: --cream
+Section header:
+
+Eyebrow: "ENDING SOON" in --accent with horizontal line
+Title: "Featured" Bebas Neue + "lots" DM Serif Display italic --muted
+Right: "View all auctions" link
+
+Grid: 1 large card (spans 2 rows left) + 4 smaller cards 2x2 right. Gap 2px.
+Each auction card:
+
+Artwork image background, dark gradient overlay from bottom
+Curator badge where applicable (--accent2 bg for "Curator's Pick", --accent bg for "New Artist")
+Title in DM Serif Display, artist name, current bid in Bebas Neue, time remaining
+Hover: 3D tilt (CSS perspective 800px, rotateX/Y max 5deg from mouse position), image scales 1.04, "Place Bid" button slides up, box-shadow glow-purple
+Framer Motion scroll entrance, staggered
+
+Card data:
+Card 1 (LARGE): "Fractured Light Series IV" by Maya Ashby, Oil on canvas 36x48, $4,800, 2h 14m, Curator's Pick badge
+Image: https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80&auto=format&fit=crop
+Card 2: "Urban Dusk" by Taro Nakamura, Acrylic 24x24, $2,100, 5h 30m
+Image: https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=600&q=80&auto=format&fit=crop
+Card 3: "Gold & Ash No. 3" by Priya Delacroix, Mixed media 20x30, $1,350, 1d 2h, New Artist badge
+Image: https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=600&q=80&auto=format&fit=crop
+Card 4: "Still Life No. 7" by Rene Brandt, Watercolor 18x24, $1,750, 3d 6h
+Image: https://images.unsplash.com/photo-1530968033775-2c92736b131e?w=600&q=80&auto=format&fit=crop
+Card 5: "Layers III" by Kofi Osei, Oil pastel 30x40, $6,500, 12h 45m
+Image: https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80&auto=format&fit=crop
+
+SECTION 5 — HOW IT WORKS (4 steps)
+Background: --ink
+Eyebrow: "SIMPLE PROCESS" in --accent2
+Title: "How it works" — "works" in DM Serif italic, dimmed
+Giant "PROCESS" watermark, 220px, rgba(255,255,255,0.02)
+4 horizontal cards, each with:
+
+Background rgba(240,240,246,0.04), border 1px solid rgba(240,240,246,0.08)
+Faded step number (01-04) in background, 80px Bebas Neue
+Colored icon square 48x48 (alternating --accent and --accent2)
+Title in DM Serif Display 22px --cream
+Description in DM Sans 300, 14px
+
+Steps:
+01 "Create your account" (person icon): "Sign up free in under two minutes. Verify your identity and add a payment method to start bidding immediately."
+02 "Browse curated lots" (search icon): "Every artwork is reviewed and approved by our expert curators before listing. No fakes, no filler — only quality work."
+03 "Place your bid" (star icon): "Your card is securely held — not charged — when you bid. If you're outbid, the hold releases instantly. Win and we charge at close."
+04 "Own original art" (checkmark icon): "Won the auction? Your payment processes automatically. The artist ships directly to you with a certificate of authenticity."
+Hover: background brightens, border glows --accent at 30% opacity, subtle purple box-shadow
+Scroll: fade-up staggered with Framer Motion
+Connecting animated gradient line across top of all cards (--accent to --accent2)
+
+SECTION 6 — CHARITY + ARTIST CTA (split halves)
+Left half — Charity (background --accent):
+
+"10% OF EVERY SALE" eyebrow, rgba(255,255,255,0.65)
+"GOES DIRECTLY TO CHARITY" Bebas Neue, white
+"Every purchase on BrushBids directly supports arts education. We believe creativity changes lives — and every bid proves it."
+"Learn More" link, white underline
+
+Right half — Artist CTA (background --ink):
+
+"FOR ARTISTS" eyebrow in --accent2
+"SHARE YOUR WORK" Bebas Neue --cream + "Reach real collectors." DM Serif italic --accent
+"Any artist can apply to list on BrushBids. Our curatorial team reviews every submission to ensure quality. No listing fees — we only earn when you do."
+"Apply as an Artist" button (white bg, --accent text, hover: --ink bg, --cream text)
+
+Equal width, min-height 400px. Mobile: stack vertically.
+
+SECTION 7 — FOOTER
+Background --ink, border-top rgba(240,240,246,0.06), padding 72px 48px 40px
+4-column grid:
+
+Col 1: Logo ("Brush" --cream, "Bids" --accent) + tagline
+Col 2 Marketplace: Browse auctions, Ending soon, New listings, Categories
+Col 3 Artists: Apply to list, How payouts work, Curation standards, Artist FAQ
+Col 4 Company: About BrushBids, Our curators, Contact, Press
+
+Bottom bar: copyright 2026 + Privacy / Terms / Cookie Policy
+
+GLOBAL REQUIREMENTS
+
+Scroll-triggered fade-ins on all sections (Framer Motion whileInView, stagger 100ms)
+3D card tilt on auction cards (CSS perspective, mousemove rotateX/Y max 5deg)
+Smooth scroll for nav anchor links
+Counter animations for stats/bid amounts
+Page load stagger: nav 0ms, hero frame 200ms, overlay text 400ms, scroll indicator 600ms
+Hover: buttons scale(1.02), purple glow box-shadow on interactive elements
+Mobile: stack columns, hamburger nav, replace 3D with static cards, disable tilt on touch
+
+AVOID
+
+No warm colors (red, orange, amber, gold, brown)
+No Inter, Roboto, Arial, Space Grotesk, system fonts
+No generic SaaS template layouts
+No rounded cards with drop shadows (sharp or barely rounded, tight gaps)
+No placeholder text — use exact copy above
+No backend/API changes — frontend only
+No Three.js outside the gallery wall section
+No janky animations

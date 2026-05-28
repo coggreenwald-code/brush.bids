@@ -20,6 +20,7 @@ import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
 import HeroPreview from "@/pages/HeroPreview";
+import HomeV2 from "@/pages/HomeV2";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { SignupPopup } from "@/components/SignupPopup";
 import { useAuth } from "@/hooks/use-auth";
@@ -100,13 +101,13 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
 
 function AppShell() {
   const [location] = useLocation();
-  const isIsolatedPreview = location === "/hero-preview";
+  const isIsolatedPreview = location === "/hero-preview" || location === "/home-v2";
 
   if (isIsolatedPreview) {
     return (
       <>
         <Toaster />
-        <HeroPreview />
+        {location === "/hero-preview" ? <HeroPreview /> : <HomeV2 />}
       </>
     );
   }
