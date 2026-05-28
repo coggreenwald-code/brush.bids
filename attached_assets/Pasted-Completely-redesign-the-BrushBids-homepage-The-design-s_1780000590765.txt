@@ -1,0 +1,349 @@
+Completely redesign the BrushBids homepage. The design should fuse Cyrculo's dark, fluid, scroll-driven aesthetic with Omnera's editorial precision and intentional polish. The result should feel like a premium digital gallery — immersive, dark, and alive with motion, but never cluttered. Every animation should feel deliberate. Every element should earn its place.
+Reference sites for design direction:
+
+Cyrculo (https://cyrclo.webflow.io/) — dark theme, ✦ markers, image grids, rotating text, fluid scroll animations, service cards with icon badges
+Omnera (https://omnerat-template.webflow.io/) — editorial clarity, large showcase images, custom cursor with crosshair lines, refined intentional motion, clean structure
+
+
+TECH STACK
+
+React + TypeScript (already in the project)
+Tailwind CSS for utility styling
+Framer Motion for scroll animations and transitions (npm install framer-motion)
+Three.js + @react-three/fiber + @react-three/drei for the 3D gallery wall (npm install three @react-three/fiber @react-three/drei)
+GSAP + ScrollTrigger for the scroll-pinned hero image sequence (npm install gsap)
+Use existing project structure — update the homepage component only. Do NOT touch backend or API routes.
+
+
+COLOR PALETTE (mandatory — these exact values, no exceptions)
+css:root {
+  --ink: #0a0a14;
+  --cream: #f0f0f6;
+  --warm: #e0e0ec;
+  --accent: #6c3ce0;
+  --accent2: #3b82f6;
+  --muted: #6b6b80;
+  --border: rgba(240,240,246,0.08);
+  --border-light: rgba(10,10,20,0.10);
+  --glow-purple: rgba(108,60,224,0.15);
+  --glow-blue: rgba(59,130,246,0.12);
+  --text-dim: rgba(240,240,246,0.55);
+  --text-muted: rgba(240,240,246,0.4);
+}
+The page is DARK-FIRST. The primary background is --ink (#0a0a14) across most sections. Light sections (--cream) are used sparingly for contrast. Do NOT use warm tones anywhere — no red, orange, amber, gold, or brown.
+
+TYPOGRAPHY (Google Fonts)
+
+Display: "Bebas Neue" — uppercase headlines, stat numbers, bid amounts
+Serif accent: "DM Serif Display" — italic only, for emphasis words
+Body: "DM Sans" — weights 300 (body), 400 (regular), 500 (labels/buttons)
+
+NEVER use Inter, Roboto, Arial, Space Grotesk, or system fonts.
+
+GLOBAL DESIGN ELEMENTS (apply across entire page)
+Custom cursor (inspired by Omnera)
+Replace the default cursor sitewide with a custom cursor:
+
+A small circle (20px diameter, 1px solid rgba(240,240,246,0.5), no fill)
+With crosshair lines extending outward: 4 thin lines (1px, 12px long) radiating from the circle at 0°, 90°, 180°, 270° — forming a + crosshair through the circle
+The circle + crosshair follows the mouse with slight easing/lag (use requestAnimationFrame with lerp, ~0.15 factor)
+On hover over interactive elements (buttons, cards, links): circle expands to 48px, lines fade out, circle gets a subtle --accent fill at 15% opacity
+On click: quick scale pulse (1.0 to 0.85 to 1.0 over 150ms)
+Hide the native cursor with cursor: none on body
+On mobile/touch: disable entirely, show normal cursor
+
+✦ Decorative markers (from Cyrculo)
+Use the ✦ character (or similar: ◆, ✧) as decorative accents throughout:
+
+Between nav links: "Auctions ✦ How It Works ✦ Artists"
+In section eyebrows: "✦ ENDING SOON"
+As list markers in feature descriptions
+In the ticker strip between items
+Color: --accent or --accent2, never white or gray
+
+Scroll-triggered reveals (from both)
+Every section and its children animate in on scroll:
+
+Use Framer Motion whileInView
+Default animation: opacity 0→1, y: 50→0, duration 0.7s, ease [0.25, 0.1, 0.25, 1]
+Stagger children by 120ms
+Images additionally scale from 1.05→1.0
+Ensure elements only animate ONCE (viewport: { once: true })
+
+Thin accent lines (from Omnera)
+Use 1px horizontal and vertical lines as structural separators:
+
+Horizontal lines above section headers (full-width, --border color)
+Vertical accent lines alongside key content (2px wide, --accent, partial height)
+These lines should animate in: grow from 0 width/height to full with 0.6s ease
+
+
+PAGE STRUCTURE (7 sections)
+
+SECTION 1 — NAVIGATION
+Dark glassmorphism nav, fixed top:
+
+Background: rgba(10,10,20,0.85) with backdrop-filter: blur(20px)
+Bottom border: 1px solid var(--border)
+Left: BrushBids logo — Bebas Neue, "Brush" in --cream, "Bids" in --accent
+Center: "Auctions ✦ How It Works ✦ Artists ✦ About" — 12px uppercase, letter-spacing 0.08em, --text-dim, hover → --cream with 0.2s transition
+Right: "Log In" (ghost button, 1px --cream/30% border) + "Start Bidding" (--accent bg, white text, hover glow-purple box-shadow)
+On scroll past 100px: reduce padding 20px→12px, background opacity increases to 0.95
+
+Mobile: hamburger icon (two horizontal lines, not three — cleaner), slide-in panel from right with full-screen dark overlay.
+
+SECTION 2 — HERO (immersive scroll experience)
+Full dark background (--ink). Two phases:
+PHASE 1: Scroll-pinned satellite-to-interior zoom
+Use GSAP ScrollTrigger to pin a full-viewport container. Total scroll distance: 5x viewport height. As the user scrolls, crossfade through 5 photographic frames with cinematic Ken Burns zoom (each scales 1.0→1.04 during its range).
+Frame 1 (0-20%): Satellite view of Manhattan
+
+Image: https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1600&q=80&auto=format&fit=crop
+Centered text overlay (on a subtle dark radial gradient scrim):
+Top line: "✦" in --accent, 24px
+Main: "WHERE ART FINDS" in Bebas Neue, clamp(52px, 7vw, 90px), --cream
+Second line: "its next home" in DM Serif Display italic, clamp(40px, 5.5vw, 72px), --accent
+Below: "Curator-approved student art auctions" in DM Sans 300, 16px, --text-dim
+Text fades in at scroll 5% and fades out at scroll 18%
+
+Frame 2 (20-40%): Aerial of museum / grand building
+
+Image: https://images.unsplash.com/photo-1575505586569-646b2ca898fc?w=1600&q=80&auto=format&fit=crop
+No text. Just the cinematic zoom and crossfade.
+
+Frame 3 (40-55%): Museum entrance / columned facade
+
+Image: https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=1600&q=80&auto=format&fit=crop
+Small text fades in at bottom center: "STEP INSIDE ✦" in --accent2, 11px, letter-spacing 0.25em, uppercase
+
+Frame 4 (55-70%): Interior corridor / grand hallway
+
+Image: https://images.unsplash.com/photo-1564399263809-d2e89a3280a6?w=1600&q=80&auto=format&fit=crop
+Vignette overlay (radial gradient from transparent center to rgba(10,10,20,0.6) edges)
+
+Frame 5 (70-90%): Gallery wall with paintings
+
+Image: https://images.unsplash.com/photo-1577720643272-265f09367456?w=1600&q=80&auto=format&fit=crop
+Cross-dissolves into Phase 2's 3D scene (the image fades to --ink as the 3D canvas fades in)
+
+Scroll progress indicator: Thin vertical line (2px, --accent) on the right edge, 60% of viewport height, fills from top as user scrolls. Small ✦ at the fill point. Fades away when Phase 1 ends.
+Rotating text element (from Cyrculo): Position a slowly spinning circular SVG text in the bottom-right corner during Phase 1. The text reads "BRUSHBIDS ✦ CURATED ART ✦ LIVE AUCTIONS ✦" arranged in a circle, rotating at 8s per revolution. Font: DM Sans 500, 10px, --text-dim. Diameter: ~100px. Fades in at scroll 10%, fades out at scroll 85%.
+PHASE 2: Interactive 3D gallery wall
+After unpin, reveal a full-width 3D scene (80vh):
+Scene:
+
+Museum wall: large plane, MeshStandardMaterial, color #1a1a24, roughness 0.9 (dark gallery wall, not white — matches the dark theme)
+5 paintings in asymmetric museum arrangement:
+
+1 large center (40% width), 2 medium offset, 2 small at edges
+Frame: BoxGeometry, MeshStandardMaterial, color #2a2a3a, roughness 0.4, metalness 0.3
+Canvas: PlaneGeometry with artwork image textures (useTexture from drei)
+
+
+Lighting: ambient 0.3 + 2 spotlights (0.7 intensity) angled down, warm white (color: #f0f0f6), casting shadows
+Optional floor: reflective dark plane (#0a0a14, roughness 0.15)
+
+Interactivity:
+
+Mouse move: camera sway ±2 degrees (damped lerp 0.05). NOT OrbitControls.
+Hover painting: pops forward (z +0.3, 0.4s ease), --glow-purple rim light fades in behind, HTML overlay appears below:
+
+"✦ CURATOR'S PICK" badge (where applicable) — --accent bg, 9px uppercase
+Painting title — DM Serif Display italic, 20px, --cream
+Artist name — DM Sans 400, 13px, --text-dim
+Current bid — Bebas Neue, 28px, --accent2
+"Place Bid →" button — small, --accent bg, white text, hover scale 1.03 + glow
+
+
+Use drei Html component for overlays
+
+Performance:
+
+Wrap in Suspense with fallback: centered ✦ pulsing in --accent (scale 1→1.2→1, 1.5s loop)
+Mobile (under 768px): replace 3D with static grid of 5 artwork cards (see mobile section below)
+
+
+SECTION 3 — STATS + SOCIAL PROOF (from Cyrculo)
+Background: --ink with a subtle horizontal 1px --border line top and bottom
+Two rows:
+Row 1 — Stats counter strip:
+Three stats in a horizontal row, separated by vertical 1px lines (--border):
+
+"2.4K" / "Active Bidders" — number in Bebas Neue 52px --cream, label in 11px uppercase --text-dim
+"840+" / "Student Artists" — same style
+"$1.2M" / "Art Sold to Date" — same style
+Numbers count up from 0 when entering viewport (use Framer Motion animate or requestAnimationFrame). Duration 1.5s with easeOut.
+
+Row 2 — Social proof (from Cyrculo's client strip):
+
+5 small circular avatar images (40px, overlapping by -8px) + text: "✦ Loved by collectors and student artists worldwide"
+Text in DM Sans 400, 14px, --text-muted
+Use placeholder avatar images or colored circles with initials
+
+
+SECTION 4 — SCROLLING TICKER
+Background: --accent (bold purple strip)
+Height: ~50px
+Scrolling left, CSS animation 24s linear infinite
+Content:
+"✦ Crimson Flow by M. Ashby — $4,800 ✦ Urban Dusk by T. Nakamura — $2,100 ✦ Layers III by C. Osei — $6,500 ✦ Still Life No. 7 by R. Brandt — $1,750 ✦ 10% OF EVERY SALE → CHARITY"
+Text: 12px uppercase, letter-spacing 0.12em, white at 85% opacity
+✦ markers in --accent2
+Duplicate 3x for seamless loop.
+
+SECTION 5 — FEATURED AUCTIONS
+Background: --ink
+Section header (Omnera-style editorial):
+
+Full-width 1px --border line across top
+Below: left-aligned "✦ ENDING SOON" eyebrow in --accent2, 11px
+Title: "Featured" in Bebas Neue 60px --cream + "lots" in DM Serif Display italic 48px --text-muted
+Right-aligned: "View all auctions →" in 13px --cream, underlined, hover --accent2
+Full-width 1px --border line across bottom of header
+
+Auction grid:
+1 large card (spans 2 rows, left, min-height 540px) + 4 smaller cards (2x2, right, min-height 265px each)
+Gap: 3px (tight gallery seams)
+Each card:
+
+Artwork image fills card, object-fit cover, default opacity 0.85
+Gradient overlay: linear-gradient(to top, rgba(10,10,20,0.95) 0%, rgba(10,10,20,0) 50%)
+Bottom content:
+
+Badge where applicable: "✦ CURATOR'S PICK" (--accent2 bg, --ink text, 9px) or "✦ NEW ARTIST" (--accent bg, white, 9px)
+Title: DM Serif Display, 20px (large card: 30px), --cream
+Artist: DM Sans 300, 13px, --text-dim
+Footer row: bid amount (Bebas Neue 24px/32px --cream) | time remaining (14px --accent2)
+
+
+"PLACE BID" button: hidden by default, slides up on hover (full width, --accent bg, white text)
+
+Interactive effects per card:
+
+3D tilt: CSS perspective(800px), rotateX/Y max ±5deg from mouse position. Smooth easeOut reset.
+Image zoom: scale 1.0→1.06 on hover, 0.7s cubic-bezier(0.25, 0.1, 0.25, 1)
+Image opacity: 0.85→0.7 on hover (darkens to show overlay better)
+Glow: box-shadow 0 0 40px var(--glow-purple) on hover
+Thin 1px --accent border-top appears on hover (sliding in from left, 0.3s)
+
+Scroll entrance: each card fades up with 120ms stagger (Framer Motion).
+Card data:
+Card 1 (LARGE): image https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80&auto=format&fit=crop — "Fractured Light Series IV" — Maya Ashby — Oil on canvas, 36×48" — $4,800 — 2h 14m — Curator's Pick badge
+Card 2: image https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?w=600&q=80&auto=format&fit=crop — "Urban Dusk" — Taro Nakamura — Acrylic, 24×24" — $2,100 — 5h 30m
+Card 3: image https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=600&q=80&auto=format&fit=crop — "Gold & Ash No. 3" — Priya Delacroix — Mixed media, 20×30" — $1,350 — 1d 2h — New Artist badge
+Card 4: image https://images.unsplash.com/photo-1530968033775-2c92736b131e?w=600&q=80&auto=format&fit=crop — "Still Life No. 7" — René Brandt — Watercolor, 18×24" — $1,750 — 3d 6h
+Card 5: image https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=600&q=80&auto=format&fit=crop — "Layers III" — Kofi Osei — Oil pastel, 30×40" — $6,500 — 12h 45m
+
+SECTION 6 — HOW IT WORKS
+Background: gradient from --ink to slightly lighter (#0e0e1a) for depth
+Section header:
+
+"✦ SIMPLE PROCESS" eyebrow in --accent
+"How it" Bebas Neue 58px --cream + "works" DM Serif Display italic --text-muted
+Giant watermark "PROCESS" at 200px, rgba(240,240,246,0.015), positioned absolute right
+
+4 step cards (Cyrculo-style service cards with Omnera structure):
+Horizontal row, each card:
+
+Background: rgba(240,240,246,0.03)
+Border: 1px solid var(--border)
+Padding: 40px 32px
+On hover: background rgba(240,240,246,0.06), border shifts to rgba(108,60,224,0.2), box-shadow 0 0 30px var(--glow-purple)
+Giant faded number background: Bebas Neue, 90px, rgba(240,240,246,0.04)
+
+Each card has:
+
+Icon in a 48px square (alternating --accent and --accent2 backgrounds, white SVG icon)
+Title: DM Serif Display, 22px, --cream
+Description: DM Sans 300, 14px, --text-dim, line-height 1.75
+
+Connecting line: A thin horizontal line (1px) running across the top of all 4 cards with a gradient from --accent (left) to --accent2 (right). Animated: grows from left to right as the section scrolls into view (GSAP or CSS animation triggered by Framer Motion).
+Steps:
+01 — "Create your account" (person/user icon)
+"Sign up free in under two minutes. Verify your identity and add a payment method to start bidding immediately."
+02 — "Browse curated lots" (search/magnifier icon)
+"Every artwork is reviewed and approved by our expert curators before listing. No fakes, no filler — only quality work."
+03 — "Place your bid" (star icon)
+"Your card is securely held — not charged — when you bid. If you're outbid, the hold releases instantly. Win and we charge at close."
+04 — "Own original art" (checkmark icon)
+"Won the auction? Your payment processes automatically. The artist ships directly to you with a certificate of authenticity."
+Scroll entrance: each card fades + slides up, 120ms stagger.
+
+SECTION 7 — CHARITY + ARTIST CTA (split)
+Two equal halves side-by-side:
+Left — Charity (background: --accent)
+
+"✦ OUR MISSION" eyebrow, rgba(255,255,255,0.6), 11px
+"10% OF EVERY SALE" in Bebas Neue 44px, white
+"goes to charity" in DM Serif Display italic 36px, --accent2
+Body: "Every purchase on BrushBids directly supports arts education. We believe creativity changes lives — and every bid proves it." — DM Sans 300, 15px, rgba(255,255,255,0.75)
+"Learn More →" link, white, underline, hover --accent2
+
+Right — Artist CTA (background: #0e0e1a, slightly lighter than --ink)
+
+"✦ FOR ARTISTS" eyebrow in --accent2
+"SHARE YOUR WORK" Bebas Neue 44px --cream
+"Reach real collectors." DM Serif Display italic 36px --accent
+Body: "Any artist can apply to list on BrushBids. Our curatorial team reviews every submission to ensure quality. No listing fees — we only earn when you do." — DM Sans 300, 15px, --text-dim
+"Apply as an Artist" button: white bg, --ink text, hover → --accent bg white text + glow
+
+Min-height 420px each. Vertical 1px --border line between them. Mobile: stack, charity on top.
+
+SECTION 8 — FOOTER
+Background: --ink
+Border-top: 1px solid var(--border)
+Top area — 4-column grid:
+Col 1 (wider):
+
+Logo: "Brush" --cream, "Bids" --accent, Bebas Neue 36px
+Tagline: "A curator-approved marketplace for original student art. Every piece vetted. Every bid secured." DM Sans 300, 14px, --text-muted
+Social icons row: 4 small circles (32px, border 1px --border) with SVG icons for Instagram, X, LinkedIn, TikTok. Hover: border --accent, icon --cream.
+
+Col 2 — "Marketplace": Browse auctions, Ending soon, New listings, Categories
+Col 3 — "Artists": Apply to list, How payouts work, Curation standards, Artist FAQ
+Col 4 — "Company": About BrushBids, Our curators, Contact, Press
+Column titles: 11px uppercase, letter-spacing 0.14em, --text-muted
+Links: 14px, DM Sans 400, --text-dim, hover → --cream
+Bottom bar:
+
+1px --border line separator
+Left: "© 2026 BrushBids ✦ All rights reserved." 12px, --text-muted
+Right: Privacy ✦ Terms ✦ Cookie Policy — same styling, hover --cream
+
+
+MOBILE RESPONSIVE (under 768px)
+
+Navigation: hamburger menu, slide-in panel
+Hero Phase 1: same scroll sequence but text sizes reduced 30%
+Hero Phase 2: replace 3D scene with a static 2-column grid of the 5 auction cards on dark bg, each card showing image + title + bid. No Three.js on mobile.
+Stats: 3-column stays but number size reduces to 36px
+Ticker: same, just faster (18s)
+Featured auctions: single-column stack, all cards min-height 280px
+How it works: 2x2 grid, then 1-column under 500px
+Charity/Artist CTA: stack vertically
+Footer: 2-column, then 1-column under 500px
+Custom cursor: disabled, default cursor restored
+3D card tilt: disabled, use simple scale(1.02) on hover instead
+
+
+PERFORMANCE REQUIREMENTS
+
+Lazy load all images below the fold
+Three.js only in the gallery wall section, wrapped in Suspense
+Use will-change: transform on animated elements
+Debounce mousemove handlers (cursor + card tilt) at 16ms
+Preload hero Frame 1 image
+All animations use GPU-composited properties only (transform, opacity)
+
+CRITICAL AVOIDANCES
+
+NO warm colors (red, orange, amber, gold, brown, tan, cream-yellow)
+NO Inter, Roboto, Arial, Space Grotesk, system fonts
+NO light/white page background as default — this is a dark-first site
+NO rounded-corner cards with drop shadows (use sharp corners or barely rounded, subtle borders)
+NO generic SaaS landing page layout
+NO placeholder/lorem ipsum text — use exact copy above
+NO backend or API changes — frontend only
+NO Three.js outside the gallery wall section
+NO janky/stuttering animations — reduce complexity if performance drops
+NO clutter — if something doesn't serve a purpose, remove it. Omnera-level intentionality.
