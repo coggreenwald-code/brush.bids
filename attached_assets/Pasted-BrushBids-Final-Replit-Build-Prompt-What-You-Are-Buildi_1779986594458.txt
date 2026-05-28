@@ -1,0 +1,217 @@
+BrushBids — Final Replit Build Prompt
+
+What You Are Building
+A single index.html file that recreates and upgrades the BrushBids homepage (brushbids.com) — a dark, atmospheric student art auction platform. You are not fetching or scraping the live site. Build everything from scratch in one self-contained file using the structure, copy, and design spec below.
+
+Tech Stack (all via CDN — no npm, no build step)
+html<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+Register ScrollTrigger immediately after loading:
+jsgsap.registerPlugin(ScrollTrigger);
+
+Color Palette (use these CSS variables throughout)
+css:root {
+  --bg:        #0d0d1a;
+  --bg2:       #12122a;
+  --purple:    #7C3AED;
+  --purple-lt: #a78bfa;
+  --white:     #ffffff;
+  --white-dim: rgba(255,255,255,0.6);
+  --border:    rgba(255,255,255,0.08);
+}
+
+Page Structure
+Build these sections in order:
+1. Navigation
+Fixed top bar, background: rgba(13,13,26,0.85), backdrop-filter: blur(12px).
+
+Left: "BrushBids" wordmark + small lightning bolt icon (use ⚡ emoji or SVG)
+Center: Home · Gallery · About · Admin
+Right: Circle avatar "C" + "Charlie" dropdown
+
+2. Hero Section
+Full-viewport (100vh). The Three.js background canvas sits behind this (see below).
+
+Small pill badge top-left of copy: ⚡ TURNING STUDENT CREATIVITY INTO OPPORTUNITY
+H1 (two lines): Your Art. (white) Your Future. (purple #a78bfa)
+
+Font: Playfair Display, bold, ~80px desktop / 48px mobile
+
+
+Subtext: "BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience."
+Two buttons:
+
+Explore Gallery → — white border, white text, hover: fills white, text goes dark
+Submit Artwork ↑ — outlined, same style
+
+
+On load: GSAP timeline — badge fades in (0.5s delay), then h1 words stagger up (0.3s each), then subtext, then buttons
+
+3. Featured Works (3D Carousel)
+Section with heading "Featured Works" in Playfair Display.
+Full implementation spec below.
+4. How It Works
+Two columns side by side: Artists (left) and Collectors (right).
+Artists — "Start selling your work":
+
+01 SUBMIT YOUR ART — Upload your artwork with a description and set your starting price.
+02 EXPERT REVIEW — Our curators review your submission for quality.
+03 GET PAID — Immediately get paid when your art sells.
+04 GIVE BACK — A portion of the sale goes to your chosen charity.
+CTA button: Start Selling
+
+Collectors — "Discover emerging talent":
+
+01 BROWSE GALLERY — Explore curated student artwork from talented emerging artists.
+02 PLACE BIDS — Bid on pieces you love and watch the auction unfold.
+03 WIN ARTWORK — Secure unique pieces while supporting student artists.
+04 SUPPORT CAUSES — Part of your purchase goes to charity.
+CTA button: Browse Gallery
+
+Active step (03 GET PAID) shown with a highlighted background card. Others are plain text rows with faint dividers.
+5. Transparent Pricing
+Centered section heading: TRANSPARENT PRICING (small caps label) + "Where Your Money Goes" (large serif).
+Subtext: "Every sale is split transparently between the artist, the platform, and a charity of the artist's choice."
+Three stat cards in a row:
+
+75% — Artist — "Goes directly to the student artist"
+20% — Platform — "Supports BrushBids operations"
+5% — Charity — "Donated to a cause the artist chooses"
+
+Numbers in large bold, each a different accent color: purple, blue (#3B82F6), green (#10B981).
+6. CTA Banner
+Dark section. Centered:
+
+Heading: "Ready to Start Your Journey?"
+Sub: "Join a community of student artists and collectors making art accessible and impactful."
+Two buttons: Submit Your Art ↑ and Browse Gallery →
+
+7. Footer
+Three columns:
+
+Quick Links: Home, Gallery, About, FAQ
+Resources: Submit Artwork, Dashboard, Terms & Conditions
+Get In Touch: Contact Us, support@brushbids.com, New York, NY + Instagram / X / Facebook icons
+
+Bottom bar: large faint BrushBids ⚡ watermark text + © 2026 BrushBids. All rights reserved. + Privacy Policy / Terms of Service links.
+
+Feature 1: Three.js Background Canvas
+Create ONE Three.js renderer for the background. Attach it to a <canvas id="bg-canvas"> with this CSS:
+css#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+All page sections must have position: relative; z-index: 1 so they appear above the canvas.
+Scene contents:
+
+Floating panels — 20 PlaneGeometry(2, 2.6) meshes placed at random x/y positions and z between -8 and -25. Use MeshBasicMaterial({ color: 0x7C3AED, transparent: true, opacity: between 0.03 and 0.07, side: THREE.DoubleSide }). Give each a random initial rotation. In the animation loop, oscillate each panel's y position with Math.sin(time * speed + offset) * 0.3 and slowly increment rotation.z by a tiny amount each frame.
+Particle field — Create a BufferGeometry with 1000 vertices scattered randomly across x: -15 to 15, y: -10 to 10, z: -5 to -20. Use PointsMaterial({ color: 0xffffff, size: 0.05, transparent: true, opacity: 0.4 }). In animation loop, move each particle's y up by 0.002 per frame; if y > 10 reset to y = -10.
+Mouse parallax — Track mousemove on the document. In animation loop, lerp camera.position.x toward mouseX * 0.5 and camera.position.y toward -mouseY * 0.5 with factor 0.02.
+Scroll camera pull — In the animation loop, read window.scrollY and set camera.position.z = 5 + scrollY * 0.003 (clamped to max 9).
+Performance — Use a delta-time check: only call renderer.render() if at least 33ms have passed since last render (30fps cap). On mobile (window.innerWidth < 768), create only 8 panels and 300 particles.
+
+Camera: PerspectiveCamera(75, aspect, 0.1, 100), position z = 5. Renderer: { alpha: true, antialias: false }, setClearColor(0x000000, 0).
+
+Feature 2: 3D Coverflow Carousel
+Create a second, separate Three.js renderer for the carousel section only. Use a <canvas id="carousel-canvas"> inside the Featured Works section with explicit dimensions:
+css#carousel-canvas {
+  width: 100%;
+  height: 500px;
+  display: block;
+  cursor: grab;
+}
+#carousel-canvas:active { cursor: grabbing; }
+Card Data (hardcode this array in JS)
+jsconst artworks = [
+  { title: "Sundream Morning Crashes", artist: "Elena Vasquez", bid: "$340", img: "https://source.unsplash.com/400x530/?painting,abstract&sig=1" },
+  { title: "Urban Grid No. 4",         artist: "Marcus Chen",   bid: "$210", img: "https://source.unsplash.com/400x530/?art,canvas&sig=2" },
+  { title: "The Last Afternoon",       artist: "Priya Nair",    bid: "$580", img: "https://source.unsplash.com/400x530/?painting,oil&sig=3" },
+  { title: "Quiet Study in Blue",      artist: "James Okafor",  bid: "$125", img: "https://source.unsplash.com/400x530/?watercolor,blue&sig=4" },
+  { title: "Golden Hour Fragment",     artist: "Sophia Liu",    bid: "$445", img: "https://source.unsplash.com/400x530/?landscape,art&sig=5" },
+  { title: "Abstract Reverie",         artist: "Luca Moretti",  bid: "$290", img: "https://source.unsplash.com/400x530/?abstract,texture&sig=6" },
+  { title: "Still Life With Noise",    artist: "Amara Diallo",  bid: "$175", img: "https://source.unsplash.com/400x530/?still,life&sig=7" },
+];
+Carousel Setup
+
+Camera: PerspectiveCamera(50, canvasWidth/500, 0.1, 100), z = 6
+Renderer: { alpha: true, antialias: true }, clear color transparent
+Load each image with THREE.TextureLoader. On load error, use a fallback MeshBasicMaterial with a purple color.
+Create 7 PlaneGeometry(2, 2.67) meshes with MeshBasicMaterial({ map: texture, side: THREE.FrontSide })
+
+Coverflow Positioning (recalculate every frame based on currentIndex float)
+For each card at index i, compute offset = i - currentIndex. Then:
+card.position.x = offset * 2.4
+card.position.z = -Math.abs(offset) * 1.2
+card.rotation.y = -offset * 0.45  (clamp to ±0.9)
+card.scale.setScalar(offset === 0 ? 1.0 : Math.max(0.65, 1 - Math.abs(offset) * 0.12))
+Center card (abs(offset) < 0.5): add a purple EdgesGeometry outline mesh as a child, scale it to 1.01x so it frames the card. Remove/hide outline on non-center cards.
+Drag Interaction
+jslet isDragging = false, dragStartX = 0, dragDelta = 0, velocity = 0;
+
+canvas.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.clientX; velocity = 0; });
+window.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  dragDelta = (dragStartX - e.clientX) / 200;
+  currentIndex += dragDelta * 0.08;
+  currentIndex = Math.max(0, Math.min(artworks.length - 1, currentIndex));
+  dragStartX = e.clientX;
+  velocity = dragDelta;
+});
+window.addEventListener('mouseup', () => { isDragging = false; });
+// Touch equivalents: touchstart/touchmove/touchend using e.touches[0].clientX
+In the animation loop, when not dragging: apply inertia (currentIndex += velocity; velocity *= 0.92), then when Math.abs(velocity) < 0.001 snap to Math.round(currentIndex) using lerp: currentIndex += (Math.round(currentIndex) - currentIndex) * 0.08.
+Auto-rotate
+Start a timer on idle. After 3 seconds of no interaction, increment currentIndex by 0.005 per frame (wraps 0 → 6). Reset timer on any mousedown/touchstart.
+HTML Info Panel (below the canvas, regular HTML not Three.js)
+html<div id="carousel-info">
+  <div id="carousel-left">
+    <div id="artwork-title"></div>
+    <div id="artwork-artist"></div>
+  </div>
+  <div id="carousel-right">
+    <div id="artwork-bid"></div>
+    <span class="live-badge">● LIVE</span>
+  </div>
+</div>
+<div id="carousel-nav">
+  <button id="prev-btn">←</button>
+  <button id="next-btn">→</button>
+</div>
+Update info panel text whenever Math.round(currentIndex) changes. Use a CSS opacity transition (0.3s) — set opacity to 0, update text, set back to 1.
+
+Mobile Handling
+At max-width: 768px:
+
+Hide #carousel-canvas entirely (display: none)
+Show a plain CSS horizontal scroll strip of artwork cards instead (simple overflow-x: auto; display: flex; gap: 16px with hardcoded card divs using CSS gradient backgrounds)
+Background Three.js canvas: reduce to 8 panels, 300 particles (check window.innerWidth on init)
+
+
+GSAP Scroll Animations
+After gsap.registerPlugin(ScrollTrigger), add these:
+js// How It Works rows stagger in
+gsap.from('.step-row', { opacity: 0, x: -30, stagger: 0.15, scrollTrigger: { trigger: '.how-it-works', start: 'top 80%' }});
+
+// Pricing cards pop in
+gsap.from('.price-card', { opacity: 0, y: 40, stagger: 0.2, scrollTrigger: { trigger: '.pricing', start: 'top 75%' }});
+
+// CTA section
+gsap.from('.cta-section h2', { opacity: 0, y: 30, scrollTrigger: { trigger: '.cta-section', start: 'top 80%' }});
+
+Final Notes for Replit
+
+Everything in one index.html — all <style> in <head>, all <script> at end of <body>
+Do not use any import or require statements — only CDN scripts loaded via <script src>
+The two Three.js renderers (background + carousel) must use separate renderer instances with separate canvases. Do not share a renderer.
+The carousel renderer should call renderer2.setSize(canvas.clientWidth, 500) and update on window resize.
+Test that all addEventListener calls are inside a DOMContentLoaded or placed after the relevant DOM elements.

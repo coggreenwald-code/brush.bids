@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BrushBids — Your Art. Your Future.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:        #0d0d1a;
+  --bg2:       #12122a;
+  --purple:    #7C3AED;
+  --purple-lt: #a78bfa;
+  --blue:      #3B82F6;
+  --green:     #10B981;
+  --white:     #ffffff;
+  --white-dim: rgba(255,255,255,0.6);
+  --white-faint: rgba(255,255,255,0.4);
+  --border:    rgba(255,255,255,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body { position: relative; }
+
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+main, nav, footer { position: relative; z-index: 1; }
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* ===================== NAV ===================== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(13, 13, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+.brand .bolt { color: var(--purple-lt); font-size: 16px; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.nav-links a {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--white-dim);
+  transition: color 0.2s ease;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--white); }
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--white-dim);
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AED, #a78bfa);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-inner { padding: 14px 20px; }
+}
+
+/* ===================== HERO ===================== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 32px 80px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.hero-inner { max-width: 880px; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--white-dim);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  opacity: 0;
+}
+.pill .bolt { color: var(--purple-lt); }
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(48px, 8vw, 80px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+.hero h1 .line {
+  display: block;
+  overflow: hidden;
+}
+.hero h1 .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(100%);
+}
+.hero h1 .accent { color: var(--purple-lt); font-style: italic; }
+
+.hero-sub {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--white-dim);
+  max-width: 580px;
+  margin-bottom: 40px;
+  opacity: 0;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  opacity: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: 1px solid var(--white);
+  color: var(--white);
+  background: transparent;
+}
+.btn:hover { background: var(--white); color: var(--bg); }
+.btn-outline { border-color: rgba(255,255,255,0.3); color: var(--white); }
+.btn-outline:hover { border-color: var(--white); background: var(--white); color: var(--bg); }
+
+.btn-purple {
+  background: var(--purple);
+  border-color: var(--purple);
+}
+.btn-purple:hover { background: var(--purple-lt); border-color: var(--purple-lt); color: var(--bg); }
+
+/* ===================== SECTIONS GENERIC ===================== */
+section { padding: 120px 32px; }
+.container { max-width: 1280px; margin: 0 auto; }
+
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--purple-lt);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+.section-sub {
+  font-size: 18px;
+  color: var(--white-dim);
+  max-width: 620px;
+  line-height: 1.6;
+}
+.section-head { margin-bottom: 60px; }
+.section-head.center { text-align: center; }
+.section-head.center .section-sub { margin: 0 auto; }
+
+/* ===================== FEATURED WORKS / CAROUSEL ===================== */
+.featured { padding-top: 60px; }
+.carousel-wrap {
+  margin-top: 24px;
+  position: relative;
+}
+#carousel-canvas {
+  width: 100%;
+  height: 500px;
+  display: block;
+  cursor: grab;
+}
+#carousel-canvas:active { cursor: grabbing; }
+
+#carousel-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 24px;
+  padding: 0 12px;
+  gap: 24px;
+  flex-wrap: wrap;
+  transition: opacity 0.3s ease;
+}
+#artwork-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+#artwork-artist {
+  font-size: 14px;
+  color: var(--white-dim);
+  margin-top: 4px;
+}
+#carousel-right { text-align: right; }
+#artwork-bid {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--purple-lt);
+  margin-bottom: 4px;
+}
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--green);
+  font-weight: 500;
+}
+
+#carousel-nav {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+#carousel-nav button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--white);
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+#carousel-nav button:hover {
+  background: var(--purple);
+  border-color: var(--purple);
+}
+
+/* Mobile carousel strip */
+.mobile-carousel {
+  display: none;
+  overflow-x: auto;
+  gap: 16px;
+  padding: 12px 4px 24px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-carousel::-webkit-scrollbar { display: none; }
+.mobile-card {
+  flex: 0 0 240px;
+  height: 320px;
+  border-radius: 12px;
+  scroll-snap-align: start;
+  background: linear-gradient(135deg, #7C3AED, #3B82F6);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.mobile-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7));
+}
+.mobile-card-inner { position: relative; z-index: 1; }
+.mobile-card-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 16px; }
+.mobile-card-artist { font-size: 12px; color: var(--white-dim); margin-top: 4px; }
+.mobile-card-bid { font-size: 14px; color: var(--purple-lt); margin-top: 8px; font-weight: 600; }
+
+@media (max-width: 768px) {
+  #carousel-canvas, #carousel-info, #carousel-nav { display: none; }
+  .mobile-carousel { display: flex; }
+}
+
+/* ===================== HOW IT WORKS ===================== */
+.how-it-works .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+@media (max-width: 900px) {
+  .how-it-works .grid { grid-template-columns: 1fr; gap: 64px; }
+}
+
+.column h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.column-sub {
+  font-size: 14px;
+  color: var(--white-dim);
+  margin-bottom: 32px;
+}
+
+.step-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+  padding: 22px 16px;
+  border-top: 1px solid var(--border);
+  align-items: start;
+}
+.step-row:last-of-type { border-bottom: 1px solid var(--border); }
+.step-row.active {
+  background: rgba(124, 58, 237, 0.08);
+  border-radius: 12px;
+  border-top-color: transparent;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+  border-left: 1px solid rgba(124, 58, 237, 0.2);
+  border-right: 1px solid rgba(124, 58, 237, 0.2);
+  border-top: 1px solid rgba(124, 58, 237, 0.2);
+  margin: 12px 0;
+}
+.step-row.active + .step-row { border-top-color: transparent; }
+.step-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--purple-lt);
+  letter-spacing: 0.1em;
+}
+.step-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.step-desc {
+  font-size: 14px;
+  color: var(--white-dim);
+  line-height: 1.55;
+}
+.column .btn { margin-top: 32px; }
+
+/* ===================== PRICING ===================== */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+@media (max-width: 900px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+}
+.price-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 32px;
+  text-align: center;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.price-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.16);
+}
+.price-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 84px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.price-card.purple .price-num { color: var(--purple-lt); }
+.price-card.blue .price-num { color: var(--blue); }
+.price-card.green .price-num { color: var(--green); }
+.price-label {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.price-desc {
+  font-size: 14px;
+  color: var(--white-dim);
+  line-height: 1.5;
+}
+
+/* ===================== CTA SECTION ===================== */
+.cta-section {
+  text-align: center;
+  padding: 140px 32px;
+  background: linear-gradient(180deg, transparent, rgba(124, 58, 237, 0.06), transparent);
+}
+.cta-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+.cta-section p {
+  font-size: 18px;
+  color: var(--white-dim);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===================== FOOTER ===================== */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 80px 32px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin-bottom: 80px;
+}
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+.footer-col h4 {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--purple-lt);
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 12px; }
+.footer-col a {
+  font-size: 14px;
+  color: var(--white-dim);
+  transition: color 0.2s ease;
+}
+.footer-col a:hover { color: var(--white); }
+.socials { display: flex; gap: 12px; margin-top: 16px; }
+.socials a {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+.socials a:hover { background: var(--purple); border-color: var(--purple); color: var(--white); }
+
+.footer-watermark {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(80px, 18vw, 220px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: rgba(255,255,255,0.04);
+  white-space: nowrap;
+  pointer-events: none;
+  text-align: center;
+  margin: 60px 0 40px;
+}
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--white-faint);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-bottom-links { display: flex; gap: 24px; }
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="brand">BrushBids <span class="bolt">⚡</span></a>
+    <div class="nav-links">
+      <a href="#" class="active">Home</a>
+      <a href="#">Gallery</a>
+      <a href="#">About</a>
+      <a href="#">Admin</a>
+    </div>
+    <div class="nav-user">
+      <div class="avatar">C</div>
+      <span>Charlie ▾</span>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="pill" id="hero-pill">
+        <span class="bolt">⚡</span> Turning Student Creativity Into Opportunity
+      </div>
+      <h1>
+        <span class="line"><span class="word">Your</span> <span class="word">Art.</span></span>
+        <span class="line"><span class="word accent">Your</span> <span class="word accent">Future.</span></span>
+      </h1>
+      <p class="hero-sub" id="hero-sub">
+        BrushBids strives to provide student artists with the necessary resources and pathways towards selling their art to a global audience.
+      </p>
+      <div class="hero-buttons" id="hero-buttons">
+        <a href="#" class="btn">Explore Gallery →</a>
+        <a href="#" class="btn btn-outline">Submit Artwork ↑</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FEATURED WORKS ===================== -->
+  <section class="featured">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-label">Live Auctions</div>
+        <h2 class="section-title">Featured Works</h2>
+        <p class="section-sub">Browse pieces hand-picked from emerging student artists currently up for bid.</p>
+      </div>
+
+      <div class="carousel-wrap">
+        <canvas id="carousel-canvas"></canvas>
+
+        <div id="carousel-info">
+          <div id="carousel-left">
+            <div id="artwork-title">—</div>
+            <div id="artwork-artist">—</div>
+          </div>
+          <div id="carousel-right">
+            <div id="artwork-bid">—</div>
+            <span class="live-badge">● LIVE</span>
+          </div>
+        </div>
+
+        <div id="carousel-nav">
+          <button id="prev-btn" aria-label="Previous">←</button>
+          <button id="next-btn" aria-label="Next">→</button>
+        </div>
+
+        <div class="mobile-carousel" id="mobile-carousel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section class="how-it-works">
+    <div class="container">
+      <div class="section-head center">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">A Path For Every Side Of The Easel</h2>
+      </div>
+
+      <div class="grid">
+        <div class="column">
+          <h3>Artists</h3>
+          <div class="column-sub">Start selling your work</div>
+
+          <div class="step-row">
+            <div class="step-number">01</div>
+            <div>
+              <div class="step-title">Submit Your Art</div>
+              <div class="step-desc">Upload your artwork with a description and set your starting price.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-number">02</div>
+            <div>
+              <div class="step-title">Expert Review</div>
+              <div class="step-desc">Our curators review your submission for quality.</div>
+            </div>
+          </div>
+          <div class="step-row active">
+            <div class="step-number">03</div>
+            <div>
+              <div class="step-title">Get Paid</div>
+              <div class="step-desc">Immediately get paid when your art sells.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-number">04</div>
+            <div>
+              <div class="step-title">Give Back</div>
+              <div class="step-desc">A portion of the sale goes to your chosen charity.</div>
+            </div>
+          </div>
+
+          <a href="#" class="btn btn-purple">Start Selling</a>
+        </div>
+
+        <div class="column">
+          <h3>Collectors</h3>
+          <div class="column-sub">Discover emerging talent</div>
+
+          <div class="step-row">
+            <div class="step-number">01</div>
+            <div>
+              <div class="step-title">Browse Gallery</div>
+              <div class="step-desc">Explore curated student artwork from talented emerging artists.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-number">02</div>
+            <div>
+              <div class="step-title">Place Bids</div>
+              <div class="step-desc">Bid on pieces you love and watch the auction unfold.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-number">03</div>
+            <div>
+              <div class="step-title">Win Artwork</div>
+              <div class="step-desc">Secure unique pieces while supporting student artists.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-number">04</div>
+            <div>
+              <div class="step-title">Support Causes</div>
+              <div class="step-desc">Part of your purchase goes to charity.</div>
+            </div>
+          </div>
+
+          <a href="#" class="btn">Browse Gallery</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PRICING ===================== -->
+  <section class="pricing">
+    <div class="container">
+      <div class="section-head center">
+        <div class="section-label">Transparent Pricing</div>
+        <h2 class="section-title">Where Your Money Goes</h2>
+        <p class="section-sub">Every sale is split transparently between the artist, the platform, and a charity of the artist's choice.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="price-card purple">
+          <div class="price-num">75%</div>
+          <div class="price-label">Artist</div>
+          <div class="price-desc">Goes directly to the student artist</div>
+        </div>
+        <div class="price-card blue">
+          <div class="price-num">20%</div>
+          <div class="price-label">Platform</div>
+          <div class="price-desc">Supports BrushBids operations</div>
+        </div>
+        <div class="price-card green">
+          <div class="price-num">5%</div>
+          <div class="price-label">Charity</div>
+          <div class="price-desc">Donated to a cause the artist chooses</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Start Your Journey?</h2>
+      <p>Join a community of student artists and collectors making art accessible and impactful.</p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-purple">Submit Your Art ↑</a>
+        <a href="#" class="btn">Browse Gallery →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Gallery</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Submit Artwork</a></li>
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get In Touch</h4>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="mailto:support@brushbids.com">support@brushbids.com</a></li>
+          <li>New York, NY</li>
+        </ul>
+        <div class="socials">
+          <a href="#" aria-label="Instagram">◎</a>
+          <a href="#" aria-label="X">✕</a>
+          <a href="#" aria-label="Facebook">f</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-watermark">BrushBids ⚡</div>
+
+    <div class="footer-bottom">
+      <div>© 2026 BrushBids. All rights reserved.</div>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  gsap.registerPlugin(ScrollTrigger);
+
+  const isMobile = window.innerWidth < 768;
+
+  /* =================================================
+     BACKGROUND THREE.JS SCENE
+     ================================================= */
+  (function initBackground() {
+    const canvas = document.getElementById('bg-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 5;
+
+    // Floating panels
+    const panelCount = isMobile ? 8 : 20;
+    const panels = [];
+    for (let i = 0; i < panelCount; i++) {
+      const geom = new THREE.PlaneGeometry(2, 2.6);
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0x7C3AED,
+        transparent: true,
+        opacity: 0.03 + Math.random() * 0.04,
+        side: THREE.DoubleSide,
+      });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.position.x = (Math.random() - 0.5) * 20;
+      mesh.position.y = (Math.random() - 0.5) * 12;
+      mesh.position.z = -8 - Math.random() * 17;
+      mesh.rotation.x = Math.random() * Math.PI;
+      mesh.rotation.y = Math.random() * Math.PI;
+      mesh.rotation.z = Math.random() * Math.PI;
+      mesh.userData = {
+        baseY: mesh.position.y,
+        speed: 0.3 + Math.random() * 0.6,
+        offset: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.002,
+      };
+      scene.add(mesh);
+      panels.push(mesh);
+    }
+
+    // Particle field
+    const particleCount = isMobile ? 300 : 1000;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 30;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = -5 - Math.random() * 15;
+    }
+    const pGeom = new THREE.BufferGeometry();
+    pGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const pMat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.4,
+    });
+    const particles = new THREE.Points(pGeom, pMat);
+    scene.add(particles);
+
+    // Mouse parallax
+    const mouse = { x: 0, y: 0 };
+    document.addEventListener('mousemove', (e) => {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = (e.clientY / window.innerHeight) * 2 - 1;
+    });
+
+    // Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animate (30fps cap)
+    let lastTime = 0;
+    function animate(time) {
+      requestAnimationFrame(animate);
+      if (time - lastTime < 33) return;
+      lastTime = time;
+      const t = time * 0.001;
+
+      // Panels
+      panels.forEach(p => {
+        const d = p.userData;
+        p.position.y = d.baseY + Math.sin(t * d.speed + d.offset) * 0.3;
+        p.rotation.z += d.rotSpeed;
+      });
+
+      // Particles
+      const pos = particles.geometry.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        pos[i * 3 + 1] += 0.002;
+        if (pos[i * 3 + 1] > 10) pos[i * 3 + 1] = -10;
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
+
+      // Mouse parallax
+      camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.02;
+      camera.position.y += (-mouse.y * 0.5 - camera.position.y) * 0.02;
+
+      // Scroll pull
+      const targetZ = Math.min(9, 5 + window.scrollY * 0.003);
+      camera.position.z += (targetZ - camera.position.z) * 0.05;
+
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+  })();
+
+  /* =================================================
+     CAROUSEL DATA
+     ================================================= */
+  const artworks = [
+    { title: "Sundream Morning Crashes", artist: "Elena Vasquez", bid: "$340", img: "https://source.unsplash.com/400x530/?painting,abstract&sig=1" },
+    { title: "Urban Grid No. 4",         artist: "Marcus Chen",   bid: "$210", img: "https://source.unsplash.com/400x530/?art,canvas&sig=2" },
+    { title: "The Last Afternoon",       artist: "Priya Nair",    bid: "$580", img: "https://source.unsplash.com/400x530/?painting,oil&sig=3" },
+    { title: "Quiet Study in Blue",      artist: "James Okafor",  bid: "$125", img: "https://source.unsplash.com/400x530/?watercolor,blue&sig=4" },
+    { title: "Golden Hour Fragment",     artist: "Sophia Liu",    bid: "$445", img: "https://source.unsplash.com/400x530/?landscape,art&sig=5" },
+    { title: "Abstract Reverie",         artist: "Luca Moretti",  bid: "$290", img: "https://source.unsplash.com/400x530/?abstract,texture&sig=6" },
+    { title: "Still Life With Noise",    artist: "Amara Diallo",  bid: "$175", img: "https://source.unsplash.com/400x530/?still,life&sig=7" },
+  ];
+
+  /* =================================================
+     MOBILE CAROUSEL FALLBACK
+     ================================================= */
+  (function buildMobileCarousel() {
+    const wrap = document.getElementById('mobile-carousel');
+    const grads = [
+      'linear-gradient(135deg,#7C3AED,#3B82F6)',
+      'linear-gradient(135deg,#a78bfa,#10B981)',
+      'linear-gradient(135deg,#3B82F6,#7C3AED)',
+      'linear-gradient(135deg,#10B981,#a78bfa)',
+      'linear-gradient(135deg,#7C3AED,#10B981)',
+      'linear-gradient(135deg,#3B82F6,#a78bfa)',
+      'linear-gradient(135deg,#a78bfa,#7C3AED)',
+    ];
+    artworks.forEach((a, i) => {
+      const card = document.createElement('div');
+      card.className = 'mobile-card';
+      card.style.background = grads[i % grads.length];
+      card.innerHTML = `
+        <div class="mobile-card-inner">
+          <div class="mobile-card-title">${a.title}</div>
+          <div class="mobile-card-artist">${a.artist}</div>
+          <div class="mobile-card-bid">${a.bid} <span style="color:#10B981;font-size:11px;letter-spacing:.1em;">● LIVE</span></div>
+        </div>`;
+      wrap.appendChild(card);
+    });
+  })();
+
+  /* =================================================
+     3D COVERFLOW CAROUSEL
+     ================================================= */
+  if (!isMobile) initCarousel();
+
+  function initCarousel() {
+    const canvas = document.getElementById('carousel-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(canvas.clientWidth, 500);
+    renderer.setClearColor(0x000000, 0);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / 500, 0.1, 100);
+    camera.position.z = 6;
+
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = 'anonymous';
+
+    const cards = [];
+    const fallbackColors = [0x7C3AED, 0x3B82F6, 0xa78bfa, 0x10B981, 0x7C3AED, 0x3B82F6, 0xa78bfa];
+
+    artworks.forEach((art, i) => {
+      const geom = new THREE.PlaneGeometry(2, 2.67);
+      const mat = new THREE.MeshBasicMaterial({
+        color: fallbackColors[i],
+        side: THREE.FrontSide,
+      });
+      const mesh = new THREE.Mesh(geom, mat);
+      scene.add(mesh);
+
+      // Outline (initially invisible)
+      const edges = new THREE.EdgesGeometry(geom);
+      const outline = new THREE.LineSegments(
+        edges,
+        new THREE.LineBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0 })
+      );
+      outline.scale.setScalar(1.01);
+      mesh.add(outline);
+      mesh.userData.outline = outline;
+
+      cards.push(mesh);
+
+      // Async texture load
+      loader.load(
+        art.img,
+        (tex) => {
+          mat.map = tex;
+          mat.color.set(0xffffff);
+          mat.needsUpdate = true;
+        },
+        undefined,
+        () => { /* keep fallback color */ }
+      );
+    });
+
+    /* State */
+    let currentIndex = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let velocity = 0;
+    let lastInteraction = performance.now();
+
+    function clampIndex(v) {
+      return Math.max(0, Math.min(artworks.length - 1, v));
+    }
+
+    /* Pointer / Touch */
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      velocity = 0;
+      lastInteraction = performance.now();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const delta = (dragStartX - e.clientX) / 200;
+      currentIndex = clampIndex(currentIndex + delta * 0.08);
+      dragStartX = e.clientX;
+      velocity = delta;
+      lastInteraction = performance.now();
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    canvas.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      dragStartX = e.touches[0].clientX;
+      velocity = 0;
+      lastInteraction = performance.now();
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const delta = (dragStartX - e.touches[0].clientX) / 200;
+      currentIndex = clampIndex(currentIndex + delta * 0.08);
+      dragStartX = e.touches[0].clientX;
+      velocity = delta;
+      lastInteraction = performance.now();
+    }, { passive: true });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    /* Nav buttons */
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      currentIndex = clampIndex(Math.round(currentIndex) - 1);
+      lastInteraction = performance.now();
+    });
+    document.getElementById('next-btn').addEventListener('click', () => {
+      currentIndex = clampIndex(Math.round(currentIndex) + 1);
+      lastInteraction = performance.now();
+    });
+
+    /* Info panel update */
+    const infoEl = document.getElementById('carousel-info');
+    const titleEl = document.getElementById('artwork-title');
+    const artistEl = document.getElementById('artwork-artist');
+    const bidEl = document.getElementById('artwork-bid');
+    let lastRoundedIndex = -1;
+    function updateInfo() {
+      const idx = Math.round(currentIndex);
+      if (idx === lastRoundedIndex) return;
+      lastRoundedIndex = idx;
+      const a = artworks[idx];
+      infoEl.style.opacity = '0';
+      setTimeout(() => {
+        titleEl.textContent = a.title;
+        artistEl.textContent = 'by ' + a.artist;
+        bidEl.textContent = a.bid;
+        infoEl.style.opacity = '1';
+      }, 150);
+    }
+    updateInfo();
+
+    /* Resize */
+    window.addEventListener('resize', () => {
+      const w = canvas.clientWidth;
+      renderer.setSize(w, 500);
+      camera.aspect = w / 500;
+      camera.updateProjectionMatrix();
+    });
+
+    /* Animation loop */
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Inertia / snap when not dragging
+      if (!isDragging) {
+        if (Math.abs(velocity) > 0.001) {
+          currentIndex = clampIndex(currentIndex + velocity);
+          velocity *= 0.92;
+        } else {
+          const target = Math.round(currentIndex);
+          currentIndex += (target - currentIndex) * 0.08;
+        }
+      }
+
+      // Auto-rotate after 3s idle
+      if (!isDragging && performance.now() - lastInteraction > 3000) {
+        currentIndex += 0.005;
+        if (currentIndex > artworks.length - 1) currentIndex = 0;
+      }
+
+      // Position cards
+      cards.forEach((card, i) => {
+        const offset = i - currentIndex;
+        card.position.x = offset * 2.4;
+        card.position.z = -Math.abs(offset) * 1.2;
+        card.rotation.y = Math.max(-0.9, Math.min(0.9, -offset * 0.45));
+        const s = offset === 0 ? 1.0 : Math.max(0.65, 1 - Math.abs(offset) * 0.12);
+        card.scale.setScalar(s);
+
+        const isCenter = Math.abs(offset) < 0.5;
+        if (card.userData.outline) {
+          card.userData.outline.material.opacity = isCenter ? 1 : 0;
+        }
+      });
+
+      updateInfo();
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+
+  /* =================================================
+     HERO INTRO ANIMATION
+     ================================================= */
+  const tl = gsap.timeline({ delay: 0.3 });
+  tl.to('#hero-pill', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0.2);
+  tl.to('.hero h1 .word', {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    stagger: 0.12,
+    ease: 'power3.out',
+  }, 0.5);
+  tl.to('#hero-sub', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 1.4);
+  tl.to('#hero-buttons', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 1.7);
+
+  /* =================================================
+     SCROLL ANIMATIONS
+     ================================================= */
+  gsap.from('.step-row', {
+    opacity: 0, x: -30, stagger: 0.15,
+    scrollTrigger: { trigger: '.how-it-works', start: 'top 80%' }
+  });
+  gsap.from('.price-card', {
+    opacity: 0, y: 40, stagger: 0.2,
+    scrollTrigger: { trigger: '.pricing', start: 'top 75%' }
+  });
+  gsap.from('.cta-section h2', {
+    opacity: 0, y: 30,
+    scrollTrigger: { trigger: '.cta-section', start: 'top 80%' }
+  });
+  gsap.from('.cta-section p', {
+    opacity: 0, y: 20,
+    scrollTrigger: { trigger: '.cta-section', start: 'top 80%' },
+    delay: 0.15
+  });
+  gsap.from('.cta-buttons', {
+    opacity: 0, y: 20,
+    scrollTrigger: { trigger: '.cta-section', start: 'top 80%' },
+    delay: 0.3
+  });
+});
+</script>
+
+</body>
+</html>
