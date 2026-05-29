@@ -4389,5 +4389,5 @@
 .cyrclo-page .header-component-grid > .inner-circle-container { grid-area: 1 / 1 / 7 / 7; place-self: center; }
 .cyrclo-page .header-component-grid > .header-content-wrap { grid-area: 1 / 1 / 7 / 7; place-self: center; width: 100%; height: 100%; }
 /* CTA bottom ring + content placement */
-.cyrclo-page .call-to-action-wrapper > .circle-container { grid-area: 3 / 1 / 4 / 4; place-self: center; }
+.cyrclo-page .call-to-action-wrapper > .circle-container { grid-area: 3 / 1 / 4 / 4; place-self: center; transform: translateY(9vh); }
 .cyrclo-page .call-to-action-wrapper > .call-to-action-content { grid-area: 2 / 1 / 4 / 4; place-self: center; width: 100%; }
