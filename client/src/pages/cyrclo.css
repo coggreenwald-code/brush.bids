@@ -4339,3 +4339,142 @@
 /* CTA bottom ring + content placement */
 .cyrclo-page .call-to-action-wrapper > .circle-container { grid-area: 3 / 1 / 4 / 4; place-self: center; }
 .cyrclo-page .call-to-action-wrapper > .call-to-action-content { grid-area: 2 / 1 / 4 / 4; place-self: center; width: 100%; }
+
+/* ===== Simple Process section (How It Works redesign) ===== */
+.cyrclo-page .section-home-service {
+  background-color: var(--background-color--primary-background);
+  margin-top: -70px;
+  padding-top: 4rem;
+}
+.cyrclo-page .process-outline {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.75rem;
+  padding: 5rem 4.5rem;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(167, 139, 250, 0.10), transparent 55%),
+    radial-gradient(120% 80% at 100% 100%, rgba(96, 165, 250, 0.08), transparent 55%);
+}
+.cyrclo-page .process-watermark {
+  position: absolute;
+  top: -3rem;
+  left: 1.5rem;
+  font-size: 13rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+}
+.cyrclo-page .process-label {
+  position: relative;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #A78BFA;
+  margin-bottom: 3.5rem;
+}
+.cyrclo-page .process-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4.5rem;
+}
+.cyrclo-page .process-col {
+  display: flex;
+  flex-direction: column;
+}
+.cyrclo-page .process-col-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+.cyrclo-page .process-col-heading {
+  font-size: 1.85rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1.5rem;
+  line-height: 1.2;
+}
+.cyrclo-page .process-col-divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 2.75rem;
+}
+.cyrclo-page .process-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+  flex: 1;
+}
+.cyrclo-page .process-step {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+.cyrclo-page .process-step-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.55;
+}
+.cyrclo-page .process-step-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 0.45rem;
+}
+.cyrclo-page .process-step-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+.cyrclo-page .process-cta {
+  margin-top: 3rem;
+}
+.cyrclo-page .process-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2.1rem;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.cyrclo-page .process-btn.solid {
+  background: #fff;
+  color: #0a0a0f;
+}
+.cyrclo-page .process-btn.solid:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+.cyrclo-page .process-btn.outline {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+.cyrclo-page .process-btn.outline:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+.cyrclo-page .accent-violet { color: #A78BFA; }
+.cyrclo-page .accent-blue { color: #60A5FA; }
+
+@media (max-width: 767px) {
+  .cyrclo-page .process-outline { padding: 2.5rem 1.5rem; }
+  .cyrclo-page .process-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .cyrclo-page .process-watermark { font-size: 6rem; top: -1.5rem; }
+}

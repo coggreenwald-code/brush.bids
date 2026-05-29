@@ -72,11 +72,35 @@ const TESTIMONIALS: { quote: string; name: string; role: string }[] = [
 const BUBBLES_OUTER = ["Impressive", "Unmatched", "Brilliant", "Exceptional"];
 const BUBBLES_INNER = ["I loved it", "Incredible", "Amazing"];
 
-const SERVICES = [
-  { subtitle: "Expert Review", heading: "Curation", text: "Every submission is reviewed by curators and AI tools so collectors discover only the strongest student work." },
-  { subtitle: "Live Auctions", heading: "Bidding", text: "Place bids in real time with an anti-sniping timer that keeps every auction fair down to the final second." },
-  { subtitle: "Giving Back", heading: "Charity", text: "A portion of every sale supports a charity chosen by the artist, so collecting art creates real impact." },
-  { subtitle: "Boosted Listings", heading: "Promotion", text: "Artists can boost a piece to gain visibility in the gallery, paying only when the artwork actually sells." },
+const PROCESS_COLUMNS = [
+  {
+    label: "Artists",
+    accent: "accent-violet",
+    heading: "Start selling your work",
+    button: "Start Selling",
+    href: "/submit-artwork",
+    buttonStyle: "solid" as const,
+    steps: [
+      { title: "Submit Your Art", text: "Upload your artwork with a description and set your starting price." },
+      { title: "Expert Review", text: "Our curators review your submission for quality, supported by advanced tools trained by art professionals." },
+      { title: "Get Paid", text: "Immediately get paid when your art sells." },
+      { title: "Give Back", text: "A portion of the sale goes to your chosen charity, making a positive impact." },
+    ],
+  },
+  {
+    label: "Collectors",
+    accent: "accent-blue",
+    heading: "Discover emerging talent",
+    button: "Browse Gallery",
+    href: "/gallery",
+    buttonStyle: "outline" as const,
+    steps: [
+      { title: "Browse Gallery", text: "Explore curated student artwork from talented emerging artists." },
+      { title: "Place Bids", text: "Bid on pieces you love and watch the auction unfold." },
+      { title: "Win Artwork", text: "Secure unique pieces while supporting student artists." },
+      { title: "Support Causes", text: "Part of your purchase goes to charity." },
+    ],
+  },
 ];
 
 const PLANS = [
@@ -450,54 +474,38 @@ function Services() {
     <section className="section-home-service">
       <div className="padding-global">
         <div className="container-large">
-          <div className="top-content">
-            <div className="text-align-center">
-              <div className="subtitle text-color-alternate">How It Works</div>
-              <div className="spacer-medium"></div>
-              <h2 className="heading-style-h2 text-color-alternate">Art That <span className="text-color-grey">Gives Back</span></h2>
-            </div>
-          </div>
-          <div className="w-layout-grid service-grid">
-            <div className="service-block medium-padding">
-              <div className="client-rating-wrap">
-                <div className="rating-block">
-                  <div className="text-size-small text-color-alternate">✦ Loved by emerging artists & collectors.</div>
-                </div>
-              </div>
-            </div>
-            {SERVICES.slice(0, 2).map((s) => (
-              <div className="service-block" key={s.heading}>
-                <div className="w-layout-grid service-content-grid">
-                  <div className="service-content-item">
-                    <div className="service-subtitle">{s.subtitle}</div>
-                    <h2 className="service-heading">{s.heading}</h2>
+          <div className="process-outline">
+            <div className="process-watermark" aria-hidden="true">Process</div>
+            <div className="process-label">Simple Process</div>
+            <div className="process-grid">
+              {PROCESS_COLUMNS.map((col) => (
+                <div className="process-col" key={col.label} data-testid={`col-process-${col.label.toLowerCase()}`}>
+                  <div className={`process-col-label ${col.accent}`}>{col.label}</div>
+                  <h3 className="process-col-heading">{col.heading}</h3>
+                  <div className="process-col-divider"></div>
+                  <div className="process-steps">
+                    {col.steps.map((s, i) => (
+                      <div className="process-step" key={s.title}>
+                        <div className={`process-step-num ${col.accent}`}>{String(i + 1).padStart(2, "0")}</div>
+                        <div className="process-step-body">
+                          <div className="process-step-title">{s.title}</div>
+                          <p className="process-step-text">{s.text}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="service-content-item"><div className="doted-line"></div></div>
-                  <div className="service-content-item">
-                    <p className="text-size-small text-color-alternate">{s.text}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div className="service-block medium-padding">
-              <ReviewStars />
-              <div className="spacer-small"></div>
-              <div className="text-size-small text-color-alternate">5,000+ bids placed • 4.9/5</div>
-            </div>
-            {SERVICES.slice(2).map((s) => (
-              <div className="service-block" key={s.heading}>
-                <div className="w-layout-grid service-content-grid">
-                  <div className="service-content-item">
-                    <div className="service-subtitle">{s.subtitle}</div>
-                    <h2 className="service-heading">{s.heading}</h2>
-                  </div>
-                  <div className="service-content-item"><div className="doted-line"></div></div>
-                  <div className="service-content-item">
-                    <p className="text-size-small text-color-alternate">{s.text}</p>
+                  <div className="process-cta">
+                    <Link
+                      href={col.href}
+                      className={`process-btn ${col.buttonStyle}`}
+                      data-testid={`button-process-${col.label.toLowerCase()}`}
+                    >
+                      {col.button}
+                    </Link>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
