@@ -401,15 +401,35 @@ function Intro() {
    Circle shape ("Keep Scrolling")
    ============================================================ */
 function CircleShape() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  // White orb grows from a small dot to fill the screen, wiping the dark
+  // "Our Story" section and revealing the light "Our Solutions" section.
+  // Max scale is computed from the viewport so the orb fully covers any
+  // screen (incl. ultrawide / 4K) — base orb is 5rem (radius 40px).
+  const [maxScale, setMaxScale] = useState(48);
+  useEffect(() => {
+    const compute = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const radiusNeeded = Math.sqrt((vw / 2) ** 2 + vh ** 2) * 1.1;
+      setMaxScale(Math.max(48, Math.ceil(radiusNeeded / 40)));
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+  const scale = useTransform(scrollYProgress, [0.25, 0.85], [1, maxScale]);
+  const textOpacity = useTransform(scrollYProgress, [0.45, 0.7], [1, 0]);
   return (
-    <section className="circle-shape-wrapper">
+    <section className="circle-shape-wrapper" ref={ref}>
       <div className="circle-shape-container">
         <div className="circle-shape-block">
-          <div className="circle-shape"></div>
-          <div className="scrolling-text-wrap">
+          <motion.div className="circle-shape" style={{ scale }}></motion.div>
+          <motion.div className="scrolling-text-wrap" style={{ opacity: textOpacity }}>
             <div className="scrolling-text">Keep Scrolling</div>
             <div className="scrolling-text">+</div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

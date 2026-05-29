@@ -4306,7 +4306,6 @@
 .cyrclo-page .scroll-title-wrapper { display: flex; width: max-content; flex-wrap: nowrap; animation: cy-marquee-half 26s linear infinite; will-change: transform; }
 .cyrclo-page .scroll-title-item { flex: 0 0 auto; padding-right: 2rem; }
 .cyrclo-page .marquee-text-component { display: flex; width: max-content; flex-wrap: nowrap; animation: cy-marquee-half 30s linear infinite; will-change: transform; }
-.cyrclo-page .scrolling-text-wrap { animation: cy-spin 16s linear infinite; }
 .cyrclo-page .circle-text { animation: cy-spin 24s linear infinite; }
 .cyrclo-page .testimonial-circle-01 { animation: cy-spin 70s linear infinite; }
 .cyrclo-page .testimonial-circle-03 { animation: cy-spin-rev 55s linear infinite; }
