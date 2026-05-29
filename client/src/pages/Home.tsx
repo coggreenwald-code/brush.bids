@@ -1,12 +1,15 @@
 import "./cyrclo.css";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useLocation } from "wouter";
-import { motion, useScroll, useTransform, useVelocity, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useVelocity, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useArtworks } from "@/hooks/use-artworks";
 import { useAuth } from "@/hooks/use-auth";
 import { handleArtworkImageError } from "@/lib/imageFallback";
 import { SEOHead } from "@/components/SEOHead";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
 import client1 from "@assets/image_1780074825390.png";
 import client2 from "@assets/image_1780074832935.png";
@@ -515,72 +518,241 @@ function Services() {
 }
 
 /* ============================================================
-   Case studies (sticky stacking)
+   Featured Works (iPod-style cover flow carousel)
    ============================================================ */
-function CaseStudies({ items }: { items: RingArt[] }) {
-  const cards = items.slice(0, 4);
-  while (cards.length < 4) cards.push(FALLBACK_ART[cards.length]);
+function FeaturedWorks({ items }: { items: RingArt[] }) {
+  const coverFlowArtworks = useMemo(() => {
+    const list = items && items.length > 0 ? items.slice(0, 12) : FALLBACK_ART;
+    return list.length > 0 ? list : FALLBACK_ART;
+  }, [items]);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % coverFlowArtworks.length);
+  }, [coverFlowArtworks.length]);
+
+  const goPrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + coverFlowArtworks.length) % coverFlowArtworks.length);
+  }, [coverFlowArtworks.length]);
+
+  useEffect(() => {
+    const interval = setInterval(goNext, 6000);
+    return () => clearInterval(interval);
+  }, [goNext]);
+
+  useEffect(() => {
+    if (currentIndex > coverFlowArtworks.length - 1) setCurrentIndex(0);
+  }, [coverFlowArtworks.length, currentIndex]);
+
+  const currentArt = coverFlowArtworks[currentIndex] ?? coverFlowArtworks[0];
+
+  const flowItems = useMemo(() => {
+    const total = coverFlowArtworks.length;
+    const half = Math.min(3, Math.floor((total - 1) / 2));
+    const result: { artwork: RingArt; offset: number; arrayIdx: number }[] = [];
+    for (let i = -half; i <= half; i++) {
+      const idx = ((currentIndex + i) % total + total) % total;
+      result.push({ artwork: coverFlowArtworks[idx], offset: i, arrayIdx: idx });
+    }
+    return result;
+  }, [coverFlowArtworks, currentIndex]);
 
   return (
-    <section className="section-home-case-studies">
-      <div className="padding-global">
-        <div className="container-large">
-          <div className="padding-section-large">
-            <div className="top-content">
-              <div className="subtitle text-align-center">Featured</div>
-              <div className="spacer-medium"></div>
-              <h2 className="heading-style-h2 text-align-center">Art In <span className="text-color-grey">Auction</span></h2>
-            </div>
-            <div className="spacer-medium"></div>
-            <div className="case-study-top-content">
-              <div className="text-size-small">Curated Picks©</div>
-              <div className="text-size-small">(2025/26)</div>
-            </div>
-            <div className="spacer-large"></div>
-            <div className="case-study-component">
-              <div className="w-layout-grid case-study-component-grid">
-                {cards.map((art, i) => (
-                  <div className="w-dyn-list" key={i} style={{ position: "sticky", top: `${6 + i * 1.5}rem` }}>
-                    <div role="list" className="w-dyn-items">
-                      <div role="listitem" className="w-dyn-item">
-                        <Link href={art.id ? `/artwork/${art.id}` : "/gallery"} className="case-study-link-wrap w-inline-block">
-                          <div className="case-study-container">
-                            <div className="case-study-bg-image" style={{ backgroundImage: `url(${art.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-                              <div className="case-study-overlay"></div>
-                            </div>
-                            <div className="case-study-thumbnail-wrap">
-                              <div className="case-study-content-wrap">
-                                <div className="case-study-content">
-                                  <div className="case-study-text-item">
-                                    <div className="case-study-text">(</div>
-                                    <div className="case-study-text">{String(i + 1).padStart(2, "0")}</div>
-                                  </div>
-                                  <div className="doted-line"></div>
-                                  <div className="case-study-text-item">
-                                    <div className="case-study-text">{art.artistName}</div>
-                                  </div>
-                                  <div className="doted-line"></div>
-                                  <div className="case-study-text-item">
-                                    <div className="case-study-text">{art.title}</div>
-                                    <div className="case-study-text">)</div>
-                                  </div>
-                                </div>
-                                <div className="case-study-thumbnail-block">
-                                  <img src={art.imageUrl} onError={handleArtworkImageError} alt={art.title} loading="lazy" className="case-study-thumbnail" />
-                                </div>
-                                <div className="view-wrapper">
-                                  <div className="view-block">View</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
+    <section aria-label="Featured Works" className="relative" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} data-testid="section-featured-works">
+      <div className="relative z-10 pt-16 md:pt-24 pb-0">
+        <motion.div
+          className="text-left px-6 md:px-12 lg:px-16 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Curated Collection</span>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-white">Featured<br />Works</h2>
+        </motion.div>
+
+        <div className="relative select-none">
+          <div
+            className="relative mx-auto overflow-hidden"
+            style={{
+              height: "500px",
+              perspective: "1400px",
+              perspectiveOrigin: "50% 38%",
+            }}
+            data-testid="cover-flow-container"
+          >
+            <div className="absolute inset-0 flex items-start justify-center" style={{ paddingTop: "10px" }}>
+              {flowItems.map(({ artwork, offset, arrayIdx }) => {
+                const isCenter = offset === 0;
+                const absOffset = Math.abs(offset);
+                const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
+
+                const coverSize = isCenter ? 340 : 260;
+                const centerGap = 220;
+                const stackSpacing = 110;
+                const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
+                const rotateY = isCenter ? 0 : side * -45;
+                const translateZ = isCenter ? 120 : -(absOffset * 30);
+                const zIndex = 20 - absOffset;
+                const itemOpacity = absOffset >= 3 ? 0.25 : absOffset === 2 ? 0.6 : 1;
+
+                return (
+                  <div
+                    key={`flow-${arrayIdx}`}
+                    className="absolute cursor-pointer"
+                    style={{
+                      zIndex,
+                      transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`,
+                      transition: "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease",
+                      transformStyle: "preserve-3d",
+                      opacity: itemOpacity,
+                      willChange: "transform, opacity",
+                    }}
+                    onClick={() => {
+                      if (offset < 0) goPrev();
+                      else if (offset > 0) goNext();
+                    }}
+                  >
+                    <div
+                      className="relative overflow-hidden"
+                      style={{
+                        width: `${coverSize}px`,
+                        height: `${coverSize}px`,
+                        borderRadius: "4px",
+                        boxShadow: isCenter
+                          ? "0 12px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3)"
+                          : `${side * -4}px 4px 16px rgba(0,0,0,0.4)`,
+                      }}
+                    >
+                      <img
+                        src={artwork.imageUrl}
+                        alt={artwork.title}
+                        onError={handleArtworkImageError}
+                        className="w-full h-full object-cover"
+                        draggable={false}
+                        loading="lazy"
+                      />
+                      {isCenter && (
+                        <div
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%)",
+                            borderRadius: "4px",
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    <div
+                      className="overflow-hidden pointer-events-none"
+                      style={{
+                        width: `${coverSize}px`,
+                        height: `${coverSize * 0.22}px`,
+                        marginTop: "1px",
+                        transform: "scaleY(-1)",
+                        WebkitMaskImage: "linear-gradient(to top, transparent 20%, rgba(0,0,0,0.18) 100%)",
+                        maskImage: "linear-gradient(to top, transparent 20%, rgba(0,0,0,0.18) 100%)",
+                        opacity: isCenter ? 0.25 : 0.12,
+                      }}
+                    >
+                      <img
+                        src={artwork.imageUrl}
+                        alt=""
+                        onError={handleArtworkImageError}
+                        className="w-full object-cover object-bottom"
+                        style={{ height: `${coverSize}px` }}
+                        draggable={false}
+                        loading="lazy"
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </div>
+
+          <div className="absolute bottom-[90px] left-0 z-20 px-6 md:px-12 lg:px-16 text-left hidden md:block" style={{ maxWidth: "calc(50% - 190px)" }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-0.5"
+              >
+                <h3 className="text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight italic text-white" data-testid="text-coverflow-title">
+                  {currentArt.title}
+                </h3>
+                <p className="text-white/50 tracking-wide text-[17px] font-semibold text-left" data-testid="text-coverflow-artist">
+                  By {currentArt.artistName}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="md:hidden absolute bottom-[70px] left-0 right-0 z-20 text-center px-4">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`mobile-${currentIndex}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-0.5 mt-6"
+              >
+                <h3 className="text-base font-display font-bold tracking-tight italic text-white" data-testid="text-coverflow-title-mobile">
+                  {currentArt.title}
+                </h3>
+                <p className="text-white/50 tracking-wide text-sm font-semibold" data-testid="text-coverflow-artist-mobile">
+                  {currentArt.artistName}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="absolute bottom-[24px] left-0 right-0 flex items-center justify-center gap-6 z-20">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={goPrev}
+              className="rounded-full border-white/20 text-white hover:bg-white/10 bg-transparent"
+              data-testid="button-coverflow-prev"
+              aria-label="Previous artwork"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+
+            <div className="flex items-center gap-1.5" role="tablist" aria-label="Featured artwork slides">
+              {coverFlowArtworks.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentIndex(i)}
+                  className={cn(
+                    "rounded-full transition-all duration-300",
+                    i === currentIndex
+                      ? "w-6 h-2 bg-[#A78BFA]"
+                      : "w-2 h-2 bg-white/20"
+                  )}
+                  role="tab"
+                  aria-selected={i === currentIndex}
+                  aria-label={`Go to artwork ${i + 1}`}
+                  data-testid={`coverflow-dot-${i}`}
+                />
+              ))}
+            </div>
+
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={goNext}
+              className="rounded-full border-white/20 text-white hover:bg-white/10 bg-transparent"
+              data-testid="button-coverflow-next"
+              aria-label="Next artwork"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -988,7 +1160,7 @@ export default function Home() {
               <div className="background-overflow"><div className="menu-background bottom"></div></div>
             </div>
           </div>
-          <CaseStudies items={ringArts} />
+          <FeaturedWorks items={ringArts} />
           <Testimonials avatars={ringArts} />
           <Pricing />
           <CallToAction ringArts={ringArts} />
