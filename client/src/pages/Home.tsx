@@ -8,6 +8,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { handleArtworkImageError } from "@/lib/imageFallback";
 import { SEOHead } from "@/components/SEOHead";
 import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
+import client1 from "@assets/image_1780074825390.png";
+import client2 from "@assets/image_1780074832935.png";
+import client3 from "@assets/image_1780074875629.png";
+import client4 from "@assets/image_1780074877660.png";
 
 import artSunset from "@assets/art-sunset-mountains.png";
 import artPortrait from "@assets/art-abstract-portrait.png";
@@ -71,6 +75,7 @@ const TESTIMONIALS: { quote: string; name: string; role: string }[] = [
 
 const BUBBLES_OUTER = ["Impressive", "Unmatched", "Brilliant", "Exceptional"];
 const BUBBLES_INNER = ["I loved it", "Incredible", "Amazing"];
+const CLIENT_PHOTOS = [client1, client2, client3, client4];
 
 const PROCESS = [
   {
@@ -598,7 +603,7 @@ function Bubble({ text }: { text: string }) {
 
 function Testimonials({ avatars }: { avatars: RingArt[] }) {
   const [slide, setSlide] = useState(0);
-  const a = (i: number) => avatars[i % avatars.length].imageUrl;
+  const a = (i: number) => CLIENT_PHOTOS[i % CLIENT_PHOTOS.length];
   const slides = useMemo(() => {
     const out: typeof TESTIMONIALS[] = [];
     for (let i = 0; i < TESTIMONIALS.length; i += 2) out.push(TESTIMONIALS.slice(i, i + 2));
