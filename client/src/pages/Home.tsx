@@ -924,7 +924,13 @@ function SiteFooter() {
           <div className="marquee-text-component">
             {[0, 1].map((k) => (
               <div className="marquee-text-wrapper" key={k}>
-                <h2 className="marquee-text opacity">BrushBids ✦ BrushBids ✦ </h2>
+                <h2 className="marquee-text opacity">
+                  {"BrushBids "}
+                  <img src={brushBidsLogo} alt="" aria-hidden="true" className="marquee-logo" style={{ height: "0.7em", width: "auto", display: "inline-block", verticalAlign: "middle" }} />
+                  {" BrushBids "}
+                  <img src={brushBidsLogo} alt="" aria-hidden="true" className="marquee-logo" style={{ height: "0.7em", width: "auto", display: "inline-block", verticalAlign: "middle" }} />
+                  {" "}
+                </h2>
               </div>
             ))}
           </div>
