@@ -1,0 +1,1 @@
+- [BrushBids homepage Webflow source](homepage-webflow-template.md) — brushbids.webflow.io is the stock "Cyrclo" template; match its design/animations but keep real BrushBids content.

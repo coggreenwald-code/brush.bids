@@ -98,13 +98,13 @@ export function Footer() {
               </li>
             </ul>
             <div className="flex gap-3 mt-6">
-              <a href="#" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-instagram" aria-label="Instagram">
+              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-instagram" aria-label="Instagram">
                 <SiInstagram className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-twitter" aria-label="Twitter">
+              <a href="https://www.x.com/" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-twitter" aria-label="X">
                 <SiX className="w-4 h-4" />
               </a>
-              <a href="#" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-facebook" aria-label="Facebook">
+              <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-facebook" aria-label="Facebook">
                 <SiFacebook className="w-4 h-4" />
               </a>
             </div>
