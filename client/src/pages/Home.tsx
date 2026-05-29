@@ -975,7 +975,6 @@ export default function Home() {
           <CaseStudies items={ringArts} />
           <Testimonials avatars={ringArts} />
           <Pricing />
-          <Faq />
           <CallToAction ringArts={ringArts} />
         </main>
         <SiteFooter />
