@@ -926,9 +926,9 @@ function SiteFooter() {
               <div className="marquee-text-wrapper" key={k}>
                 <h2 className="marquee-text opacity">
                   {"BrushBids "}
-                  <img src={brushBidsLogo} alt="" aria-hidden="true" className="marquee-logo" style={{ height: "calc(0.7em + 160px)", width: "auto", display: "inline-block", verticalAlign: "middle" }} />
+                  <img src={brushBidsLogo} alt="" aria-hidden="true" className="marquee-logo" style={{ height: "calc(0.7em + 240px)", width: "auto", display: "inline-block", verticalAlign: "middle" }} />
                   {" BrushBids "}
-                  <img src={brushBidsLogo} alt="" aria-hidden="true" className="marquee-logo" style={{ height: "calc(0.7em + 160px)", width: "auto", display: "inline-block", verticalAlign: "middle" }} />
+                  <img src={brushBidsLogo} alt="" aria-hidden="true" className="marquee-logo" style={{ height: "calc(0.7em + 240px)", width: "auto", display: "inline-block", verticalAlign: "middle" }} />
                   {" "}
                 </h2>
               </div>
