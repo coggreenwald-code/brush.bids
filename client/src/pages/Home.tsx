@@ -615,7 +615,7 @@ function Testimonials({ avatars }: { avatars: RingArt[] }) {
                 <div className="text-align-center">
                   <div className="subtitle text-color-alternate">Trusted by Our Community</div>
                   <div className="spacer-medium"></div>
-                  <h2 className="heading-style-h2 text-color-alternate">What People <span className="text-color-grey">Say</span></h2>
+                  <h2 className="heading-style-h2 text-color-alternate">What People <span className="text-color-grey text-[94px]">What Our Clients Say</span></h2>
                 </div>
               </div>
               <div className="testimonial-component">
