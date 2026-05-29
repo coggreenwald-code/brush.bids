@@ -907,12 +907,12 @@ function SiteFooter() {
                 <div className="footer-content-block">
                   <div className="footer-block">
                     <Link href="/terms" className="link-button w-inline-block">
-                      <div className="link-wrap"><div className="link-button-text">Terms</div><div className="link-button-text">Terms</div></div>
+                      <div className="link-wrap"><div className="link-button-text">Terms &amp; Conditions</div><div className="link-button-text">Terms &amp; Conditions</div></div>
                     </Link>
                   </div>
                   <div className="footer-block">
                     <Link href="/faq" className="link-button w-inline-block">
-                      <div className="link-wrap"><div className="link-button-text">FAQ</div><div className="link-button-text">FAQ</div></div>
+                      <div className="link-wrap"><div className="link-button-text">FAQs</div><div className="link-button-text">FAQs</div></div>
                     </Link>
                   </div>
                 </div>
