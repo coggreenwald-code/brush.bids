@@ -11,7 +11,12 @@ import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
 import client1 from "@assets/image_1780074825390.png";
 import client2 from "@assets/image_1780074832935.png";
 import client3 from "@assets/image_1780074875629.png";
-import client4 from "@assets/image_1780074877660.png";
+import client4 from "@assets/image_1780074919196.png";
+import client5 from "@assets/image_1780074936628.png";
+import client6 from "@assets/image_1780074957234.png";
+import client7 from "@assets/image_1780074996675.png";
+import client8 from "@assets/image_1780075007097.png";
+import client9 from "@assets/image_1780075043458.png";
 
 import artSunset from "@assets/art-sunset-mountains.png";
 import artPortrait from "@assets/art-abstract-portrait.png";
@@ -75,7 +80,7 @@ const TESTIMONIALS: { quote: string; name: string; role: string }[] = [
 
 const BUBBLES_OUTER = ["Impressive", "Unmatched", "Brilliant", "Exceptional"];
 const BUBBLES_INNER = ["I loved it", "Incredible", "Amazing"];
-const CLIENT_PHOTOS = [client1, client2, client3, client4];
+const CLIENT_PHOTOS = [client1, client2, client3, client4, client5, client6, client7, client8, client9];
 
 const PROCESS = [
   {
