@@ -1827,6 +1827,7 @@
 }.cyrclo-page .circle-shape-wrapper{
   z-index: 5;
   height: 150vh;
+  margin-top: -500px;
   position: relative;
 }.cyrclo-page .circle-shape-container{
   height: 100vh;
