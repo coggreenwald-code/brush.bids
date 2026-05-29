@@ -1,5 +1,5 @@
 import "./cyrclo.css";
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, type SyntheticEvent } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence, useScroll, useTransform, useVelocity, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
@@ -28,6 +28,13 @@ import artGeometric from "@assets/art-geometric-abstract.png";
 import artFloral from "@assets/art-floral-still-life.png";
 import artCityscape from "@assets/art-urban-cityscape.png";
 import artFlow from "@assets/art-abstract-flow.png";
+import wheelFiller1 from "@assets/image_1780075713790.png";
+import wheelFiller2 from "@assets/image_1780075725368.png";
+import wheelFiller3 from "@assets/image_1780075735035.png";
+import wheelFiller4 from "@assets/image_1780075750287.png";
+import wheelFiller5 from "@assets/image_1780075765035.png";
+import wheelFiller6 from "@assets/image_1780075773302.png";
+import wheelFiller7 from "@assets/image_1780075792373.png";
 
 const wrapValue = (min: number, max: number, v: number) => {
   const range = max - min;
@@ -58,6 +65,25 @@ const FALLBACK_ART: RingArt[] = [
 
 const OUTER_COUNT = 18;
 const INNER_COUNT = 12;
+
+const WHEEL_FILLERS = [
+  wheelFiller1,
+  wheelFiller2,
+  wheelFiller3,
+  wheelFiller4,
+  wheelFiller5,
+  wheelFiller6,
+  wheelFiller7,
+];
+
+function handleWheelImageError(index: number) {
+  return (e: SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.currentTarget;
+    if (img.dataset.wheelFallback) return;
+    img.dataset.wheelFallback = "1";
+    img.src = WHEEL_FILLERS[index % WHEEL_FILLERS.length];
+  };
+}
 
 function sizedImage(url: string): string {
   if (!url.includes("images.unsplash.com")) return url;
@@ -303,7 +329,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
                 {Array.from({ length: OUTER_COUNT }).map((_, i) => (
                   <div key={i} className={`circle-item _${String(i + 1).padStart(2, "0")}`}>
                     <div className="circle-image-item">
-                      <img src={at(i).imageUrl} onError={handleArtworkImageError} alt={at(i).title} loading="eager" className="circle-image" />
+                      <img src={at(i).imageUrl} onError={handleWheelImageError(i)} alt={at(i).title} loading="eager" className="circle-image" />
                     </div>
                   </div>
                 ))}
@@ -316,7 +342,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
                 {Array.from({ length: INNER_COUNT }).map((_, i) => (
                   <div key={i} className={`inner-circle-item _${String(i + 1).padStart(2, "0")}`}>
                     <div className="inner-circle-image-item">
-                      <img src={at(i + 3).imageUrl} onError={handleArtworkImageError} alt={at(i + 3).title} loading="eager" className="card-image" />
+                      <img src={at(i + 3).imageUrl} onError={handleWheelImageError(i + 3)} alt={at(i + 3).title} loading="eager" className="card-image" />
                     </div>
                   </div>
                 ))}
@@ -491,20 +517,20 @@ function Services() {
           <div className="process-grid">
             {PROCESS.map((col) => (
               <div className="service-block process-card" key={col.label}>
-                <div className="service-subtitle">{col.label}</div>
-                <h2 className="process-card-heading text-[31px]">{col.heading}</h2>
-                <div className="doted-line process-card-divider"></div>
-                <div className="process-steps">
-                  {col.steps.map((step) => (
-                    <div className="process-step" key={step.n}>
-                      <div className="process-step-number">{step.n}</div>
-                      <div className="process-step-body">
-                        <div className="process-step-title">{step.title}</div>
-                        <p className="text-size-small text-color-alternate process-step-text">{step.text}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="process-card-head">
+                  <div className="service-subtitle">{col.label}</div>
+                  <h2 className="process-card-heading text-[31px]">{col.heading}</h2>
+                  <div className="doted-line process-card-divider"></div>
                 </div>
+                {col.steps.map((step) => (
+                  <div className="process-step" key={step.n}>
+                    <div className="process-step-number">{step.n}</div>
+                    <div className="process-step-body">
+                      <div className="process-step-title">{step.title}</div>
+                      <p className="text-size-small text-color-alternate process-step-text">{step.text}</p>
+                    </div>
+                  </div>
+                ))}
                 <div className="process-card-button">
                   <MainButton href={col.cta.href} label={col.cta.label} />
                 </div>
@@ -1005,7 +1031,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
               {Array.from({ length: OUTER_COUNT }).map((_, i) => (
                 <div key={i} className={`circle-item _${String(i + 1).padStart(2, "0")}`}>
                   <div className="circle-image-item">
-                    <img src={at(i).imageUrl} onError={handleArtworkImageError} alt={at(i).title} loading="lazy" className="circle-image" />
+                    <img src={at(i).imageUrl} onError={handleWheelImageError(i)} alt={at(i).title} loading="lazy" className="circle-image" />
                   </div>
                 </div>
               ))}
