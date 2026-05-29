@@ -72,11 +72,29 @@ const TESTIMONIALS: { quote: string; name: string; role: string }[] = [
 const BUBBLES_OUTER = ["Impressive", "Unmatched", "Brilliant", "Exceptional"];
 const BUBBLES_INNER = ["I loved it", "Incredible", "Amazing"];
 
-const SERVICES = [
-  { subtitle: "Expert Review", heading: "Curation", text: "Every submission is reviewed by curators and AI tools so collectors discover only the strongest student work." },
-  { subtitle: "Live Auctions", heading: "Bidding", text: "Place bids in real time with an anti-sniping timer that keeps every auction fair down to the final second." },
-  { subtitle: "Giving Back", heading: "Charity", text: "A portion of every sale supports a charity chosen by the artist, so collecting art creates real impact." },
-  { subtitle: "Boosted Listings", heading: "Promotion", text: "Artists can boost a piece to gain visibility in the gallery, paying only when the artwork actually sells." },
+const PROCESS = [
+  {
+    label: "Artists",
+    heading: "Start selling your work",
+    cta: { href: "/submit-artwork", label: "Start Selling" },
+    steps: [
+      { n: "01", title: "Submit Your Art", text: "Upload your artwork with a description and set your starting price." },
+      { n: "02", title: "Expert Review", text: "Our curators review your submission for quality, supported by advanced tools trained by art professionals." },
+      { n: "03", title: "Get Paid", text: "Immediately get paid when your art sells." },
+      { n: "04", title: "Give Back", text: "A portion of the sale goes to your chosen charity, making a positive impact." },
+    ],
+  },
+  {
+    label: "Collectors",
+    heading: "Discover emerging talent",
+    cta: { href: "/gallery", label: "Browse Gallery" },
+    steps: [
+      { n: "01", title: "Browse Gallery", text: "Explore curated student artwork from talented emerging artists." },
+      { n: "02", title: "Place Bids", text: "Bid on pieces you love and watch the auction unfold." },
+      { n: "03", title: "Win Artwork", text: "Secure unique pieces while supporting student artists." },
+      { n: "04", title: "Support Causes", text: "Part of your purchase goes to charity." },
+    ],
+  },
 ];
 
 const PLANS = [
@@ -457,44 +475,25 @@ function Services() {
               <h2 className="heading-style-h2 text-color-alternate">Art That <span className="text-color-grey">Gives Back</span></h2>
             </div>
           </div>
-          <div className="w-layout-grid service-grid">
-            <div className="service-block medium-padding">
-              <div className="client-rating-wrap">
-                <div className="rating-block">
-                  <div className="text-size-small text-color-alternate">✦ Loved by emerging artists & collectors.</div>
+          <div className="process-grid">
+            {PROCESS.map((col) => (
+              <div className="service-block process-card" key={col.label}>
+                <div className="service-subtitle">{col.label}</div>
+                <h2 className="process-card-heading">{col.heading}</h2>
+                <div className="doted-line process-card-divider"></div>
+                <div className="process-steps">
+                  {col.steps.map((step) => (
+                    <div className="process-step" key={step.n}>
+                      <div className="process-step-number">{step.n}</div>
+                      <div className="process-step-body">
+                        <div className="process-step-title">{step.title}</div>
+                        <p className="text-size-small text-color-alternate process-step-text">{step.text}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-            {SERVICES.slice(0, 2).map((s) => (
-              <div className="service-block" key={s.heading}>
-                <div className="w-layout-grid service-content-grid">
-                  <div className="service-content-item">
-                    <div className="service-subtitle">{s.subtitle}</div>
-                    <h2 className="service-heading">{s.heading}</h2>
-                  </div>
-                  <div className="service-content-item"><div className="doted-line"></div></div>
-                  <div className="service-content-item">
-                    <p className="text-size-small text-color-alternate">{s.text}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div className="service-block medium-padding">
-              <ReviewStars />
-              <div className="spacer-small"></div>
-              <div className="text-size-small text-color-alternate">5,000+ bids placed • 4.9/5</div>
-            </div>
-            {SERVICES.slice(2).map((s) => (
-              <div className="service-block" key={s.heading}>
-                <div className="w-layout-grid service-content-grid">
-                  <div className="service-content-item">
-                    <div className="service-subtitle">{s.subtitle}</div>
-                    <h2 className="service-heading">{s.heading}</h2>
-                  </div>
-                  <div className="service-content-item"><div className="doted-line"></div></div>
-                  <div className="service-content-item">
-                    <p className="text-size-small text-color-alternate">{s.text}</p>
-                  </div>
+                <div className="process-card-button">
+                  <MainButton href={col.cta.href} label={col.cta.label} />
                 </div>
               </div>
             ))}
