@@ -2495,7 +2495,7 @@
   display: grid;
   position: sticky;
   top: 0;
-  overflow: clip;
+  overflow: visible;
 }.cyrclo-page .call-to-action-content{
   z-index: 5;
   position: relative;
