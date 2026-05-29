@@ -489,7 +489,7 @@ function Services() {
             {PROCESS.map((col) => (
               <div className="service-block process-card" key={col.label}>
                 <div className="service-subtitle">{col.label}</div>
-                <h2 className="process-card-heading">{col.heading}</h2>
+                <h2 className="process-card-heading text-[31px]">{col.heading}</h2>
                 <div className="doted-line process-card-divider"></div>
                 <div className="process-steps">
                   {col.steps.map((step) => (
