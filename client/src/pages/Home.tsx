@@ -402,25 +402,31 @@ function Intro() {
    ============================================================ */
 function CircleShape() {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  // White orb grows from a small dot to fill the screen, wiping the dark
-  // "Our Story" section and revealing the light "Our Solutions" section.
-  // Max scale is computed from the viewport so the orb fully covers any
-  // screen (incl. ultrawide / 4K) — base orb is 5rem (radius 40px).
-  const [maxScale, setMaxScale] = useState(48);
+  // The wrapper is 150vh tall with a 100vh sticky container, so the section
+  // pins to the viewport for roughly the first third of this range. We map
+  // scroll relative to that pin so the orb grows while the section is pinned.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  // White orb is anchored to the bottom edge of the viewport and grows from a
+  // small dot to fill the screen — its bottom half stays off-screen, so only
+  // the top emerges, wiping the dark "Our Story" section and revealing the
+  // light "Our Solutions" section.
+  // Max scale is computed from the viewport so the orb fully covers any screen
+  // (incl. ultrawide / 4K). Base orb is 5rem (radius 40px) centered at the
+  // bottom edge, so the farthest point to cover is a top corner.
+  const [maxScale, setMaxScale] = useState(60);
   useEffect(() => {
     const compute = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const radiusNeeded = Math.sqrt((vw / 2) ** 2 + vh ** 2) * 1.1;
-      setMaxScale(Math.max(48, Math.ceil(radiusNeeded / 40)));
+      const radiusNeeded = Math.sqrt((vw / 2) ** 2 + vh ** 2) * 1.15;
+      setMaxScale(Math.max(60, Math.ceil(radiusNeeded / 40)));
     };
     compute();
     window.addEventListener("resize", compute);
     return () => window.removeEventListener("resize", compute);
   }, []);
-  const scale = useTransform(scrollYProgress, [0.25, 0.85], [1, maxScale]);
-  const textOpacity = useTransform(scrollYProgress, [0.45, 0.7], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.3], [1, maxScale]);
+  const textOpacity = useTransform(scrollYProgress, [0.08, 0.26], [1, 0]);
   return (
     <section className="circle-shape-wrapper" ref={ref}>
       <div className="circle-shape-container">

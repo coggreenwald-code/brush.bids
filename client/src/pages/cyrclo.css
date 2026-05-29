@@ -1826,15 +1826,16 @@
   height: 10rem;
 }.cyrclo-page .circle-shape-wrapper{
   z-index: 5;
-  height: 60vh;
+  height: 150vh;
   position: relative;
 }.cyrclo-page .circle-shape-container{
-  height: 60vh;
+  height: 100vh;
   position: sticky;
   top: 0;
 }.cyrclo-page .circle-shape-block{
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
+  padding-bottom: 4rem;
   width: 100%;
   height: 100%;
   display: flex;
@@ -1850,6 +1851,10 @@
   width: 5rem;
   height: 5rem;
   position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  margin-left: -2.5rem;
+  transform-origin: center center;
 }.cyrclo-page .section-home-service{
   z-index: 10;
   background-color: var(--background-color--secondary-background);
