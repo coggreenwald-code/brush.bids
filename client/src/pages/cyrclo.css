@@ -1859,6 +1859,7 @@
 }.cyrclo-page .section-home-service{
   z-index: 10;
   background-color: var(--background-color--secondary-background);
+  margin-top: -200px;
   padding-bottom: 6rem;
   position: relative;
   overflow: clip;
