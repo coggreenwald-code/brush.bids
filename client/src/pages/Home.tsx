@@ -298,8 +298,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
               <h1 className="title">BrushBids</h1>
               <div className="header-description">
                 <div className="text-align-center">
-                  <div className="text-size-small">The Premier Marketplace for Student Art.
-</div>
+                  <div className="text-size-small">Where emerging student artists meet collectors — curated auctions, real-time bidding, and a portion of every sale given to charity.</div>
                 </div>
               </div>
             </div>
