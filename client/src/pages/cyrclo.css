@@ -2249,7 +2249,7 @@
   transition: all .35s;
   display: flex;
   position: absolute;
-  inset: auto auto -5.75rem 0%;
+  inset: auto auto -4.8125rem 0%;
 }.cyrclo-page .left-arrow:hover{
   transform: scale(1.01);
   box-shadow: 0 5px 10px #0000000d;
@@ -2264,7 +2264,7 @@
   transition: all .35s;
   display: flex;
   position: absolute;
-  inset: auto 0% -5.75rem auto;
+  inset: auto 0% -4.8125rem auto;
 }.cyrclo-page .right-arrow:hover{
   transform: scale(1.01);
   box-shadow: 0 5px 10px #0000000d;
