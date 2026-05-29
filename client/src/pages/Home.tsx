@@ -426,6 +426,8 @@ function Services() {
         <div className="container-large">
           <div className="top-content">
             <div className="text-align-center">
+              <div className="subtitle text-color-alternate">How It Works</div>
+              <div className="spacer-medium"></div>
               <h2 className="heading-style-h2 text-color-alternate">Art That <span className="text-color-grey">Gives Back</span></h2>
             </div>
           </div>
