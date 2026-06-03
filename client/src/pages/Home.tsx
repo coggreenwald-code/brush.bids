@@ -295,13 +295,15 @@ function Navbar() {
 function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // Outer ring: no zoom; fades out early so it's fully gone before you reach the
-  // "Student Art, Reimagined" section.
-  const outerOpacity = useTransform(scrollYProgress, [0.1, 0.5], [1, 0]);
-  // Inner ring: subtle zoom (~1.2x of its original size) that builds while you
-  // scroll, plus a gradual fade-out instead of disappearing all at once.
-  const innerZoom = useTransform(scrollYProgress, [0, 1], [1.4, 1.68]);
-  const innerOpacity = useTransform(scrollYProgress, [0.3, 0.95], [1, 0]);
+  // Rings keep their responsive CSS base size at entry (so the full wheel is
+  // visible with breathing room). Scrolling only applies a moderate zoom-IN to
+  // the ring contents plus a fade: both rings zoom while the hero is pinned, the
+  // outer fades out as the hero scrolls up, and the inner lingers longest before
+  // the next section appears.
+  const outerZoom = useTransform(scrollYProgress, [0, 0.5], [1, 1.18]);
+  const innerZoom = useTransform(scrollYProgress, [0, 0.6], [1, 1.32]);
+  const outerOpacity = useTransform(scrollYProgress, [0.45, 0.7], [1, 0]);
+  const innerOpacity = useTransform(scrollYProgress, [0.55, 0.95], [1, 0]);
 
   // Both rings rotate; rotation speed reacts to scroll velocity
   const { scrollY } = useScroll();
@@ -325,8 +327,8 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
       <div className="circle-component">
         <div className="w-layout-grid header-component-grid">
           <div className="circle-container">
-            <motion.div className="circle-wrapper" style={{ scale: 1.4, opacity: outerOpacity }}>
-              <motion.div className="circle-block" style={{ rotate: outerRotate }}>
+            <motion.div className="circle-wrapper" style={{ opacity: outerOpacity }}>
+              <motion.div className="circle-block" style={{ rotate: outerRotate, scale: outerZoom }}>
                 {Array.from({ length: OUTER_COUNT }).map((_, i) => (
                   <div key={i} className={`circle-item _${String(i + 1).padStart(2, "0")}`}>
                     <div className="circle-image-item">
@@ -338,8 +340,8 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
             </motion.div>
           </div>
           <div className="inner-circle-container">
-            <motion.div className="inner-circle-wrapper" style={{ scale: innerZoom, opacity: innerOpacity }}>
-              <motion.div className="inner-circle-block" style={{ rotate: innerRotate }}>
+            <motion.div className="inner-circle-wrapper" style={{ opacity: innerOpacity }}>
+              <motion.div className="inner-circle-block" style={{ rotate: innerRotate, scale: innerZoom }}>
                 {Array.from({ length: INNER_COUNT }).map((_, i) => (
                   <div key={i} className={`inner-circle-item _${String(i + 1).padStart(2, "0")}`}>
                     <div className="inner-circle-image-item">

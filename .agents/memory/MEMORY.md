@@ -1,1 +1,2 @@
 - [BrushBids homepage Webflow source](homepage-webflow-template.md) — brushbids.webflow.io is the stock "Cyrclo" template; match its design/animations but keep real BrushBids content.
+- [Cyrclo hero transform conflict](cyrclo-hero-transform-conflict.md) — CSS spin animation on `transform` silently kills Framer Motion rotate/zoom; keep ring rotation+zoom in one system (wrapper=responsive scale+opacity, block=scroll zoom).
