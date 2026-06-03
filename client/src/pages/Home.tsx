@@ -1046,7 +1046,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
           </div>
           <div className="spacer-small"></div>
           <div className="max-width-medium align-center">
-            <div className="text-size-regular text-align-center">Ready to Start Your Journey?</div>
+            <div className="text-size-regular text-align-center">Explore curated student artwork, place your bid, and support emerging artists and charity with every piece you collect.</div>
           </div>
           <div className="spacer-large"></div>
           <div className="button-wrap">
