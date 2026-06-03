@@ -352,7 +352,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
           <div className="header-content-wrap">
             <div className="header-content">
               <img src={brushBidsLogo} alt="BrushBids" style={{ height: "72px", width: "auto", background: "transparent", display: "block", margin: "0 auto 0.25rem" }} />
-              <h1 className="title">BrushBids</h1>
+              <h1 className="title">Brush<span style={{ color: "#A78BFA" }}>Bids</span></h1>
               <div className="header-description">
                 <div className="text-align-center">
                   <div className="text-size-small">The Premier Marketplace for Student Art.</div>

@@ -4451,10 +4451,10 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1.2px, transparent 1.5px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.10) 1.2px, transparent 1.5px);
   background-size: 20px 20px;
-  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 48%, #000 92%);
-  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 48%, #000 92%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 40%, #000 92%);
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 40%, #000 92%);
 }
 .cyrclo-page .section-home-header .circle-component { position: relative; z-index: 1; }
 
@@ -4550,3 +4550,34 @@
   .cyrclo-page .circle-image,
   .cyrclo-page .card-image { animation: none; }
 }
+
+/* --- Dotted backgrounds: Keep Scrolling transition + Start Now section --- */
+/* Keep Scrolling transition uses the same dark dots as "How It Works",
+   layered above the growing white orb (z-index 2) but below the text (z-index 10) */
+.cyrclo-page .circle-shape-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.10) 1.3px, transparent 1.6px);
+  background-size: 18px 18px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
+}
+
+/* Start Now (CTA): continue the same light dots used in "Join BrushBids" */
+.cyrclo-page .call-to-action-wrapper { isolation: isolate; }
+.cyrclo-page .call-to-action-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.13) 1.3px, transparent 1.6px);
+  background-size: 18px 18px;
+  -webkit-mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, transparent 28%, #000 85%);
+  mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, transparent 28%, #000 85%);
+}
+.cyrclo-page .call-to-action-wrapper > .circle-container { position: relative; z-index: 1; }
+.cyrclo-page .call-to-action-content { position: relative; z-index: 5; }
