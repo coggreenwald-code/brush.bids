@@ -1163,7 +1163,7 @@
   font-weight: var(--_typography---font-weight--regular);
   white-space: nowrap;
 }.cyrclo-page .section-home-header{
-  height: 100vh;
+  height: 200vh;
   position: relative;
 }.cyrclo-page .section-about-header{
   position: relative;
@@ -1733,7 +1733,7 @@
   margin-bottom: 0;
   margin-right: 5rem;
 }.cyrclo-page .header-spacer{
-  height: 117px;
+  height: 14rem;
 }.cyrclo-page .intro-text{
   color: var(--primary-color--white);
   text-align: center;
