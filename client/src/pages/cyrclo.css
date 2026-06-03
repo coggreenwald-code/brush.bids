@@ -1733,7 +1733,7 @@
   margin-bottom: 0;
   margin-right: 5rem;
 }.cyrclo-page .header-spacer{
-  height: 14rem;
+  height: 90px;
 }.cyrclo-page .intro-text{
   color: var(--primary-color--white);
   text-align: center;
@@ -4456,7 +4456,7 @@
   -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 40%, #000 92%);
   mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 40%, #000 92%);
 }
-.cyrclo-page .section-home-header .circle-component { position: relative; z-index: 1; }
+.cyrclo-page .section-home-header .circle-component { position: sticky; top: 0; z-index: 1; }
 
 /* --- Lifted 3D cards: "How It Works" process/service blocks --- */
 .cyrclo-page .process-grid,
