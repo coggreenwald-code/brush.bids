@@ -1042,7 +1042,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
           <div className="top-content">
             <div className="subtitle text-align-center">Start Now</div>
             <div className="spacer-medium"></div>
-            <h2 className="heading-style-h2 text-align-center">Ready to Start Your <span className="text-[#A78BFA]">Journey?</span></h2>
+            <h2 className="heading-style-h2 text-align-center font-bold whitespace-nowrap text-[clamp(1.5rem,5vw,3rem)]">Ready to Start Your <span className="text-[#A78BFA]">Journey?</span></h2>
           </div>
           <div className="spacer-small"></div>
           <div className="max-width-medium align-center">
@@ -1051,6 +1051,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
           <div className="spacer-large"></div>
           <div className="button-wrap">
             <MainButton href="/gallery" label="Browse Gallery" />
+            <MainButton href="/submit-artwork" label="Submit Your Art" />
           </div>
         </div>
         <div className="cta-opacity"></div>

@@ -1762,6 +1762,8 @@
 }.cyrclo-page .button-wrap{
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
   display: flex;
 }.cyrclo-page .main-button{
   z-index: 1;
