@@ -1083,7 +1083,7 @@ function SiteFooter() {
                 <Link href="/" className="footer-link w-inline-block">
                   <img src={brushBidsLogo} loading="lazy" alt="BrushBids" className="footer-logo" style={{ height: "2.5rem", width: "auto" }} />
                 </Link>
-                <div className="text-size-regular text-align-center">Student art auctions for a good cause.</div>
+                <div className="text-size-regular text-align-center">Join a community of student artists and collectors making art accessible and impactful.</div>
                 <div className="spacer-xsmall"></div>
                 <SocialLinks />
               </div>
@@ -1102,7 +1102,7 @@ function SiteFooter() {
                 <div className="footer-content-block">
                   <div className="footer-block">
                     <div className="footer-text">Curated by</div>
-                    <span className="link-button"><div className="link-wrap"><div className="link-button-text">BrushBids</div></div></span>
+                    <span className="link-button"><div className="link-wrap"><div className="link-button-text">Artists</div></div></span>
                   </div>
                   <div className="footer-block">
                     <div className="footer-text">Supporting</div>
