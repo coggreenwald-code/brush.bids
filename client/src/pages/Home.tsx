@@ -1042,7 +1042,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
           <div className="top-content">
             <div className="subtitle text-align-center">Start Now</div>
             <div className="spacer-medium"></div>
-            <h2 className="heading-style-h2 text-align-center">Let&rsquo;s Discover <span className="text-color-grey">Art</span></h2>
+            <h2 className="heading-style-h2 text-align-center">Ready to Start Your <span className="text-[#A78BFA]">Journey?</span></h2>
           </div>
           <div className="spacer-small"></div>
           <div className="max-width-medium align-center">
