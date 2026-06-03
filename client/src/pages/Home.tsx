@@ -295,9 +295,11 @@ function Navbar() {
 function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // No scroll-driven zoom: rings stay a fixed size. Only the fade-out (for the
-  // section transition) and the velocity-reactive rotation respond to scroll.
+  // Rings stay a fixed size (no scroll zoom). The inner ring sits 1.2x larger.
+  // Inner ring fades out as the hero scrolls away; the outer ring fades out
+  // quickly and completely, so it's never seen by the time the Intro appears.
   const opacity = useTransform(scrollYProgress, [0, 0.85, 1], [1, 1, 0]);
+  const outerOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
 
   // Both rings rotate; rotation speed reacts to scroll velocity
   const { scrollY } = useScroll();
@@ -321,7 +323,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
       <div className="circle-component">
         <div className="w-layout-grid header-component-grid">
           <div className="circle-container">
-            <motion.div className="circle-wrapper" style={{ scale: 1.4, opacity }}>
+            <motion.div className="circle-wrapper" style={{ scale: 1.4, opacity: outerOpacity }}>
               <motion.div className="circle-block" style={{ rotate: outerRotate }}>
                 {Array.from({ length: OUTER_COUNT }).map((_, i) => (
                   <div key={i} className={`circle-item _${String(i + 1).padStart(2, "0")}`}>
@@ -334,7 +336,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
             </motion.div>
           </div>
           <div className="inner-circle-container">
-            <motion.div className="inner-circle-wrapper" style={{ scale: 1.4, opacity }}>
+            <motion.div className="inner-circle-wrapper" style={{ scale: 1.68, opacity }}>
               <motion.div className="inner-circle-block" style={{ rotate: innerRotate }}>
                 {Array.from({ length: INNER_COUNT }).map((_, i) => (
                   <div key={i} className={`inner-circle-item _${String(i + 1).padStart(2, "0")}`}>
