@@ -4405,3 +4405,148 @@
 /* CTA bottom ring + content placement */
 .cyrclo-page .call-to-action-wrapper > .circle-container { grid-area: 3 / 1 / 4 / 4; place-self: center; transform: translateY(9vh); }
 .cyrclo-page .call-to-action-wrapper > .call-to-action-content { grid-area: 2 / 1 / 4 / 4; place-self: center; width: 100%; }
+
+/* ============================================================
+   3D depth pass: dotted halftone backgrounds, lifted cards,
+   floating 3D wheel tiles (matches Cyrclo/Webflow reference)
+   ============================================================ */
+
+/* --- Halftone dotted radial backgrounds behind sections --- */
+/* Dark sections: light dots, denser at the edges, fading out toward center */
+.cyrclo-page .section-home-pricing { isolation: isolate; }
+.cyrclo-page .section-home-pricing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.13) 1.3px, transparent 1.6px);
+  background-size: 18px 18px;
+  -webkit-mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, transparent 28%, #000 85%);
+  mask-image: radial-gradient(ellipse 65% 60% at 50% 50%, transparent 28%, #000 85%);
+}
+.cyrclo-page .section-home-pricing .divider-wrap,
+.cyrclo-page .section-home-pricing .padding-global { position: relative; z-index: 1; }
+
+/* Light "How It Works" section: dark dots, edge-weighted */
+.cyrclo-page .section-home-service { isolation: isolate; }
+.cyrclo-page .section-home-service::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.10) 1.3px, transparent 1.6px);
+  background-size: 18px 18px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
+}
+.cyrclo-page .section-home-service .padding-global { position: relative; z-index: 1; }
+
+/* Hero: faint edge dots that stay clear of the central blend-mode wheel */
+.cyrclo-page .section-home-header { isolation: isolate; }
+.cyrclo-page .section-home-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1.2px, transparent 1.5px);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 48%, #000 92%);
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 48%, #000 92%);
+}
+.cyrclo-page .section-home-header .circle-component { position: relative; z-index: 1; }
+
+/* --- Lifted 3D cards: "How It Works" process/service blocks --- */
+.cyrclo-page .process-grid,
+.cyrclo-page .service-grid { perspective: 1600px; }
+.cyrclo-page .service-block,
+.cyrclo-page .process-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background-image: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+  box-shadow:
+    0 1px 2px rgba(17, 17, 26, 0.05),
+    0 8px 18px -8px rgba(17, 17, 26, 0.14),
+    0 24px 48px -22px rgba(17, 17, 26, 0.22);
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1), box-shadow .45s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.cyrclo-page .service-block:hover,
+.cyrclo-page .process-card:hover {
+  transform: translateY(-8px) rotateX(4deg) rotateY(-3deg);
+  box-shadow:
+    0 2px 4px rgba(17, 17, 26, 0.06),
+    0 18px 32px -10px rgba(17, 17, 26, 0.20),
+    0 40px 70px -28px rgba(17, 17, 26, 0.30);
+}
+
+/* --- Lifted 3D cards: "Join BrushBids" pricing blocks --- */
+.cyrclo-page .pricing-component-grid { perspective: 1800px; }
+.cyrclo-page .pricing-wrap {
+  transition: transform .45s cubic-bezier(.2, .7, .2, 1), box-shadow .45s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 18px 40px -16px rgba(0, 0, 0, 0.55),
+    0 40px 80px -30px rgba(0, 0, 0, 0.6);
+}
+.cyrclo-page .pricing-block {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+.cyrclo-page .pricing-wrapper:hover .pricing-wrap {
+  transform: translateY(-10px) rotateX(5deg);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    0 28px 56px -16px rgba(0, 0, 0, 0.6),
+    0 60px 110px -36px rgba(0, 0, 0, 0.7);
+}
+
+/* --- Floating 3D wheel tiles (hero + CTA rings, the mp4 reference) --- */
+.cyrclo-page .circle-image-item,
+.cyrclo-page .inner-circle-image-item { transform-style: preserve-3d; }
+.cyrclo-page .circle-image,
+.cyrclo-page .card-image {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 18px -6px rgba(0, 0, 0, 0.65),
+    0 2px 6px rgba(0, 0, 0, 0.45);
+  backface-visibility: hidden;
+}
+.cyrclo-page .circle-image { animation: cy-tile-3d 7s ease-in-out infinite; }
+.cyrclo-page .card-image { animation: cy-tile-3d 8s ease-in-out infinite; }
+/* staggered tilt so the ring reads as a field of floating 3D cards */
+.cyrclo-page .circle-item._02 .circle-image,
+.cyrclo-page .inner-circle-item._02 .card-image { animation-delay: -1s; }
+.cyrclo-page .circle-item._04 .circle-image,
+.cyrclo-page .inner-circle-item._04 .card-image { animation-delay: -2s; }
+.cyrclo-page .circle-item._06 .circle-image,
+.cyrclo-page .inner-circle-item._06 .card-image { animation-delay: -3s; }
+.cyrclo-page .circle-item._08 .circle-image,
+.cyrclo-page .inner-circle-item._08 .card-image { animation-delay: -4s; }
+.cyrclo-page .circle-item._10 .circle-image,
+.cyrclo-page .inner-circle-item._10 .card-image { animation-delay: -5s; }
+.cyrclo-page .circle-item._12 .circle-image,
+.cyrclo-page .inner-circle-item._12 .card-image { animation-delay: -6s; }
+.cyrclo-page .circle-item._14 .circle-image { animation-delay: -2.5s; }
+.cyrclo-page .circle-item._16 .circle-image { animation-delay: -4.5s; }
+.cyrclo-page .circle-item._18 .circle-image { animation-delay: -6.5s; }
+
+@keyframes cy-tile-3d {
+  0%   { transform: perspective(600px) rotateX(7deg)  rotateY(-9deg) translateZ(0); }
+  50%  { transform: perspective(600px) rotateX(-7deg) rotateY(9deg)  translateZ(14px); }
+  100% { transform: perspective(600px) rotateX(7deg)  rotateY(-9deg) translateZ(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cyrclo-page .circle-image,
+  .cyrclo-page .card-image { animation: none; }
+}
+
+/* Perf guard: drop per-tile 3D tilt on small screens (keeps ring spin only) */
+@media (max-width: 767px) {
+  .cyrclo-page .circle-image,
+  .cyrclo-page .card-image { animation: none; }
+}
