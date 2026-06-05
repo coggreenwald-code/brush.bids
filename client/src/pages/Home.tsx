@@ -958,7 +958,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
   const at = (i: number) => ringArts[i % ringArts.length];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.8, 3.2]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 2.3]);
   return (
     <section ref={ref} className="call-to-action">
       <div className="call-to-action-wrapper">

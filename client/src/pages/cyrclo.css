@@ -1902,6 +1902,8 @@
   inset: 0% 0% 0% -200%;
 }.cyrclo-page .menu-background.bottom{
   top: auto;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.10) 1.3px, transparent 1.6px);
+  background-size: 18px 18px;
 }.cyrclo-page .menu-background.top-background{
   bottom: auto;
 }.cyrclo-page .menu-background.bottom-background{
