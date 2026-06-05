@@ -2,7 +2,18 @@ import "../pages/cyrclo.css";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
+import { LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
 
 const SOCIALS = [
   { Icon: SiInstagram, href: "https://www.instagram.com/", label: "Instagram Link", small: false },
@@ -72,6 +83,71 @@ export function SiteMenu() {
 
   return (
     <div className="cyrclo-page">
+      <Link
+        href="/"
+        className="hidden md:flex items-center gap-2.5 fixed top-4 left-6 z-[1001]"
+        data-testid="link-home-logo"
+      >
+        <div className="w-8 h-8 flex items-center justify-center">
+          <img src={brushBidsLogo} alt="BrushBids" className="w-full h-full brightness-0 invert" />
+        </div>
+        <span className="text-lg font-bold text-white tracking-tight">BrushBids</span>
+      </Link>
+
+      <div className="hidden md:flex items-center fixed top-3 right-6 z-[1001]">
+        {isAuthenticated ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+                data-testid="button-user-menu"
+              >
+                <Avatar className="w-7 h-7">
+                  <AvatarFallback className="bg-[#A78BFA]/20 text-[#A78BFA] text-xs font-bold border border-[#A78BFA]/30">
+                    {user?.firstName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm text-white/80">
+                  {user?.firstName || user?.username || "User"}
+                </span>
+                <ChevronDown className="w-3 h-3 text-white/40" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-[#1a1a2e] border-white/10">
+              <div className="px-2 py-1.5">
+                <p className="text-sm font-medium text-white">{user?.firstName || user?.username}</p>
+                <p className="text-xs text-white/50 capitalize">
+                  {user?.role === "both" ? "Artist & Collector" : user?.role}
+                </p>
+              </div>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard" className="cursor-pointer text-white/70 hover:text-white">
+                  <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem
+                onClick={() => logout()}
+                className="cursor-pointer text-red-400 hover:text-red-300"
+                data-testid="button-sign-out"
+              >
+                <LogOut className="w-4 h-4 mr-2" /> Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Link href="/auth">
+            <Button
+              className="rounded-full text-sm bg-white text-[#0a0a0f] font-medium px-6 hover:bg-white/90"
+              data-testid="button-sign-in"
+            >
+              Sign In
+            </Button>
+          </Link>
+        )}
+      </div>
+
       <div role="banner" className="navbar w-nav">
         <div className="nav-wrapper">
           <div className="nav-block">
