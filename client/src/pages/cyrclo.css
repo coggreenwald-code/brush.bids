@@ -4395,7 +4395,16 @@
 .cyrclo-page .case-study-component-grid { grid-row-gap: 2rem; }
 /* Fixed navbar must paint above main-wrapper (fixed elements create their own stacking context) */
 .cyrclo-page .navbar { z-index: 1000; }
-.cyrclo-page .menu-button { cursor: pointer; pointer-events: auto; }
+.cyrclo-page .menu-button { cursor: pointer; pointer-events: auto; -webkit-appearance: none; appearance: none; background: transparent; border: 0; padding: 0; color: inherit; }
+/* Hamburger -> X when the overlay is open */
+.cyrclo-page .menu-line { transition: transform .3s ease, opacity .3s ease; }
+.cyrclo-page .menu-button.is-open .menu-line.top { transform: translateY(5px) rotate(45deg); }
+.cyrclo-page .menu-button.is-open .menu-line.middle { opacity: 0; }
+.cyrclo-page .menu-button.is-open .menu-line.bottom { transform: translateY(-5px) rotate(-45deg); }
+/* Dark rounded overlay panel that holds the links + socials */
+.cyrclo-page .nav-menu-content { height: auto; min-height: 18rem; max-height: 82vh; padding: 2.75rem 2rem; background-color: #161616; overflow-y: auto; }
+/* Sign Out renders as a button but must look like the other nav links */
+.cyrclo-page .nav-link-button { background: none; border: 0; padding: 0; margin: 0; font: inherit; cursor: pointer; width: 100%; }
 
 /* ===== Ring grid placement (Webflow used #w-node IDs; mapped to classes) ===== */
 /* Hero: stack outer ring, inner ring, and content centered over the full grid */

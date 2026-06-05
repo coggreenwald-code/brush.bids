@@ -8,6 +8,7 @@ import { useArtworks } from "@/hooks/use-artworks";
 import { useAuth } from "@/hooks/use-auth";
 import { handleArtworkImageError } from "@/lib/imageFallback";
 import { SEOHead } from "@/components/SEOHead";
+import { SiteMenu } from "@/components/SiteMenu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
@@ -218,73 +219,6 @@ function ReviewStars() {
           <path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7L12 2z" />
         </svg>
       ))}
-    </div>
-  );
-}
-
-/* ============================================================
-   Navbar (notch menu)
-   ============================================================ */
-function Navbar() {
-  const [open, setOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = open ? "hidden" : prev;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  const links = [
-    { label: "Home", href: "/" },
-    { label: "Gallery", href: "/gallery" },
-    { label: "About", href: "/about" },
-    { label: "FAQ", href: "/faq" },
-    { label: isAuthenticated ? "Dashboard" : "Sign In", href: isAuthenticated ? "/dashboard" : "/auth" },
-  ];
-
-  return (
-    <div role="banner" className="navbar w-nav">
-      <div className="nav-wrapper">
-        <div className="nav-block">
-          <nav role="navigation" className={open ? "nav-menu w-nav-menu is-open" : "nav-menu w-nav-menu"}>
-            <div className="nav-menu-container">
-              <div className="nav-menu-content">
-                <div className="nav-menu-list">
-                  {links.map((l) => (
-                    <div className="nav-overflow" key={l.label}>
-                      <Link href={l.href} onClick={() => setOpen(false)} className="nav-link w-inline-block" data-testid={`nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}>
-                        <div className="nav-text">{l.label}</div>
-                        <div className="nav-text">{l.label}</div>
-                      </Link>
-                    </div>
-                  ))}
-                  <div className="nav-overflow">
-                    <div className="nav-social-media">
-                      <SocialLinks />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="nav-background"></div>
-            </div>
-          </nav>
-          <div className="menu-button w-nav-button" onClick={() => setOpen((v) => !v)} role="button" aria-label={open ? "Close menu" : "Open menu"} data-testid="button-menu">
-            <div className="nav-menu-block">
-              <div className="menu-button-wrap">
-                <div className="menu-line-item"><div className="menu-line top"></div></div>
-                <div className="menu-line-item"><div className="menu-line middle"></div></div>
-                <div className="menu-line-item"><div className="menu-line bottom"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -1175,7 +1109,7 @@ export default function Home() {
         description="Discover and bid on curated student artwork in real-time auctions. A portion of every sale supports charity."
       />
       <div className="page-wrapper">
-        <Navbar />
+        <SiteMenu />
         <main className="main-wrapper">
           <div id="top" className="back-to-top"></div>
           <HeroRing ringArts={ringArts} />
