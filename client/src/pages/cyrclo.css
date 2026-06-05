@@ -4447,8 +4447,8 @@
   pointer-events: none;
   background-image: radial-gradient(rgba(0, 0, 0, 0.10) 1.3px, transparent 1.6px);
   background-size: 18px 18px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
-  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
 }
 .cyrclo-page .section-home-service .padding-global { position: relative; z-index: 1; }
 
@@ -4571,8 +4571,8 @@
   pointer-events: none;
   background-image: radial-gradient(rgba(0, 0, 0, 0.10) 1.3px, transparent 1.6px);
   background-size: 18px 18px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
-  mask-image: radial-gradient(ellipse 70% 65% at 50% 45%, transparent 26%, #000 88%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
 }
 
 /* Start Now (CTA): continue the same light dots used in "Join BrushBids" */
