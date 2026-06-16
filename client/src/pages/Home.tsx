@@ -229,17 +229,16 @@ function ReviewStars() {
 function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // OUTER carousel: enlarged to 1.4x and given a scroll-driven exit that is
-  // visually distinct from the inner wheel. Each outer tile starts at 1.4x,
-  // then as the hero scrolls up the tiles spread radially OUTWARD from the
-  // center (outerSpread) while shrinking to 0 (outerScale) and fading
-  // (outerOpacity) — so they scatter outward and vanish, the opposite of the
-  // inner wheel which zooms inward. All values are tied to scrollYProgress so
-  // the motion is smooth and reverses cleanly on scroll up.
-  const outerScale = useTransform(scrollYProgress, [0, 0.55], [1.4, 0]);
-  const outerSpread = useTransform(scrollYProgress, [0, 0.55], [0, -120]);
-  const outerOpacity = useTransform(scrollYProgress, [0.1, 0.55], [1, 0]);
-  // INNER wheel: untouched — keeps its inward zoom and longer-lingering fade.
+  // Rings keep their responsive CSS base size at entry (so the full wheel is
+  // visible with breathing room). The inner wheel zooms IN and fades as the hero
+  // scrolls up, lingering longest before the next section appears.
+  // Outer ring exits OUTWARD: the ring's radius expands (block scales up) so the
+  // tiles fly away from center, while each tile shrinks (counter-scale) and the
+  // whole layer fades to 0. This reads as distinct from the inner wheel's inward
+  // zoom. Everything is driven by scroll progress so it reverses cleanly.
+  const outerExpand = useTransform(scrollYProgress, [0, 0.55], [1, 1.7]);
+  const outerTileScale = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+  const outerOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const innerZoom = useTransform(scrollYProgress, [0, 0.6], [1, 1.32]);
   const innerOpacity = useTransform(scrollYProgress, [0.55, 0.95], [1, 0]);
 
@@ -266,10 +265,10 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
         <div className="w-layout-grid header-component-grid">
           <div className="circle-container">
             <motion.div className="circle-wrapper" style={{ opacity: outerOpacity }}>
-              <motion.div className="circle-block" style={{ rotate: outerRotate }}>
+              <motion.div className="circle-block" style={{ rotate: outerRotate, scale: outerExpand }}>
                 {Array.from({ length: OUTER_COUNT }).map((_, i) => (
                   <div key={i} className={`circle-item _${String(i + 1).padStart(2, "0")}`}>
-                    <motion.div className="circle-image-item" style={{ scale: outerScale, y: outerSpread }}>
+                    <motion.div className="circle-image-item" style={{ scale: outerTileScale }}>
                       <img src={at(i).imageUrl} onError={handleWheelImageError(i)} alt={at(i).title} loading="eager" className="circle-image" />
                     </motion.div>
                   </div>
