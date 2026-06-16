@@ -4625,3 +4625,9 @@
     padding-right: 1.25rem;
   }
 }
+
+/* Mobile-only (375 & 414) — pull the footer ~250px closer to the Start Now
+   buttons by shortening the scroll-driven CTA section. Desktop unaffected. */
+@media (max-width: 479px) {
+  .cyrclo-page .call-to-action { height: calc(200vh - 250px); }
+}
