@@ -2487,7 +2487,7 @@
   grid-row-gap: 1rem;
   width: 100%;
 }.cyrclo-page .call-to-action{
-  height: 200vh;
+  height: calc(200vh - 250px);
   padding-bottom: var(--_sizes---spacer--xlarge);
   position: relative;
   overflow: clip;

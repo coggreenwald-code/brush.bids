@@ -263,7 +263,7 @@ function MobileHero() {
       </div>
 
       <div className="flex flex-col items-center text-center">
-        <img src={brushBidsLogo} alt="BrushBids" className="h-14 w-auto mb-3" />
+        <img src={brushBidsLogo} alt="BrushBids" className="h-[5.25rem] w-auto mb-3" />
         <h1 className="text-5xl font-bold tracking-tight text-white leading-none">
           Brush<span style={{ color: "#A78BFA" }}>Bids</span>
         </h1>
@@ -536,7 +536,7 @@ function Services() {
             <div className="text-align-center">
               <div className="subtitle text-color-alternate">How It Works</div>
               <div className="spacer-medium"></div>
-              <h2 className="heading-style-h2 text-color-alternate">Art That <span className="text-color-grey">Gives Back</span></h2>
+              <h2 className="heading-style-h2 text-color-alternate" style={{ fontWeight: 700 }}>Art That <span className="text-color-grey">Gives Back</span></h2>
             </div>
           </div>
           <div className="process-grid">
@@ -637,7 +637,7 @@ function FeaturedWorks({ items }: { items: RingArt[] }) {
           transition={{ duration: 0.5 }}
         >
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em] mb-3 block">Curated Collection</span>
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-white">Featured<br />Works</h2>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-white" style={{ fontWeight: 700 }}>Featured<br />Works</h2>
         </motion.div>
 
         <div className="relative select-none">
@@ -865,7 +865,7 @@ function Testimonials({ avatars }: { avatars: RingArt[] }) {
                 <div className="text-align-center">
                   <div className="subtitle text-color-alternate">Trusted by Our Community</div>
                   <div className="spacer-medium"></div>
-                  <h2 className="heading-style-h2 text-color-alternate">What People <span className="text-color-grey text-[2rem] md:text-[94px]">What Our Clients Say</span></h2>
+                  <h2 className="heading-style-h2 text-color-alternate" style={{ fontWeight: 700 }}>What People <span className="text-color-grey text-[2rem] md:text-[94px]">What Our <span style={{ color: "#ffffff" }}>Clients Say</span></span></h2>
                 </div>
               </div>
               <div className="testimonial-component">
@@ -951,7 +951,7 @@ function Pricing() {
               <div className="top-content">
                 <div className="subtitle text-align-center">Join BrushBids</div>
                 <div className="spacer-medium"></div>
-                <h2 className="heading-style-h2 text-align-center">Built for <span className="text-color-grey">Everyone</span></h2>
+                <h2 className="heading-style-h2 text-align-center" style={{ fontWeight: 700 }}>Built for <span className="text-color-grey">Everyone</span></h2>
               </div>
               <div className="spacer-xlarge"></div>
               <div className="pricing-component">
@@ -1084,7 +1084,7 @@ function CallToAction({ ringArts }: { ringArts: RingArt[] }) {
           <div className="top-content">
             <div className="subtitle text-align-center">Start Now</div>
             <div className="spacer-medium"></div>
-            <h2 className="heading-style-h2 text-align-center font-bold md:whitespace-nowrap text-[clamp(1.5rem,5vw,3rem)]">Ready to Start Your <span className="text-[#A78BFA]">Journey?</span></h2>
+            <h2 className="heading-style-h2 text-align-center font-bold md:whitespace-nowrap text-[clamp(1.5rem,5vw,3rem)]" style={{ fontWeight: 700 }}>Ready to Start Your <span className="text-[#A78BFA]">Journey?</span></h2>
           </div>
           <div className="spacer-small"></div>
           <div className="max-width-medium align-center">
