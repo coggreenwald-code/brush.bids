@@ -250,14 +250,11 @@ function computeOuterOrbitRem(vw: number): number {
 
 /**
  * Mobile hero (below `md`). The orbital ring is too dense for narrow phones, so
- * on mobile we show a clean, simple hero: logo + title, tagline, two CTA buttons
- * and a horizontal-scroll strip of artwork thumbnails. Everything stays inside
- * the page gutters (px-5); the thumbnail strip bleeds edge-to-edge for scroll
- * but its first/last tiles start/end inside the gutter. Hidden at md+ where the
- * desktop orbital ring takes over (unchanged).
+ * on mobile we show a clean, simple hero: logo + title, tagline and the CTA
+ * buttons only — no artwork imagery. Everything stays inside the page gutters
+ * (px-5). Hidden at md+ where the desktop orbital ring takes over (unchanged).
  */
-function MobileHero({ ringArts }: { ringArts: RingArt[] }) {
-  const thumbs = ringArts.slice(0, 8);
+function MobileHero() {
   return (
     <section className="md:hidden relative px-5 pt-28 pb-14 overflow-hidden" data-testid="hero-mobile">
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
@@ -275,6 +272,7 @@ function MobileHero({ ringArts }: { ringArts: RingArt[] }) {
         <div className="mt-7 flex w-full max-w-xs flex-col gap-3">
           <Link
             href="/submit-artwork"
+            style={{ color: "#0a0a0f" }}
             className="flex h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-[#0a0a0f] active:scale-[0.98] transition-transform"
             data-testid="button-hero-mobile-sell"
           >
@@ -288,26 +286,6 @@ function MobileHero({ ringArts }: { ringArts: RingArt[] }) {
             Browse Gallery
           </Link>
         </div>
-      </div>
-
-      <div
-        className="mt-9 -mx-5 flex gap-3 overflow-x-auto px-5 pb-2 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        data-testid="hero-mobile-thumbs"
-      >
-        {thumbs.map((art, i) => (
-          <div
-            key={`mobile-thumb-${i}`}
-            className="snap-start shrink-0 w-32 h-40 overflow-hidden rounded-xl border border-white/10 bg-white/[0.02]"
-          >
-            <img
-              src={art.imageUrl}
-              alt={art.title}
-              onError={handleWheelImageError(i)}
-              className="h-full w-full object-cover"
-              loading="eager"
-            />
-          </div>
-        ))}
       </div>
     </section>
   );
@@ -365,7 +343,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
 
   return (
     <>
-      <MobileHero ringArts={ringArts} />
+      <MobileHero />
       <header ref={ref} className="section-home-header hidden md:block">
         <div className="circle-component">
         <div className="w-layout-grid header-component-grid">
@@ -887,7 +865,7 @@ function Testimonials({ avatars }: { avatars: RingArt[] }) {
                 <div className="text-align-center">
                   <div className="subtitle text-color-alternate">Trusted by Our Community</div>
                   <div className="spacer-medium"></div>
-                  <h2 className="heading-style-h2 text-color-alternate">What People <span className="text-color-grey text-[94px]">What Our Clients Say</span></h2>
+                  <h2 className="heading-style-h2 text-color-alternate">What People <span className="text-color-grey text-[2rem] md:text-[94px]">What Our Clients Say</span></h2>
                 </div>
               </div>
               <div className="testimonial-component">

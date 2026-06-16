@@ -4592,3 +4592,17 @@
 }
 .cyrclo-page .call-to-action-wrapper > .circle-container { position: relative; z-index: 1; }
 .cyrclo-page .call-to-action-content { position: relative; z-index: 5; }
+
+/* Mobile testimonials (375 & 414): let long quotes wrap, add breathing room,
+   and never clip the white card. Desktop is unaffected (>=480px). */
+@media (max-width: 479px) {
+  .cyrclo-page .testimonial-slider { height: auto; }
+  .cyrclo-page .mask,
+  .cyrclo-page .testimonial-slide { height: auto; overflow: visible; }
+  .cyrclo-page .testimonial-content-wrap { padding: 1.5rem; }
+  .cyrclo-page .testimonial-text {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+  }
+}
