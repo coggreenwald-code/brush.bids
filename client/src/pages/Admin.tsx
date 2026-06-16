@@ -14,7 +14,7 @@ export default function Admin() {
   if (user?.role !== "admin") {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex items-center justify-center min-h-[60vh] px-4">
           <div className="p-8 text-center max-w-md rounded-xl bg-white/[0.02] border border-white/5">
             <AlertCircle className="w-12 h-12 mx-auto text-red-400 mb-4" />
             <h2 className="text-xl font-bold text-white mb-2" data-testid="text-access-denied">Access Denied</h2>
@@ -28,13 +28,13 @@ export default function Admin() {
 
   return (
     <Layout>
-      <div className="space-y-6 pb-16">
+      <div className="space-y-6 pb-16 px-4 md:px-0">
         <div style={{ paddingLeft: "10px" }}>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Administration</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1" data-testid="text-admin-title">Admin Portal</h1>
         </div>
         <Tabs defaultValue="curation" className="w-full">
-          <TabsList className="bg-white/[0.03] border border-white/5 max-sm:mx-3 max-sm:w-[calc(100%-1.5rem)] max-sm:flex-wrap max-sm:gap-1">
+          <TabsList className="bg-white/[0.03] border border-white/5 max-sm:w-full max-sm:justify-start max-sm:overflow-x-auto">
             <TabsTrigger value="curation" data-testid="tab-curation">Curation</TabsTrigger>
             <TabsTrigger value="payouts" data-testid="tab-payouts">Pending Payouts</TabsTrigger>
             <TabsTrigger value="tax" data-testid="tab-tax">Tax Collected</TabsTrigger>

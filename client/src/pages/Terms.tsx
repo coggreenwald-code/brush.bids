@@ -7,7 +7,7 @@ export default function Terms() {
   return (
     <Layout>
       <SEOHead title="Terms & Conditions | BrushBids" description="Read BrushBids terms of service, privacy policy, and auction rules." />
-      <div className="space-y-12 pb-16 max-w-3xl mx-auto">
+      <div className="space-y-12 pb-16 max-w-3xl mx-auto px-4 md:px-0">
         <section className="text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">
             <FileText className="w-8 h-8 text-[#A78BFA]" />

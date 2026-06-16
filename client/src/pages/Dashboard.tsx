@@ -373,7 +373,7 @@ export default function Dashboard() {
   if (!user) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-full min-h-[50vh]">
+        <div className="flex items-center justify-center h-full min-h-[50vh] px-4">
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-bold text-white">Please Sign In</h2>
             <p className="text-white/60">You need to be logged in to view your dashboard.</p>
@@ -387,7 +387,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <SEOHead title="Dashboard | BrushBids" description="Manage your artworks, portfolio, earnings, and profile on BrushBids." />
-      <div className="space-y-8">
+      <div className="space-y-8 px-4 md:px-0">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
             <span className="text-sm font-medium text-[#A78BFA] uppercase tracking-widest">Your Studio</span>
@@ -447,7 +447,7 @@ export default function Dashboard() {
           <div className="lg:col-span-2 space-y-6">
             <Tabs defaultValue="artworks">
               <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-                <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 max-sm:mx-3 max-sm:w-[calc(100%-1.5rem)] max-sm:justify-between">
+                <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 max-sm:w-full max-sm:justify-start max-sm:overflow-x-auto">
                   <TabsTrigger value="artworks" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">My Artworks</TabsTrigger>
                   <TabsTrigger value="portfolio" data-testid="tab-portfolio" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">
                     <FolderOpen className="w-4 h-4 mr-1" /> Portfolio

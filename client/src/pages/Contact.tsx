@@ -66,7 +66,7 @@ export default function Contact() {
   return (
     <Layout>
       <SEOHead title="Contact | BrushBids" description="Get in touch with the BrushBids team. We'd love to hear from you about partnerships, feedback, or questions." />
-      <div className="space-y-16 pb-16 max-w-5xl mx-auto">
+      <div className="space-y-16 pb-16 max-w-5xl mx-auto px-4 md:px-0">
         <section className="text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-[#60A5FA]/10 flex items-center justify-center mx-auto">
             <MessageSquare className="w-8 h-8 text-[#A78BFA]" />

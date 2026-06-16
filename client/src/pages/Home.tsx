@@ -248,6 +248,71 @@ function computeOuterOrbitRem(vw: number): number {
   return Math.round(Math.max(0, h) * 100) / 100;
 }
 
+/**
+ * Mobile hero (below `md`). The orbital ring is too dense for narrow phones, so
+ * on mobile we show a clean, simple hero: logo + title, tagline, two CTA buttons
+ * and a horizontal-scroll strip of artwork thumbnails. Everything stays inside
+ * the page gutters (px-5); the thumbnail strip bleeds edge-to-edge for scroll
+ * but its first/last tiles start/end inside the gutter. Hidden at md+ where the
+ * desktop orbital ring takes over (unchanged).
+ */
+function MobileHero({ ringArts }: { ringArts: RingArt[] }) {
+  const thumbs = ringArts.slice(0, 8);
+  return (
+    <section className="md:hidden relative px-5 pt-28 pb-14 overflow-hidden" data-testid="hero-mobile">
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[320px] h-[320px] rounded-full bg-[#A78BFA]/20 blur-[90px]" />
+        <div className="absolute top-24 right-0 w-[200px] h-[200px] rounded-full bg-[#F472B6]/15 blur-[80px]" />
+      </div>
+
+      <div className="flex flex-col items-center text-center">
+        <img src={brushBidsLogo} alt="BrushBids" className="h-14 w-auto mb-3" />
+        <h1 className="text-5xl font-bold tracking-tight text-white leading-none">
+          Brush<span style={{ color: "#A78BFA" }}>Bids</span>
+        </h1>
+        <p className="mt-3 text-base text-white/60 max-w-xs">The Premier Marketplace for Student Art.</p>
+
+        <div className="mt-7 flex w-full max-w-xs flex-col gap-3">
+          <Link
+            href="/submit-artwork"
+            className="flex h-12 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-[#0a0a0f] active:scale-[0.98] transition-transform"
+            data-testid="button-hero-mobile-sell"
+          >
+            Start Selling
+          </Link>
+          <Link
+            href="/gallery"
+            className="flex h-12 items-center justify-center rounded-full border border-white/20 px-6 text-sm font-semibold text-white active:scale-[0.98] transition-transform"
+            data-testid="button-hero-mobile-browse"
+          >
+            Browse Gallery
+          </Link>
+        </div>
+      </div>
+
+      <div
+        className="mt-9 -mx-5 flex gap-3 overflow-x-auto px-5 pb-2 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        data-testid="hero-mobile-thumbs"
+      >
+        {thumbs.map((art, i) => (
+          <div
+            key={`mobile-thumb-${i}`}
+            className="snap-start shrink-0 w-32 h-40 overflow-hidden rounded-xl border border-white/10 bg-white/[0.02]"
+          >
+            <img
+              src={art.imageUrl}
+              alt={art.title}
+              onError={handleWheelImageError(i)}
+              className="h-full w-full object-cover"
+              loading="eager"
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -299,8 +364,10 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
   const at = (i: number) => ringArts[i % ringArts.length];
 
   return (
-    <header ref={ref} className="section-home-header">
-      <div className="circle-component">
+    <>
+      <MobileHero ringArts={ringArts} />
+      <header ref={ref} className="section-home-header hidden md:block">
+        <div className="circle-component">
         <div className="w-layout-grid header-component-grid">
           <div className="circle-container" style={{ ["--cy-outer-orbit" as string]: `${orbitRem}rem` } as CSSProperties}>
             <motion.div className="circle-wrapper" style={{ opacity: outerOpacity }}>
@@ -341,8 +408,9 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
           </div>
         </div>
         <div className="header-overlay"></div>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 }
 
@@ -552,6 +620,23 @@ function FeaturedWorks({ items }: { items: RingArt[] }) {
 
   const currentArt = coverFlowArtworks[currentIndex] ?? coverFlowArtworks[0];
 
+  // Cover-flow uses fixed pixel sizes tuned for desktop. On phones the desktop
+  // center (340px) is wider than the viewport gutters, so we scale the whole
+  // flow down below `md`. Desktop values are unchanged.
+  const [vw, setVw] = useState(() => (typeof window !== "undefined" ? window.innerWidth : 1280));
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  const isMobile = vw > 0 && vw < 768;
+  const centerSize = isMobile ? Math.min(240, vw - 110) : 340;
+  const sideSize = isMobile ? Math.round(centerSize * 0.72) : 260;
+  const flowCenterGap = isMobile ? Math.round(centerSize * 0.62) : 220;
+  const flowStackSpacing = isMobile ? Math.round(centerSize * 0.42) : 110;
+  const flowHeight = isMobile ? 360 : 500;
+  const centerZ = isMobile ? 60 : 120;
+
   const flowItems = useMemo(() => {
     const total = coverFlowArtworks.length;
     const half = Math.min(3, Math.floor((total - 1) / 2));
@@ -581,7 +666,7 @@ function FeaturedWorks({ items }: { items: RingArt[] }) {
           <div
             className="relative mx-auto overflow-hidden"
             style={{
-              height: "500px",
+              height: `${flowHeight}px`,
               perspective: "1400px",
               perspectiveOrigin: "50% 38%",
             }}
@@ -593,12 +678,12 @@ function FeaturedWorks({ items }: { items: RingArt[] }) {
                 const absOffset = Math.abs(offset);
                 const side = offset < 0 ? -1 : offset > 0 ? 1 : 0;
 
-                const coverSize = isCenter ? 340 : 260;
-                const centerGap = 220;
-                const stackSpacing = 110;
+                const coverSize = isCenter ? centerSize : sideSize;
+                const centerGap = flowCenterGap;
+                const stackSpacing = flowStackSpacing;
                 const translateX = isCenter ? 0 : side * (centerGap + (absOffset - 1) * stackSpacing);
                 const rotateY = isCenter ? 0 : side * -45;
-                const translateZ = isCenter ? 120 : -(absOffset * 30);
+                const translateZ = isCenter ? centerZ : -(absOffset * 30);
                 const zIndex = 20 - absOffset;
                 const itemOpacity = absOffset >= 3 ? 0.25 : absOffset === 2 ? 0.6 : 1;
 

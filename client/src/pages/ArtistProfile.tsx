@@ -62,7 +62,7 @@ export default function ArtistProfile() {
   return (
     <Layout>
       <SEOHead title={`${artistName} | BrushBids`} description={`View artwork by ${artistName} on BrushBids.`} />
-      <div className="max-w-5xl mx-auto space-y-8 pb-16">
+      <div className="max-w-5xl mx-auto space-y-8 pb-16 px-4 md:px-0">
         <div className="p-8 rounded-xl bg-white/[0.02] border border-white/5">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             <Avatar className="w-32 h-32">

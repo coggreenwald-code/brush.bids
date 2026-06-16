@@ -117,7 +117,7 @@ export default function MyBids() {
   if (!isAuthenticated) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex items-center justify-center min-h-[60vh] px-4">
           <div className="p-8 text-center max-w-md rounded-xl bg-white/[0.02] border border-white/5">
             <Gavel className="w-12 h-12 mx-auto text-white/30 mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">Sign In Required</h2>
@@ -142,7 +142,7 @@ export default function MyBids() {
 
   return (
     <Layout>
-      <div className="space-y-8 pb-16">
+      <div className="space-y-8 pb-16 px-4 md:px-0">
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Activity</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">My Bids</h1>
@@ -172,7 +172,7 @@ export default function MyBids() {
         )}
 
         <Tabs defaultValue="active">
-          <TabsList className="max-sm:mx-3 max-sm:w-[calc(100%-1.5rem)] max-sm:flex-wrap max-sm:gap-1">
+          <TabsList className="max-sm:w-full max-sm:justify-start max-sm:overflow-x-auto">
             <TabsTrigger value="active" data-testid="tab-active-bids">
               Active ({isLoading ? "-" : activeBids.length})
             </TabsTrigger>

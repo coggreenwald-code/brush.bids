@@ -220,7 +220,7 @@ export default function SubmitArtwork() {
   return (
     <Layout>
       <SEOHead title="Submit Artwork | BrushBids" description="Submit your artwork for expert curation and auction on BrushBids." />
-      <div className="max-w-2xl mx-auto space-y-8">
+      <div className="max-w-2xl mx-auto space-y-8 px-4 md:px-0">
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Create Listing</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">Submit Artwork</h1>

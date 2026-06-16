@@ -226,7 +226,7 @@ export default function Gallery() {
         </div>
 
         {(activeFilters.length > 0 || searchQuery) && (
-          <div className="flex items-center gap-2 flex-wrap mt-6 px-1">
+          <div className="flex items-center gap-2 flex-wrap mt-6 px-4 md:px-1">
             <span className="text-sm text-white/40">Active filters:</span>
             {searchQuery && (
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm">
@@ -251,7 +251,7 @@ export default function Gallery() {
           </div>
         )}
 
-        <div className="mt-10">
+        <div className="mt-10 px-4 md:px-0">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (

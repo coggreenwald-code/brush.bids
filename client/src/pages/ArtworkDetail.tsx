@@ -297,7 +297,7 @@ export default function ArtworkDetail() {
   return (
     <Layout>
       <SEOHead title={`${artwork.title} | BrushBids`} description={artwork.description.slice(0, 160)} />
-      <div className="w-full">
+      <div className="w-full px-4 md:px-0">
         <div className="mb-8">
           <Link href="/gallery">
             <span className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors text-sm cursor-pointer" data-testid="link-back-gallery">
