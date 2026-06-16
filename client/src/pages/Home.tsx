@@ -264,7 +264,7 @@ function MobileHero() {
 
       <div className="flex flex-col items-center text-center">
         <img src={brushBidsLogo} alt="BrushBids" className="h-[92px] w-auto mb-3" />
-        <h1 className="text-5xl font-black tracking-tight text-white leading-none" style={{ fontWeight: 900 }}>
+        <h1 className="text-5xl font-normal tracking-tight text-white leading-none" style={{ fontWeight: 400 }}>
           Brush<span style={{ color: "#A78BFA" }}>Bids</span>
         </h1>
         <p className="mt-3 text-base text-white/60 max-w-xs">The Premier Marketplace for Student Art.</p>
