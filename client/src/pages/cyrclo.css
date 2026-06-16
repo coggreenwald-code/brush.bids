@@ -1498,7 +1498,7 @@
   perspective: 1000px;
   border-radius: 100%;
   width: 6.3rem;
-  height: 25rem;
+  height: var(--cy-outer-orbit, 25rem);
   position: absolute;
   transform: rotate(0);
 }.cyrclo-page .circle-item._02{

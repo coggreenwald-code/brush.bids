@@ -1,5 +1,5 @@
 import "./cyrclo.css";
-import { useState, useEffect, useRef, useMemo, useCallback, type SyntheticEvent } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, type SyntheticEvent, type CSSProperties } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence, useScroll, useTransform, useVelocity, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
@@ -226,9 +226,48 @@ function ReviewStars() {
 /* ============================================================
    Hero ring
    ============================================================ */
+
+// Largest outer-ring orbit (the `.circle-item` height, in rem) that keeps the
+// ring un-clipped at a given viewport width. The effective on-screen radius is
+// `(1.75*H - 3.5) * 16 * wrapperScale`px (image-item sits at top:-125% of the
+// circle-item height); we require radius + tile-half-width + margin <= vw/2 and
+// solve for H. The result is the no-clip MAX, so we only cap the upper end
+// (~30% tighter than the old 25rem) — there is no clipping-relevant lower bound.
+function computeOuterOrbitRem(vw: number): number {
+  let wrapperScale = 1.2; // base (>= 992px)
+  let tileWidthRem = 6.3;
+  if (vw <= 479) wrapperScale = 0.6;
+  else if (vw <= 767) wrapperScale = 0.8;
+  else if (vw <= 991) wrapperScale = 1.1;
+  else if (vw <= 1439) wrapperScale = 1.2;
+  else { wrapperScale = 1.3; tileWidthRem = 7; }
+  const margin = Math.max(24, vw * 0.04); // comfortable breathing room
+  const halfAvail = vw / 2 - margin;
+  const hMax = (halfAvail / (16 * wrapperScale) + 3.5 - tileWidthRem / 2) / 1.75;
+  const h = Math.min(18, Number.isFinite(hMax) ? hMax : 18);
+  return Math.round(Math.max(0, h) * 100) / 100;
+}
+
 function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+
+  // Outer ring orbit radius (the `.circle-item` height) is responsive so the
+  // ring frames the title on desktop (~30% tighter than the old 25rem) but
+  // always shrinks to fit narrow viewports — no tile is ever clipped at any
+  // width or on resize. Tile SIZE (1.4x) and the scroll exit are unchanged;
+  // only the orbit lever changes. Applied as a CSS var scoped to this ring's
+  // container, so the inner wheel and the CTA ring are unaffected. Initialized
+  // synchronously so the very first paint is already fit (no clipped frame).
+  const [orbitRem, setOrbitRem] = useState(() =>
+    typeof window !== "undefined" ? computeOuterOrbitRem(window.innerWidth) : 18,
+  );
+  useEffect(() => {
+    const onResize = () => setOrbitRem(computeOuterOrbitRem(window.innerWidth));
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   // Rings keep their responsive CSS base size at entry (so the full wheel is
   // visible with breathing room). The inner wheel zooms IN and fades as the hero
   // scrolls up, lingering longest before the next section appears.
@@ -263,7 +302,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
     <header ref={ref} className="section-home-header">
       <div className="circle-component">
         <div className="w-layout-grid header-component-grid">
-          <div className="circle-container">
+          <div className="circle-container" style={{ ["--cy-outer-orbit" as string]: `${orbitRem}rem` } as CSSProperties}>
             <motion.div className="circle-wrapper" style={{ opacity: outerOpacity }}>
               <motion.div className="circle-block" style={{ rotate: outerRotate, scale: outerExpand }}>
                 {Array.from({ length: OUTER_COUNT }).map((_, i) => (
