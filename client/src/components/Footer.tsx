@@ -90,7 +90,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 text-white/40">
                 <Mail className="w-4 h-4" />
-                <span>support@brushbids.com</span>
+                <span>charlie@brushbids.com</span>
               </li>
               <li className="flex items-center gap-2 text-white/40">
                 <MapPin className="w-4 h-4" />

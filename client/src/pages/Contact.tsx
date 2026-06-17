@@ -46,7 +46,7 @@ export default function Contact() {
     {
       icon: Mail,
       title: "Email Us",
-      description: "support@brushbids.com",
+      description: "charlie@brushbids.com",
       note: "For general inquiries",
     },
     {
