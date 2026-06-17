@@ -1,0 +1,34 @@
+Two bugs are breaking the bidding flow on the live site. Please investigate the
+server/deployment logs and fix both.
+BUG 1 — Bid fails with a 500 error.
+When a buyer places a bid, POST /api/bids returns 500 and the UI shows:
+"Bid failed — The client disconnected before the request was completed."
+This happens in the bid-hold creation where it calls
+stripe.checkout.sessions.create().
+Please:
+- Check the deployment/server logs for the actual exception thrown during that
+  Stripe call, and fix the root cause. Likely suspects to check:
+  (a) The request is timing out — the Stripe call (plus the per-request
+      getUncachableStripeClient credential fetch and automatic_tax calculation)
+      is taking too long on the live deployment. If so, reduce latency (e.g.,
+      cache the Stripe client/credentials within the request lifecycle) and make
+      sure the deployment doesn't cold-start mid-request.
+  (b) An artist's Stripe Connect account is a TEST-mode account being used with
+      the now-LIVE keys, so transfer_data.destination references an account that
+      doesn't exist in live mode. If that's it: skip transfer_data and fall back
+      to the manual payout queue when the destination account is invalid, rather
+      than throwing a 500.
+  (c) automatic_tax failing in live mode.
+- Improve error handling on POST /api/bids so the REAL Stripe error message is
+  logged server-side and returned to the client, instead of the vague
+  "client disconnected" message. We need to see the true cause.
+BUG 2 — Shipping rates fail with 422 when the artist has no ship-from address.
+GET /api/shipping/rates returns 422 because the artist hasn't set a ship-from
+address, which blocks the buyer from bidding.
+Please:
+- Require artists to set a complete ship-from address BEFORE their artwork can
+  be approved / go live, so no biddable artwork is ever missing one.
+- In the bidding UI, if shipping still can't be calculated, show a clear,
+  friendly message explaining why instead of a silent failure — and don't let
+  the buyer get stuck on a broken bid.
+Test the full bid flow end-to-end after fixing, on both desktop and mobile.

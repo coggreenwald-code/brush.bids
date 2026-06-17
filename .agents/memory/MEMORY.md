@@ -1,3 +1,4 @@
 - [BrushBids homepage Webflow source](homepage-webflow-template.md) — brushbids.webflow.io is the stock "Cyrclo" template; match its design/animations but keep real BrushBids content.
 - [Cyrclo hero transform conflict](cyrclo-hero-transform-conflict.md) — CSS spin animation on `transform` silently kills Framer Motion rotate/zoom; keep ring rotation+zoom in one system (wrapper=responsive scale+opacity, block=scroll zoom).
 - [Cyrclo scoped styles reuse](cyrclo-scoped-styles.md) — Cyrclo CSS is scoped under `.cyrclo-page` + loaded only via cyrclo.css import; reuse anywhere needs both the wrapper div and a self-import.
+- [Bid-hold Stripe resilience](bid-hold-stripe-resilience.md) — tax must fail closed (never disable automatic_tax); Connect destination may fall back to manual payout; surface real Stripe errors.

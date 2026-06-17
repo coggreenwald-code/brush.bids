@@ -5,7 +5,26 @@ import Stripe from 'stripe';
 
 let connectionSettings: any;
 
-async function getCredentials() {
+// Cache the resolved Stripe credentials per environment for a short window so
+// we don't hit the Replit connectors API on every request. The credential
+// fetch is a network round-trip that, on a cold-started deployment, can push a
+// single request past the client's timeout (surfacing as the misleading
+// "client disconnected before the request was completed" error).
+type CachedCreds = { publishableKey: string; secretKey: string };
+let credsCache: { env: string; creds: CachedCreds; expires: number } | null = null;
+const CREDS_TTL_MS = 10 * 60 * 1000;
+
+async function getCredentials(): Promise<CachedCreds> {
+  const env = process.env.REPLIT_DEPLOYMENT === '1' ? 'production' : 'development';
+  if (credsCache && credsCache.env === env && credsCache.expires > Date.now()) {
+    return credsCache.creds;
+  }
+  const creds = await fetchCredentials();
+  credsCache = { env, creds, expires: Date.now() + CREDS_TTL_MS };
+  return creds;
+}
+
+async function fetchCredentials(): Promise<CachedCreds> {
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY
     ? 'repl ' + process.env.REPL_IDENTITY
@@ -47,12 +66,37 @@ async function getCredentials() {
   };
 }
 
+// Shared Stripe SDK options. maxNetworkRetries + a generous timeout make the
+// SDK retry transient connection blips instead of bubbling up a
+// StripeConnectionError ("...client disconnected before the request was
+// completed"), which is what was failing POST /api/bids on the live deployment.
+const STRIPE_OPTIONS: Stripe.StripeConfig = {
+  apiVersion: '2025-11-17.clover',
+  maxNetworkRetries: 2,
+  timeout: 30000,
+};
+
+let clientCache: { env: string; client: Stripe; expires: number } | null = null;
+const CLIENT_TTL_MS = 10 * 60 * 1000;
+
+// Cached Stripe client. Reuses the same instance (and cached credentials)
+// within a ~10 minute window to keep per-request latency low. Use this for
+// hot request paths like bid-hold creation.
+export async function getStripeClient(): Promise<Stripe> {
+  const env = process.env.REPLIT_DEPLOYMENT === '1' ? 'production' : 'development';
+  if (clientCache && clientCache.env === env && clientCache.expires > Date.now()) {
+    return clientCache.client;
+  }
+  const { secretKey } = await getCredentials();
+  const client = new Stripe(secretKey, STRIPE_OPTIONS);
+  clientCache = { env, client, expires: Date.now() + CLIENT_TTL_MS };
+  return client;
+}
+
 export async function getUncachableStripeClient() {
   const { secretKey } = await getCredentials();
 
-  return new Stripe(secretKey, {
-    apiVersion: '2025-11-17.clover',
-  });
+  return new Stripe(secretKey, STRIPE_OPTIONS);
 }
 
 export async function getStripePublishableKey() {

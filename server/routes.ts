@@ -8,7 +8,8 @@ import { getEasyPostRates } from "./easypost";
 import { sendAdultUpgradeEmail } from "./emailService";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
-import { getUncachableStripeClient, getStripePublishableKey, getAppOrigin } from "./stripeClient";
+import type Stripe from "stripe";
+import { getUncachableStripeClient, getStripeClient, getStripePublishableKey, getAppOrigin } from "./stripeClient";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -122,6 +123,20 @@ export async function registerRoutes(
     }
     try {
       const { status, feedback } = api.artworks.updateStatus.input.parse(req.body);
+      // Gate approval on the artist having a complete ship-from address, so no
+      // biddable artwork ever goes live missing one (which would 422 the
+      // buyer's shipping-rate lookup mid-bid).
+      if (status === "approved") {
+        const target = await storage.getArtwork(Number(req.params.id));
+        if (target) {
+          const seller = await storage.getUser(target.artistId);
+          if (!seller?.shipFromStreet || !seller?.shipFromCity || !seller?.shipFromState || !seller?.shipFromZip) {
+            return res.status(400).json({
+              message: "This artist hasn't set a complete ship-from address yet. Ask them to add it in Dashboard → Shipping before this artwork can be approved.",
+            });
+          }
+        }
+      }
       const artwork = await storage.updateArtworkStatus(Number(req.params.id), status, feedback);
       res.json(artwork);
     } catch (err) {
@@ -309,7 +324,7 @@ export async function registerRoutes(
       if (!artist) return res.status(404).json({ message: "Artist not found" });
       const useConnect = hasStripeConnectReady(artist);
 
-      const stripe = await getUncachableStripeClient();
+      const stripe = await getStripeClient();
       const amountCents = Math.round(Number(input.amount) * 100);
       // Split: 75% artist / 20% platform / 5% charity (charity paid manually
       // off-Stripe). Boost shifts that much from artist to platform.
@@ -317,82 +332,118 @@ export async function registerRoutes(
       const appFeeCents = Math.min(amountCents, Math.round(amountCents * (0.25 + boostPct / 100)));
 
       const origin = getAppOrigin();
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        mode: 'payment',
-        customer_email: (req.user as any).email || undefined,
-        // Stripe Tax requires a customer record for address-based calculation.
-        customer_creation: 'always',
-        // Buyer must enter a US ship-to address before paying so Stripe Tax
-        // can determine sales-tax obligation per the marketplace facilitator
-        // rules. Tax registrations are configured in the Stripe Dashboard;
-        // jurisdictions with no registration return $0 tax.
-        billing_address_collection: 'required',
-        shipping_address_collection: { allowed_countries: ['US'] },
-        automatic_tax: { enabled: true },
-        line_items: [{
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `Bid hold: ${artwork.title}`,
-              description: `Card authorization for your bid on "${artwork.title}". Your card will only be charged if you win the auction. Sales tax shown below is collected by BrushBids as the marketplace facilitator.`,
-              images: artwork.imageUrl ? [artwork.imageUrl] : [],
-              // General tangible goods. Stripe Tax matches this to state-level
-              // sales-tax rules. Override per artwork later if we add digital
-              // or service categories.
-              tax_code: 'txcd_99999999',
-            },
-            unit_amount: amountCents,
-            // Tax is added on top of the bid (exclusive). The bid amount the
-            // artist sees, the application fee, and the transfer split are all
-            // computed against the pre-tax bid.
-            tax_behavior: 'exclusive',
-          },
-          quantity: 1,
-        }],
-        payment_intent_data: {
-          capture_method: 'manual',
-          // For Connect artists: appFeeCents is ONLY the platform's pre-tax
-          // cut, and the scheduler bumps application_fee_amount at capture
-          // time to also retain the collected tax (artist payout stays based
-          // on the pre-tax bid).
-          //
-          // For manual-payout (non-Connect) artists: we omit transfer_data
-          // entirely so the full charge lands on the platform balance, and
-          // the admin pays the artist their share off-Stripe. We still
-          // remember baseAppFeeCents so the scheduler can compute their
-          // queued payout amount.
-          ...(useConnect
-            ? {
-                application_fee_amount: appFeeCents,
-                transfer_data: { destination: artist.stripeAccountId! },
-              }
-            : {}),
-          metadata: {
-            kind: 'bid_hold',
-            artworkId: String(artwork.id),
-            bidderId,
-            bidAmount: String(input.amount),
-            baseAppFeeCents: String(appFeeCents),
-            payoutKind: useConnect ? 'connect' : 'manual',
-          },
-        },
-        metadata: {
+
+      // Build the Checkout Session params. `useConnectFlag` toggles the direct
+      // transfer to the artist's connected account; it can be turned off as a
+      // fallback if Stripe rejects the connected account (e.g. a stale/test-mode
+      // account used with live keys) so a bid never hard-fails the buyer with a
+      // 500. Stripe Tax stays ON — BrushBids is the marketplace facilitator and
+      // must collect tax, so a tax-config failure fails closed (surfaced as an
+      // actionable error) rather than silently selling untaxed.
+      const buildSessionParams = (
+        useConnectFlag: boolean,
+      ): Stripe.Checkout.SessionCreateParams => {
+        const sharedMetadata = {
           kind: 'bid_hold',
           artworkId: String(artwork.id),
           bidderId,
           bidAmount: String(input.amount),
           baseAppFeeCents: String(appFeeCents),
-          payoutKind: useConnect ? 'connect' : 'manual',
-        },
-        // Bound to min(auctionEnd, now+24h), clamped to Stripe's 30-min min.
-        expires_at: Math.max(
-          Math.floor(Date.now() / 1000) + 30 * 60,
-          Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 24 * 60 * 60 * 1000) / 1000),
-        ),
-        success_url: `${origin}/artwork/${artwork.id}?bid=success&amount=${input.amount}`,
-        cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
-      });
+          payoutKind: useConnectFlag ? 'connect' : 'manual',
+        };
+        return {
+          payment_method_types: ['card'],
+          mode: 'payment',
+          customer_email: (req.user as any).email || undefined,
+          // Stripe Tax requires a customer record for address-based calculation.
+          customer_creation: 'always',
+          // Buyer must enter a US ship-to address before paying so Stripe Tax
+          // can determine sales-tax obligation per the marketplace facilitator
+          // rules. Tax registrations are configured in the Stripe Dashboard;
+          // jurisdictions with no registration return $0 tax.
+          billing_address_collection: 'required',
+          shipping_address_collection: { allowed_countries: ['US'] },
+          automatic_tax: { enabled: true },
+          line_items: [{
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `Bid hold: ${artwork.title}`,
+                description: `Card authorization for your bid on "${artwork.title}". Your card will only be charged if you win the auction. Sales tax shown below is collected by BrushBids as the marketplace facilitator.`,
+                images: artwork.imageUrl ? [artwork.imageUrl] : [],
+                // General tangible goods. Stripe Tax matches this to state-level
+                // sales-tax rules. Override per artwork later if we add digital
+                // or service categories.
+                tax_code: 'txcd_99999999',
+              },
+              unit_amount: amountCents,
+              // Tax is added on top of the bid (exclusive). The bid amount the
+              // artist sees, the application fee, and the transfer split are all
+              // computed against the pre-tax bid.
+              tax_behavior: 'exclusive',
+            },
+            quantity: 1,
+          }],
+          payment_intent_data: {
+            capture_method: 'manual',
+            // For Connect artists: appFeeCents is ONLY the platform's pre-tax
+            // cut, and the scheduler bumps application_fee_amount at capture
+            // time to also retain the collected tax (artist payout stays based
+            // on the pre-tax bid).
+            //
+            // For manual-payout (non-Connect) artists: we omit transfer_data
+            // entirely so the full charge lands on the platform balance, and
+            // the admin pays the artist their share off-Stripe. We still
+            // remember baseAppFeeCents so the scheduler can compute their
+            // queued payout amount.
+            ...(useConnectFlag
+              ? {
+                  application_fee_amount: appFeeCents,
+                  transfer_data: { destination: artist.stripeAccountId! },
+                }
+              : {}),
+            metadata: sharedMetadata,
+          },
+          metadata: sharedMetadata,
+          // Bound to min(auctionEnd, now+24h), clamped to Stripe's 30-min min.
+          expires_at: Math.max(
+            Math.floor(Date.now() / 1000) + 30 * 60,
+            Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 24 * 60 * 60 * 1000) / 1000),
+          ),
+          success_url: `${origin}/artwork/${artwork.id}?bid=success&amount=${input.amount}`,
+          cancel_url: `${origin}/artwork/${artwork.id}?bid=cancelled`,
+        };
+      };
+
+      // The one recoverable Stripe failure we downgrade-and-retry instead of
+      // 500ing: the connected account is invalid in this mode (e.g. a TEST-mode
+      // account used with LIVE keys). We then retry without transfer_data and
+      // queue the artist's payout manually. Tax errors are NOT swallowed.
+      const isInvalidDestinationError = (e: any) =>
+        e?.type === 'StripeInvalidRequestError' &&
+        (/destination/i.test(e?.param || '') ||
+          /no such destination|test mode|live mode|does not have access|destination account|connected account/i.test(e?.message || ''));
+
+      let useConnectEff = useConnect;
+      let session: Stripe.Checkout.Session | undefined;
+      for (let attempt = 0; attempt < 2 && !session; attempt++) {
+        try {
+          session = await stripe.checkout.sessions.create(
+            buildSessionParams(useConnectEff),
+          );
+        } catch (stripeErr: any) {
+          if (useConnectEff && isInvalidDestinationError(stripeErr)) {
+            console.error(
+              `[bids] Connect destination ${artist.stripeAccountId} rejected by Stripe (${stripeErr?.message}); ` +
+                `falling back to the manual payout queue for artwork ${artwork.id}.`,
+            );
+            useConnectEff = false;
+            continue;
+          }
+          throw stripeErr;
+        }
+      }
+      if (!session) throw new Error('Could not create bid hold checkout session');
 
       // No bid row is written here — the webhook inserts it once Stripe
       // confirms the authorization, so abandoned checkouts leave no rows.
@@ -405,8 +456,21 @@ export async function registerRoutes(
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
       }
-      console.error("Bid hold creation failed:", err);
-      res.status(500).json({ message: err.message || "Failed to create bid hold" });
+      // Log the REAL Stripe error server-side (type/code/param/requestId) so the
+      // true cause is visible in deployment logs, and surface a meaningful
+      // message to the client instead of a vague "client disconnected".
+      console.error("[bids] Bid hold creation failed:", {
+        type: err?.type,
+        code: err?.code,
+        param: err?.param,
+        requestId: err?.requestId,
+        message: err?.message,
+      });
+      const clientMessage =
+        typeof err?.type === 'string' && err.type.startsWith('Stripe')
+          ? `Payment setup failed: ${err.message}`
+          : err?.message || "Failed to create bid hold";
+      res.status(500).json({ message: clientMessage });
     }
   });
 
