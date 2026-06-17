@@ -333,7 +333,15 @@ export async function registerRoutes(
       if (!artist) return res.status(404).json({ message: "Artist not found" });
       const useConnect = hasStripeConnectReady(artist);
 
+      // --- Timing instrumentation (see "client disconnected" 500s on the live
+      // autoscale deployment). Logs elapsed ms for the two suspected-slow steps:
+      // resolving the Stripe client (which may fetch Replit-connector creds on a
+      // cold instance) and creating the Checkout Session (Stripe Tax adds RTTs).
+      const t0 = Date.now();
+      console.log(`[bids][timing] artwork=${input.artworkId} bidder=${bidderId} — resolving Stripe client...`);
       const stripe = await getStripeClient();
+      const tClient = Date.now();
+      console.log(`[bids][timing] getStripeClient() took ${tClient - t0}ms`);
       const amountCents = Math.round(Number(input.amount) * 100);
       // Split: 75% artist / 20% platform / 5% charity (charity paid manually
       // off-Stripe). Boost shifts that much from artist to platform.
@@ -436,11 +444,15 @@ export async function registerRoutes(
       let useConnectEff = useConnect;
       let session: Stripe.Checkout.Session | undefined;
       for (let attempt = 0; attempt < 2 && !session; attempt++) {
+        const tCreate = Date.now();
+        console.log(`[bids][timing] calling stripe.checkout.sessions.create() (attempt ${attempt + 1}, connect=${useConnectEff})...`);
         try {
           session = await stripe.checkout.sessions.create(
             buildSessionParams(useConnectEff),
           );
+          console.log(`[bids][timing] sessions.create() took ${Date.now() - tCreate}ms; total since handler start ${Date.now() - t0}ms`);
         } catch (stripeErr: any) {
+          console.log(`[bids][timing] sessions.create() FAILED after ${Date.now() - tCreate}ms (attempt ${attempt + 1})`);
           if (useConnectEff && isInvalidDestinationError(stripeErr)) {
             console.error(
               `[bids] Connect destination ${artist.stripeAccountId} rejected by Stripe (${stripeErr?.message}); ` +
@@ -465,16 +477,19 @@ export async function registerRoutes(
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
       }
-      // Log the REAL Stripe error server-side (type/code/param/requestId) so the
-      // true cause is visible in deployment logs, and surface a meaningful
+      // Log the REAL error server-side (type/code/param/requestId + FULL stack)
+      // so the true cause is visible in deployment logs, and surface a meaningful
       // message to the client instead of a vague "client disconnected".
       console.error("[bids] Bid hold creation failed:", {
+        name: err?.name,
         type: err?.type,
         code: err?.code,
         param: err?.param,
+        statusCode: err?.statusCode,
         requestId: err?.requestId,
         message: err?.message,
       });
+      console.error("[bids] Full error stack:", err?.stack || err);
       const clientMessage =
         typeof err?.type === 'string' && err.type.startsWith('Stripe')
           ? `Payment setup failed: ${err.message}`

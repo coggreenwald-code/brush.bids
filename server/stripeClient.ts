@@ -2,6 +2,7 @@
 // Uses Replit's Stripe connection API for credentials
 
 import Stripe from 'stripe';
+import https from 'https';
 
 let connectionSettings: any;
 
@@ -66,14 +67,29 @@ async function fetchCredentials(): Promise<CachedCreds> {
   };
 }
 
-// Shared Stripe SDK options. maxNetworkRetries + a generous timeout make the
-// SDK retry transient connection blips instead of bubbling up a
-// StripeConnectionError ("...client disconnected before the request was
-// completed"), which is what was failing POST /api/bids on the live deployment.
+// ROOT CAUSE of the POST /api/bids 500s on the live autoscale deployment:
+// the request failed fast (~1.2s, NOT a timeout) with a Stripe-typed
+// StripeConnectionError whose message was "The client disconnected before the
+// request was completed." That string is NOT in the Stripe SDK — it's an
+// underlying socket reset the SDK wraps.
+//
+// Node 20 defaults the global HTTPS agent to keepAlive:true. On autoscale the
+// instance idles between bids; the pooled outbound socket to Stripe gets closed
+// by Stripe's LB / the egress proxy; the next bid writes to that dead socket and
+// resets instantly. The SDK's network retries can all grab stale pooled sockets
+// in the same tick, so they don't save it.
+//
+// Fix: give the Stripe client its own agent that does NOT reuse idle sockets, so
+// every Stripe call opens a known-good connection. The extra TLS handshake
+// (~150ms) is negligible next to hard-failing the buyer's bid. maxNetworkRetries
+// stays as a safety net for genuine transient blips.
+const stripeAgent = new https.Agent({ keepAlive: false });
+
 const STRIPE_OPTIONS: Stripe.StripeConfig = {
   apiVersion: '2025-11-17.clover',
   maxNetworkRetries: 2,
   timeout: 30000,
+  httpAgent: stripeAgent,
 };
 
 let clientCache: { env: string; client: Stripe; expires: number } | null = null;
