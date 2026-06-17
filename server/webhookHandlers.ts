@@ -6,7 +6,7 @@
 import type Stripe from 'stripe';
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
-import { releaseLosingHoldsForArtwork } from './auctionScheduler';
+import { releaseLosingHoldsForArtwork, queueManualPayoutForBid } from './auctionScheduler';
 import { persistTaxFromCheckoutSession, persistTaxIfMissing } from './taxPersistence';
 import { sendPayoutReadyEmail, sendPayoutRestrictedEmail } from './emailService';
 
@@ -88,6 +88,121 @@ async function ensureBidAuthorized(opts: {
   }
 }
 
+// Buy It Now settlement. The buyout PI is charged immediately (automatic
+// capture), so by the time this fires the buyer's card is already debited.
+// We must: (1) atomically claim the sale to guarantee a buyout and a winning
+// bid never both succeed, (2) end the auction, (3) record the captured sale as
+// a bid row (payouts.bidId requires one), (4) persist tax, (5) queue the manual
+// payout if the artist isn't on Connect, (6) release every other bidder's hold.
+// Idempotent against duplicate webhook deliveries.
+async function handleBuyoutCompleted(opts: {
+  artworkId: number;
+  bidderId: string;
+  amount: number;
+  sessionId: string;
+  paymentIntentId: string;
+}): Promise<void> {
+  const { artworkId, bidderId, amount, sessionId, paymentIntentId } = opts;
+  const stripe = await getUncachableStripeClient();
+
+  // Idempotency: if we've already recorded & captured this buyout, we're done.
+  let bid = await storage.getBidByCheckoutSession(sessionId);
+  if (!bid) bid = await storage.getBidByPaymentIntent(paymentIntentId);
+  if (bid && bid.holdStatus === 'captured') {
+    await persistTaxIfMissing(sessionId, paymentIntentId);
+    return;
+  }
+
+  const artwork = await storage.getArtwork(artworkId);
+  if (!artwork) {
+    console.error(`[buyout] artwork ${artworkId} missing; refunding ${paymentIntentId}`);
+    await stripe.refunds.create({ payment_intent: paymentIntentId }).catch(() => {});
+    return;
+  }
+
+  // Atomic double-sale guard. Only one of {buyout, winning-bid capture} can set
+  // paidAt. If we lose the race, refund the immediate charge and bail.
+  let owned = await storage.tryClaimArtworkSale(artworkId, bidderId);
+  if (!owned) {
+    const fresh = await storage.getArtwork(artworkId);
+    if (fresh?.paidBy === bidderId) {
+      // We already claimed it on a previous (partial) delivery — finish the
+      // remaining idempotent steps below rather than refunding.
+      owned = true;
+    } else {
+      console.warn(`[buyout] lost sale race for artwork ${artworkId}; refunding ${paymentIntentId}`);
+      await stripe.refunds.create({ payment_intent: paymentIntentId }).catch((err) =>
+        console.error(`[buyout] refund failed for ${paymentIntentId}:`, err));
+      if (!bid) {
+        await storage.createBid({
+          artworkId,
+          bidderId,
+          amount: amount.toFixed(2),
+          stripeCheckoutSessionId: sessionId,
+          stripePaymentIntentId: paymentIntentId,
+          holdStatus: 'canceled',
+        });
+      } else {
+        await storage.updateBidByPaymentIntent(paymentIntentId, { holdStatus: 'canceled' });
+      }
+      return;
+    }
+  }
+
+  // End the auction right now so the scheduler won't try to capture a bid.
+  await storage.extendAuctionEndTime(artworkId, new Date());
+
+  // Record the captured sale as a bid row (required for payout linkage).
+  let pi: Stripe.PaymentIntent | undefined;
+  try {
+    pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+  } catch (err) {
+    console.error(`[buyout] retrieve PI ${paymentIntentId} failed:`, err);
+  }
+  const meta = pi?.metadata ?? {};
+  if (!bid) {
+    bid = await storage.createBid({
+      artworkId,
+      bidderId,
+      amount: amount.toFixed(2),
+      stripeCheckoutSessionId: sessionId,
+      stripePaymentIntentId: paymentIntentId,
+      holdStatus: 'captured',
+      capturedAt: new Date(),
+      shippingCarrier: meta.shippingCarrier ?? undefined,
+      shippingService: meta.shippingService ?? undefined,
+      shippingAmount: meta.shippingAmount ?? undefined,
+    });
+  } else {
+    bid = await storage.markBidCaptured(paymentIntentId);
+  }
+
+  // Persist sales tax + ship-to onto the bid row.
+  await persistTaxFromCheckoutSession(sessionId, paymentIntentId);
+
+  // Manual payout queue when the artist isn't on Stripe Connect (funds landed
+  // on the platform balance). Connect artists were paid via transfer_data.
+  const isManualPayout = meta.payoutKind === 'manual' || !pi?.transfer_data;
+  if (isManualPayout && bid) {
+    const bidCents = Math.round(amount * 100);
+    await queueManualPayoutForBid(bid, artwork, bidCents);
+  }
+
+  // Release every OTHER bidder's authorized hold for this artwork.
+  const others = await storage.getAuthorizedBidsForArtwork(artworkId);
+  for (const other of others) {
+    if (!other.stripePaymentIntentId || other.id === bid?.id) continue;
+    try {
+      await stripe.paymentIntents.cancel(other.stripePaymentIntentId);
+      await storage.updateBidByPaymentIntent(other.stripePaymentIntentId, { holdStatus: 'canceled' });
+    } catch (err) {
+      console.error(`[buyout] failed to release hold ${other.id}:`, err);
+    }
+  }
+
+  console.log(`[buyout] artwork ${artworkId} sold via Buy It Now to ${bidderId} (${isManualPayout ? 'manual payout queued' : 'connect transfer'})`);
+}
+
 export class WebhookHandlers {
   static async processWebhook(payload: Buffer, signature: string): Promise<void> {
     if (!Buffer.isBuffer(payload)) {
@@ -165,6 +280,27 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
     await ensureBidAuthorized({ artworkId, bidderId, amount, sessionId: session.id, paymentIntentId });
     await persistTaxFromCheckoutSession(session.id, paymentIntentId);
+    return;
+  }
+
+  if (kind === 'buyout') {
+    const paymentIntentId = typeof session.payment_intent === 'string'
+      ? session.payment_intent
+      : session.payment_intent?.id;
+    if (!paymentIntentId) {
+      console.warn(`buyout session ${session.id} has no payment_intent`);
+      return;
+    }
+    const artworkId = Number(session.metadata?.artworkId);
+    const bidderId = String(session.metadata?.bidderId || '');
+    const subtotalCents = session.amount_subtotal ?? 0;
+    const metaAmount = Number(session.metadata?.bidAmount || 0);
+    const amount = subtotalCents > 0 ? subtotalCents / 100 : metaAmount;
+    if (!artworkId || !bidderId || !amount) {
+      console.warn(`buyout session ${session.id} missing required metadata`);
+      return;
+    }
+    await handleBuyoutCompleted({ artworkId, bidderId, amount, sessionId: session.id, paymentIntentId });
     return;
   }
 

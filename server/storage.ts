@@ -100,6 +100,7 @@ export interface IStorage {
   updateArtworkImage(id: number, imageUrl: string): Promise<Artwork>;
   setArtworkCheckoutSession(id: number, stripeSessionId: string, expectedPaidBy: string): Promise<Artwork>;
   markArtworkPaid(id: number, paidBy?: string): Promise<Artwork | null>;
+  tryClaimArtworkSale(id: number, paidBy: string): Promise<boolean>;
   getArtworkBySessionId(sessionId: string): Promise<Artwork | undefined>;
   updateArtworkPromotion(id: number, promotionPercentage: number): Promise<Artwork>;
   getApprovedArtworksSortedByPromotion(): Promise<Artwork[]>;
@@ -338,6 +339,18 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!updated) return await this.getArtwork(id) || null;
     return updated;
+  }
+
+  // Atomically claim an artwork as sold. Returns true ONLY if this call set
+  // paidAt (i.e. won the race); returns false if the artwork was already paid.
+  // This is the single source of truth for the buyout-vs-winning-bid guard:
+  // whoever claims first owns the sale, the loser must refund/release.
+  async tryClaimArtworkSale(id: number, paidBy: string): Promise<boolean> {
+    const [updated] = await db.update(artworks)
+      .set({ paidAt: new Date(), paidBy })
+      .where(sql`${artworks.id} = ${id} AND ${artworks.paidAt} IS NULL`)
+      .returning();
+    return !!updated;
   }
 
   async getArtworkBySessionId(sessionId: string): Promise<Artwork | undefined> {

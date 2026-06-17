@@ -23,6 +23,10 @@ export const artworks = pgTable("artworks", {
   artistId: varchar("artist_id").references(() => users.id).notNull(),
   status: statusEnum("status").default("pending").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  // Optional "Buy It Now" / buyout price. When set (and > reserve price), a
+  // collector can purchase the artwork immediately at this price, ending the
+  // auction. NULL means no buyout option.
+  buyNowPrice: decimal("buy_now_price", { precision: 10, scale: 2 }),
   aiScore: integer("ai_score"),
   aiFeedback: text("ai_feedback"),
   charityId: integer("charity_id"),

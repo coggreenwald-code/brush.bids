@@ -276,6 +276,35 @@ export const api = {
       },
     },
   },
+  // Buy It Now (buyout) — charges immediately at the artwork's buyNowPrice and
+  // ends the auction. Like the bid flow, no row is written synchronously; the
+  // webhook records the captured sale once Stripe confirms payment.
+  buyout: {
+    create: {
+      method: 'POST' as const,
+      path: '/api/buyout',
+      input: z.object({
+        artworkId: z.number(),
+        bidderId: z.string(),
+        shippingStreet: z.string().optional(),
+        shippingCity: z.string().optional(),
+        shippingState: z.string().optional(),
+        shippingPostalCode: z.string().optional(),
+        shippingCountry: z.string().optional(),
+        shippingCarrier: z.string().optional(),
+        shippingService: z.string().optional(),
+        shippingAmount: z.string().optional(),
+      }),
+      responses: {
+        200: z.object({
+          checkoutUrl: z.string().url(),
+          artworkId: z.number(),
+          amount: z.string(),
+        }),
+        400: errorSchemas.validation,
+      },
+    },
+  },
   // Charities
   charities: {
     list: {

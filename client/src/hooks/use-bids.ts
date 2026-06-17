@@ -51,3 +51,47 @@ export function usePlaceBid() {
     },
   });
 }
+
+type BuyNowInput = {
+  artworkId: number;
+  bidderId: string;
+  shippingStreet?: string;
+  shippingCity?: string;
+  shippingState?: string;
+  shippingPostalCode?: string;
+  shippingCountry?: string;
+  shippingCarrier?: string;
+  shippingService?: string;
+  shippingAmount?: string;
+};
+
+// Buy It Now — charges immediately. Redirects to Stripe Checkout; the sale is
+// finalized (artwork marked sold, auction ended, other holds released) by the
+// webhook once payment confirms.
+export function useBuyNow() {
+  return useMutation({
+    mutationFn: async (data: BuyNowInput) => {
+      const validated = api.buyout.create.input.parse(data);
+      const res = await fetch(api.buyout.create.path, {
+        method: api.buyout.create.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(validated),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        let message = 'Failed to start checkout';
+        try {
+          const body = await res.json();
+          if (body?.message) message = body.message;
+        } catch {/* non-JSON body */}
+        throw new Error(message);
+      }
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      if (data?.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    },
+  });
+}

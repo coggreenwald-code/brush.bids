@@ -102,6 +102,15 @@ export async function registerRoutes(
           field: "auctionDurationDays",
         });
       }
+      // Buy It Now price, when provided, must exceed the reserve/starting price.
+      if (input.buyNowPrice != null && input.buyNowPrice !== "") {
+        if (Number(input.buyNowPrice) <= Number(input.price)) {
+          return res.status(400).json({
+            message: "Buy It Now price must be higher than the reserve price.",
+            field: "buyNowPrice",
+          });
+        }
+      }
       const artwork = await storage.createArtwork(input);
       res.status(201).json(artwork);
     } catch (err) {
@@ -470,6 +479,161 @@ export async function registerRoutes(
         typeof err?.type === 'string' && err.type.startsWith('Stripe')
           ? `Payment setup failed: ${err.message}`
           : err?.message || "Failed to create bid hold";
+      res.status(500).json({ message: clientMessage });
+    }
+  });
+
+  // Buy It Now — immediate purchase at the artwork's buyNowPrice. Unlike the
+  // bid flow (manual capture / card hold), this charges the buyer's card
+  // RIGHT AWAY (automatic capture). On success the webhook marks the artwork
+  // sold, ends the auction, releases other bidders' holds, and routes payout.
+  app.post(api.buyout.create.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "You must be signed in to buy" });
+    }
+    try {
+      const input = api.buyout.create.input.parse(req.body);
+      const bidderId = (req.user as any).id || (req.user as any).claims?.sub;
+      if (input.bidderId !== bidderId) {
+        return res.status(403).json({ message: "Buyer mismatch" });
+      }
+
+      const artwork = await storage.getArtwork(input.artworkId);
+      if (!artwork) return res.status(404).json({ message: "Artwork not found" });
+      if (artwork.status !== "approved") return res.status(400).json({ message: "This artwork is not available for purchase" });
+      if (artwork.paidAt) return res.status(400).json({ message: "This artwork has already been sold" });
+      if (artwork.artistId === bidderId) return res.status(400).json({ message: "You cannot buy your own artwork" });
+      if (artwork.buyNowPrice == null) return res.status(400).json({ message: "This artwork doesn't have a Buy It Now price" });
+
+      const now = new Date();
+      let auctionEndTime: Date;
+      if (artwork.endTime) {
+        auctionEndTime = new Date(artwork.endTime);
+      } else {
+        auctionEndTime = new Date(artwork.createdAt || now);
+        auctionEndTime.setDate(auctionEndTime.getDate() + (artwork.auctionDurationDays || 7));
+      }
+      if (now >= auctionEndTime) return res.status(400).json({ message: "This auction has ended" });
+
+      const artist = await storage.getUser(artwork.artistId);
+      if (!artist) return res.status(404).json({ message: "Artist not found" });
+      const useConnect = hasStripeConnectReady(artist);
+
+      const stripe = await getStripeClient();
+      const buyNowAmount = Number(artwork.buyNowPrice);
+      const amountCents = Math.round(buyNowAmount * 100);
+      // Same split as bids: 75% artist / 20% platform / 5% charity, with boost
+      // shifting from artist to platform.
+      const boostPct = Math.max(0, Math.min(75, artwork.promotionPercentage || 0));
+      const appFeeCents = Math.min(amountCents, Math.round(amountCents * (0.25 + boostPct / 100)));
+
+      const origin = getAppOrigin();
+
+      const buildSessionParams = (
+        useConnectFlag: boolean,
+      ): Stripe.Checkout.SessionCreateParams => {
+        const sharedMetadata: Record<string, string> = {
+          kind: 'buyout',
+          artworkId: String(artwork.id),
+          bidderId,
+          bidAmount: String(buyNowAmount),
+          baseAppFeeCents: String(appFeeCents),
+          payoutKind: useConnectFlag ? 'connect' : 'manual',
+        };
+        if (input.shippingCarrier) sharedMetadata.shippingCarrier = input.shippingCarrier;
+        if (input.shippingService) sharedMetadata.shippingService = input.shippingService;
+        if (input.shippingAmount) sharedMetadata.shippingAmount = input.shippingAmount;
+        return {
+          payment_method_types: ['card'],
+          mode: 'payment',
+          customer_email: (req.user as any).email || undefined,
+          customer_creation: 'always',
+          billing_address_collection: 'required',
+          shipping_address_collection: { allowed_countries: ['US'] },
+          automatic_tax: { enabled: true },
+          line_items: [{
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `Buy It Now: ${artwork.title}`,
+                description: `Immediate purchase of "${artwork.title}". Your card is charged now and the auction ends. Sales tax shown below is collected by BrushBids as the marketplace facilitator.`,
+                images: artwork.imageUrl ? [artwork.imageUrl] : [],
+                tax_code: 'txcd_99999999',
+              },
+              unit_amount: amountCents,
+              tax_behavior: 'exclusive',
+            },
+            quantity: 1,
+          }],
+          payment_intent_data: {
+            // Immediate charge (no manual hold) — buyout pays right away.
+            // For Connect artists, bump the application_fee at session time so
+            // platform retains its cut + collected tax; artist payout stays
+            // based on the pre-tax buyout price.
+            ...(useConnectFlag
+              ? {
+                  application_fee_amount: appFeeCents,
+                  transfer_data: { destination: artist.stripeAccountId! },
+                }
+              : {}),
+            metadata: sharedMetadata,
+          },
+          metadata: sharedMetadata,
+          expires_at: Math.max(
+            Math.floor(Date.now() / 1000) + 30 * 60,
+            Math.floor(Math.min(auctionEndTime.getTime(), Date.now() + 24 * 60 * 60 * 1000) / 1000),
+          ),
+          success_url: `${origin}/artwork/${artwork.id}?buyout=success&amount=${buyNowAmount}`,
+          cancel_url: `${origin}/artwork/${artwork.id}?buyout=cancelled`,
+        };
+      };
+
+      const isInvalidDestinationError = (e: any) =>
+        e?.type === 'StripeInvalidRequestError' &&
+        (/destination/i.test(e?.param || '') ||
+          /no such destination|test mode|live mode|does not have access|destination account|connected account/i.test(e?.message || ''));
+
+      let useConnectEff = useConnect;
+      let session: Stripe.Checkout.Session | undefined;
+      for (let attempt = 0; attempt < 2 && !session; attempt++) {
+        try {
+          session = await stripe.checkout.sessions.create(
+            buildSessionParams(useConnectEff),
+          );
+        } catch (stripeErr: any) {
+          if (useConnectEff && isInvalidDestinationError(stripeErr)) {
+            console.error(
+              `[buyout] Connect destination ${artist.stripeAccountId} rejected by Stripe (${stripeErr?.message}); ` +
+                `falling back to the manual payout queue for artwork ${artwork.id}.`,
+            );
+            useConnectEff = false;
+            continue;
+          }
+          throw stripeErr;
+        }
+      }
+      if (!session) throw new Error('Could not create buyout checkout session');
+
+      res.status(200).json({
+        artworkId: input.artworkId,
+        amount: String(buyNowAmount),
+        checkoutUrl: session.url,
+      });
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message, field: err.errors[0].path.join('.') });
+      }
+      console.error("[buyout] Buyout checkout creation failed:", {
+        type: err?.type,
+        code: err?.code,
+        param: err?.param,
+        requestId: err?.requestId,
+        message: err?.message,
+      });
+      const clientMessage =
+        typeof err?.type === 'string' && err.type.startsWith('Stripe')
+          ? `Payment setup failed: ${err.message}`
+          : err?.message || "Failed to start checkout";
       res.status(500).json({ message: clientMessage });
     }
   });

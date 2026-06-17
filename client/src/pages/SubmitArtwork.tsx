@@ -23,6 +23,9 @@ const formSchema = z.object({
   description: z.string().min(10, "Description too short"),
   imageUrl: z.string().min(1, "Please upload an image of your artwork"),
   price: z.coerce.number().min(1, "Price must be positive"),
+  // Optional Buy It Now price. 0 / empty means no buyout. When set it must be
+  // higher than the reserve price (validated in the refine below).
+  buyNowPrice: z.coerce.number().min(0).optional(),
   dimensionLength: z.coerce.number().min(0.1, "Length is required"),
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
   weightOz: z.coerce.number().min(1, "Weight is required").optional(),
@@ -30,6 +33,9 @@ const formSchema = z.object({
   charityId: z.coerce.number().optional(),
   charityNote: z.string().max(200).optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
+}).refine((d) => !d.buyNowPrice || d.buyNowPrice > d.price, {
+  message: "Buy It Now price must be higher than the reserve price",
+  path: ["buyNowPrice"],
 });
 
 export default function SubmitArtwork() {
@@ -194,6 +200,7 @@ export default function SubmitArtwork() {
       charityNote: isOther ? rest.charityNote : undefined,
       artistId: user.id,
       price: data.price.toString(),
+      buyNowPrice: data.buyNowPrice && data.buyNowPrice > 0 ? data.buyNowPrice.toString() : undefined,
       dimensions,
     } as any, {
       onSuccess: () => {
@@ -293,6 +300,23 @@ export default function SubmitArtwork() {
                       <FormControl>
                         <Input type="number" placeholder="50.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="buyNowPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white/70">Buy It Now Price ($) <span className="text-white/40 font-normal">— optional</span></FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="e.g. 250.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} value={field.value ?? ""} data-testid="input-buy-now-price" />
+                      </FormControl>
+                      <FormDescription className="text-white/40">
+                        Let collectors purchase instantly at this price, ending the auction early. Must be higher than the reserve price.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

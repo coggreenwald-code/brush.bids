@@ -94,12 +94,27 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
         ? {}
         : { application_fee_amount: Math.min(totalCents, baseFeeCents + taxCents) };
       await stripe.paymentIntents.capture(currentWinner.stripePaymentIntentId, captureArgs);
-      await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId);
+      // Atomically claim the sale. If a Buy It Now purchase won concurrently
+      // (paidAt already set by someone else), refund this just-captured charge
+      // so a buyout and a winning bid never both succeed.
+      const claimed = await storage.tryClaimArtworkSale(artworkId, currentWinner.bidderId);
+      if (!claimed) {
+        console.warn(`[scheduler] artwork ${artworkId} already sold (buyout) — refunding captured bid ${currentWinner.id}`);
+        await stripe.refunds.create({ payment_intent: currentWinner.stripePaymentIntentId }).catch(err =>
+          console.error(`[scheduler] refund failed for bid ${currentWinner.id}:`, err));
+        await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "canceled" });
+        return false;
+      }
+      // The sale is now claimed (paidAt set), so the scheduler will never
+      // revisit this artwork. Run the money-critical finalization steps first
+      // and make tax persistence best-effort so a failure in auxiliary
+      // bookkeeping can't strand an already-captured, already-claimed sale.
       await storage.markBidCaptured(currentWinner.stripePaymentIntentId);
-      await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
       if (isManualPayout) {
         await queueManualPayoutForBid(currentWinner, artwork, bidCents);
       }
+      await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId)
+        .catch(err => console.error(`[scheduler] tax persist failed for bid ${currentWinner.id}:`, err));
       console.log(`[scheduler] captured winning bid ${currentWinner.id} for artwork ${artworkId} (bid ${bidCents}c + tax ${taxCents}c, ${isManualPayout ? "manual payout queued" : "connect transfer"})`);
       break;
     } catch (err: any) {
@@ -108,14 +123,24 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
       // the actual PI status before deciding.
       const pi = await stripe.paymentIntents.retrieve(currentWinner.stripePaymentIntentId);
       if (pi.status === "succeeded") {
-        await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId);
+        const claimed = await storage.tryClaimArtworkSale(artworkId, currentWinner.bidderId);
+        if (!claimed) {
+          console.warn(`[scheduler] artwork ${artworkId} already sold (buyout) — refunding captured bid ${currentWinner.id}`);
+          await stripe.refunds.create({ payment_intent: currentWinner.stripePaymentIntentId }).catch(refundErr =>
+            console.error(`[scheduler] refund failed for bid ${currentWinner.id}:`, refundErr));
+          await storage.updateBidByPaymentIntent(currentWinner.stripePaymentIntentId, { holdStatus: "canceled" });
+          return false;
+        }
+        // Money-critical steps first; tax persistence best-effort so it can't
+        // strand an already-claimed sale (paidAt set → no scheduler retry).
         await storage.markBidCaptured(currentWinner.stripePaymentIntentId);
-        await storage.markArtworkPaid(artworkId, currentWinner.bidderId);
         const isManualPayout = (pi.metadata?.payoutKind === "manual") || !pi.transfer_data;
         if (isManualPayout) {
           const bidCents = Math.round(Number(currentWinner.amount) * 100);
           await queueManualPayoutForBid(currentWinner, artwork, bidCents);
         }
+        await persistTaxIfMissing(currentWinner.stripeCheckoutSessionId, currentWinner.stripePaymentIntentId)
+          .catch(taxErr => console.error(`[scheduler] tax persist failed for bid ${currentWinner.id}:`, taxErr));
         break;
       }
       console.warn(`[scheduler] bid ${currentWinner.id} not capturable (${pi.status}); falling back`);
@@ -145,7 +170,7 @@ async function settleArtwork(artworkId: number): Promise<boolean> {
 // The amount queued is the artist's pre-tax share after the platform's cut and
 // any promotion boost — charity (5%) is held back too and the admin can decide
 // how to disburse it later.
-async function queueManualPayoutForBid(
+export async function queueManualPayoutForBid(
   bid: { id: number; bidderId: string; amount: string },
   artwork: { id: number; artistId: string; promotionPercentage: string | number | null },
   bidCents: number,

@@ -3,7 +3,7 @@ import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtwork } from "@/hooks/use-artworks";
 import { handleArtworkImageError } from "@/lib/imageFallback";
-import { useBids, usePlaceBid } from "@/hooks/use-bids";
+import { useBids, usePlaceBid, useBuyNow } from "@/hooks/use-bids";
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Copy, Check, User, QrCode, Ruler, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Loader2, DollarSign, Clock, Heart, Share2, Twitter, Facebook, Copy, Check, User, QrCode, Ruler, ArrowLeft, AlertTriangle, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -92,18 +92,22 @@ export default function ArtworkDetail() {
   const { data: bids, isLoading: loadingBids } = useBids(id);
   const { user } = useAuth();
   const placeBid = usePlaceBid();
+  const buyNow = useBuyNow();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [showShipping, setShowShipping] = useState(false);
   const [pendingBidAmount, setPendingBidAmount] = useState<number>(0);
+  // Which flow the shipping modal is collecting an address for.
+  const [checkoutMode, setCheckoutMode] = useState<'bid' | 'buyout'>('bid');
 
   const [pendingBidSuccess, setPendingBidSuccess] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const bidParam = params.get('bid');
+    const buyoutParam = params.get('buyout');
     if (bidParam === 'success') {
       setPendingBidSuccess(true);
       window.history.replaceState({}, "", window.location.pathname);
@@ -111,6 +115,19 @@ export default function ArtworkDetail() {
       toast({
         title: "Bid cancelled",
         description: "No charge was made. You can try again any time before the auction ends.",
+        variant: "destructive",
+      });
+      window.history.replaceState({}, "", window.location.pathname);
+    } else if (buyoutParam === 'success') {
+      toast({
+        title: "Purchase complete!",
+        description: "Your card has been charged and the artwork is yours. The auction is now closed.",
+      });
+      window.history.replaceState({}, "", window.location.pathname);
+    } else if (buyoutParam === 'cancelled') {
+      toast({
+        title: "Purchase cancelled",
+        description: "No charge was made. The artwork is still available.",
         variant: "destructive",
       });
       window.history.replaceState({}, "", window.location.pathname);
@@ -260,13 +277,55 @@ export default function ArtworkDetail() {
       toast({ title: "Please login", description: "You must be logged in to place a bid", variant: "destructive" });
       return;
     }
+    setCheckoutMode('bid');
     setPendingBidAmount(amount);
+    setShowShipping(true);
+  };
+
+  const doBuyNow = (amount: number, shipping: Parameters<typeof doPlaceBid>[1]) => {
+    buyNow.mutate({
+      artworkId: artwork.id,
+      bidderId: user!.id as unknown as string,
+      ...(shipping ? {
+        shippingStreet: shipping.toStreet,
+        shippingCity: shipping.toCity,
+        shippingState: shipping.toState,
+        shippingPostalCode: shipping.toZip,
+        shippingCountry: "US",
+        shippingCarrier: shipping.carrier,
+        shippingService: shipping.service,
+        shippingAmount: shipping.shippingAmount.toString(),
+      } : {}),
+    }, {
+      onSuccess: (data: { checkoutUrl?: string } | undefined) => {
+        if (data?.checkoutUrl) {
+          toast({ title: "Taking you to checkout…", description: `Your card will be charged $${amount.toLocaleString()} to buy this artwork now.` });
+        }
+      },
+      onError: (err: Error) => {
+        toast({ title: "Purchase failed", description: err.message, variant: "destructive" });
+      },
+    });
+  };
+
+  const handleBuyNowClick = () => {
+    if (!user) {
+      toast({ title: "Please login", description: "You must be logged in to buy this artwork", variant: "destructive" });
+      return;
+    }
+    if (artwork.buyNowPrice == null) return;
+    setCheckoutMode('buyout');
+    setPendingBidAmount(Number(artwork.buyNowPrice));
     setShowShipping(true);
   };
 
   const handleShippingConfirm = (shipping: Parameters<typeof doPlaceBid>[1]) => {
     setShowShipping(false);
-    doPlaceBid(pendingBidAmount, shipping);
+    if (checkoutMode === 'buyout') {
+      doBuyNow(pendingBidAmount, shipping);
+    } else {
+      doPlaceBid(pendingBidAmount, shipping);
+    }
   };
 
   const handleCopyLink = () => {
@@ -522,6 +581,28 @@ export default function ArtworkDetail() {
                       )}
                     />
                   </form>
+                  {artwork.buyNowPrice != null && !isOwnArtwork && (
+                    <div className="pt-2">
+                      <div className="relative flex items-center my-1">
+                        <div className="flex-1 h-px bg-white/10" />
+                        <span className="px-3 text-xs uppercase tracking-widest text-white/30">or</span>
+                        <div className="flex-1 h-px bg-white/10" />
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleBuyNowClick}
+                        disabled={buyNow.isPending}
+                        className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold hover:opacity-90"
+                        data-testid="button-buy-now"
+                      >
+                        <Zap className="w-4 h-4 mr-2" />
+                        {buyNow.isPending ? "Starting checkout…" : `Buy It Now — $${Number(artwork.buyNowPrice).toLocaleString()}`}
+                      </Button>
+                      <p className="text-xs text-white/30 mt-2 text-center">
+                        Skip the auction — purchase instantly. Your card is charged now (plus tax) and the auction ends immediately.
+                      </p>
+                    </div>
+                  )}
                 </Form>
               ) : isAuctionEnded && artwork.status === 'approved' ? (
                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-md text-center" data-testid="auction-ended-notice">
