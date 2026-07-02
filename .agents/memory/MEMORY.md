@@ -4,3 +4,4 @@
 - [Autoscale stale-socket resets](autoscale-stripe-keepalive.md) — fast (~1s) connection errors on autoscale = reused dead keep-alive sockets; give external clients `keepAlive:false` agent, not just retries.
 - [Buyout & settlement](buyout-and-settlement.md) — shipping not charged via Stripe (bid+tax only); double-sale guard via atomic tryClaimArtworkSale; scheduler never retries a paidAt artwork so post-claim steps must be best-effort.
 - [Bid-hold Stripe resilience](bid-hold-stripe-resilience.md) — tax must fail closed (never disable automatic_tax); Connect destination may fall back to manual payout; surface real Stripe errors.
+- [Deployment vs repo drift](deploy-vs-repo-drift.md) — autoscale runs last-published build; a repo fix isn't live until republish; prove via publish-commit order + absence of new log lines.
