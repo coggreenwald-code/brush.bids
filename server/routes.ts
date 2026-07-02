@@ -111,6 +111,17 @@ export async function registerRoutes(
           });
         }
       }
+      // Require a COMPLETE ship-from address up front so no biddable artwork is
+      // ever missing one (which would 422 a buyer's shipping-rate lookup
+      // mid-bid). This prompts the artist early instead of failing at approval.
+      const submittingArtist = await storage.getUser(userId);
+      if (!submittingArtist?.shipFromStreet || !submittingArtist?.shipFromCity ||
+          !submittingArtist?.shipFromState || !submittingArtist?.shipFromZip) {
+        return res.status(400).json({
+          message: "Add your complete ship-from address (street, city, state, ZIP) in Dashboard → Shipping before submitting artwork, so buyers can get live shipping rates.",
+          field: "shipFrom",
+        });
+      }
       const artwork = await storage.createArtwork(input);
       res.status(201).json(artwork);
     } catch (err) {
@@ -1032,11 +1043,14 @@ export async function registerRoutes(
   app.patch("/api/users/me/ship-from", async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Not authenticated" });
     const userId = (req.user as any).claims?.sub || (req.user as any).id;
+    // Trim + format-validate so a "complete" ship-from address is actually
+    // usable by EasyPost — whitespace-only or malformed values must not pass,
+    // otherwise the artwork goes live but the buyer's rate lookup 502s later.
     const schema = z.object({
-      shipFromStreet: z.string().min(3),
-      shipFromCity: z.string().min(2),
-      shipFromState: z.string().length(2, "Use 2-letter state code, e.g. NY"),
-      shipFromZip: z.string().min(5),
+      shipFromStreet: z.string().trim().min(3, "Enter a valid street address"),
+      shipFromCity: z.string().trim().min(2, "Enter a valid city"),
+      shipFromState: z.string().trim().toUpperCase().regex(/^[A-Z]{2}$/, "Use a 2-letter state code, e.g. NY"),
+      shipFromZip: z.string().trim().regex(/^\d{5}(-\d{4})?$/, "Enter a valid US ZIP code"),
     });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
@@ -1172,6 +1186,16 @@ export async function registerRoutes(
     }
     try {
       const { auctionDurationDays, charityId, charityNote, reviewType } = api.portfolio.convertToAuction.input.parse(req.body);
+      // Same ship-from requirement as a direct submission — a converted
+      // portfolio piece becomes a biddable auction and must have a from-address.
+      const convertingArtist = await storage.getUser(item.artistId);
+      if (!convertingArtist?.shipFromStreet || !convertingArtist?.shipFromCity ||
+          !convertingArtist?.shipFromState || !convertingArtist?.shipFromZip) {
+        return res.status(400).json({
+          message: "Add your complete ship-from address (street, city, state, ZIP) in Dashboard → Shipping before listing this piece for auction.",
+          field: "shipFrom",
+        });
+      }
       const artwork = await storage.createArtwork({
         title: item.title,
         description: item.description || "",

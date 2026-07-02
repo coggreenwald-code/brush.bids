@@ -56,18 +56,38 @@ export async function getEasyPostRates(opts: EasyPostRateOpts): Promise<Shipping
   };
 
   const encoded = Buffer.from(apiKey + ":").toString("base64");
-  const resp = await fetch("https://api.easypost.com/v2/shipments", {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${encoded}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+
+  let resp: Response;
+  try {
+    resp = await fetch("https://api.easypost.com/v2/shipments", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${encoded}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (netErr: any) {
+    // Network-level failure reaching EasyPost (DNS, TLS, timeout). Log the real
+    // cause so it's visible in deployment logs, not a generic error.
+    console.error(`[easypost] network error calling EasyPost: ${netErr?.message || netErr}`);
+    throw new Error(`Could not reach the shipping service: ${netErr?.message || "network error"}`);
+  }
 
   if (!resp.ok) {
+    // Surface the REAL EasyPost error (HTTP status + their error.message) both
+    // in the server logs and to the caller, instead of a generic failure.
     const text = await resp.text();
-    throw new Error(`EasyPost API error ${resp.status}: ${text}`);
+    let apiMessage = text;
+    try {
+      const parsed = JSON.parse(text);
+      apiMessage = parsed?.error?.message || parsed?.error || text;
+      if (typeof apiMessage !== "string") apiMessage = JSON.stringify(apiMessage);
+    } catch {
+      /* body wasn't JSON — keep raw text */
+    }
+    console.error(`[easypost] API error ${resp.status}: ${apiMessage}`);
+    throw new Error(`EasyPost API error ${resp.status}: ${apiMessage}`);
   }
 
   const data = await resp.json();
