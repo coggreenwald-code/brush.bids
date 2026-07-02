@@ -23,6 +23,17 @@ const allowedMimeTypes = new Set([
   "image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp", "image/tiff",
 ]);
 
+// Stripe requires product_data.images to be real http(s) URLs of <= 2048 chars.
+// Our artwork images are often stored as base64 data URLs (tens of thousands of
+// chars), which Stripe rejects. Only pass through valid, short http(s) URLs;
+// otherwise omit images so the checkout session still creates.
+function stripeProductImages(imageUrl?: string | null): string[] {
+  if (!imageUrl) return [];
+  if (imageUrl.length > 2048) return [];
+  if (!/^https?:\/\//i.test(imageUrl)) return [];
+  return [imageUrl];
+}
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -482,7 +493,7 @@ export async function registerRoutes(
               product_data: {
                 name: `Bid hold: ${artwork.title}`,
                 description: `Card authorization for your bid on "${artwork.title}". Your card will only be charged if you win the auction. Sales tax shown below is collected by BrushBids as the marketplace facilitator.`,
-                images: artwork.imageUrl ? [artwork.imageUrl] : [],
+                images: stripeProductImages(artwork.imageUrl),
                 // General tangible goods. Stripe Tax matches this to state-level
                 // sales-tax rules. Override per artwork later if we add digital
                 // or service categories.
@@ -667,7 +678,7 @@ export async function registerRoutes(
               product_data: {
                 name: `Buy It Now: ${artwork.title}`,
                 description: `Immediate purchase of "${artwork.title}". Your card is charged now and the auction ends. Sales tax shown below is collected by BrushBids as the marketplace facilitator.`,
-                images: artwork.imageUrl ? [artwork.imageUrl] : [],
+                images: stripeProductImages(artwork.imageUrl),
                 tax_code: 'txcd_99999999',
               },
               unit_amount: amountCents,
