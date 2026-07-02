@@ -387,7 +387,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <SEOHead title="Dashboard | BrushBids" description="Manage your artworks, portfolio, earnings, and profile on BrushBids." />
-      <div className="space-y-8 px-4 md:px-0">
+      <div className="max-w-7xl mx-auto space-y-8 px-4 md:px-8">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div>
             <span className="text-sm font-medium text-[#A78BFA] uppercase tracking-widest">Your Studio</span>
@@ -729,8 +729,8 @@ export default function Dashboard() {
                             </div>
                             {(user as any)?.parentGuardianEmail && (
                               <div className="flex items-center justify-between py-2 border-b border-white/5">
-                                <span className="text-sm text-white/50">Parent email</span>
-                                <span className="text-sm text-white font-mono">{(user as any).parentGuardianEmail}</span>
+                                <span className="text-sm text-white/50 flex-shrink-0">Parent email</span>
+                                <span className="text-sm text-white font-mono min-w-0 break-all text-right pl-4">{(user as any).parentGuardianEmail}</span>
                               </div>
                             )}
                             {(user as any)?.parentPayoutMethod && (
@@ -741,8 +741,8 @@ export default function Dashboard() {
                             )}
                             {(user as any)?.parentPayoutHandle && (
                               <div className="flex items-center justify-between py-2">
-                                <span className="text-sm text-white/50">Parent handle</span>
-                                <span className="text-sm text-white font-mono">{(user as any).parentPayoutHandle}</span>
+                                <span className="text-sm text-white/50 flex-shrink-0">Parent handle</span>
+                                <span className="text-sm text-white font-mono min-w-0 break-all text-right pl-4">{(user as any).parentPayoutHandle}</span>
                               </div>
                             )}
                           </div>
@@ -756,8 +756,8 @@ export default function Dashboard() {
                             )}
                             {payoutStatus.handle && (
                               <div className="flex items-center justify-between py-2">
-                                <span className="text-sm text-white/50">Handle / email</span>
-                                <span className="text-sm text-white font-mono">{payoutStatus.handle}</span>
+                                <span className="text-sm text-white/50 flex-shrink-0">Handle / email</span>
+                                <span className="text-sm text-white font-mono min-w-0 break-all text-right pl-4">{payoutStatus.handle}</span>
                               </div>
                             )}
                           </div>

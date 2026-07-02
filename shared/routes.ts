@@ -144,6 +144,24 @@ export const api = {
         404: errorSchemas.notFound,
       },
     },
+    relist: {
+      method: 'POST' as const,
+      path: '/api/artworks/:id/relist',
+      input: z.object({
+        auctionDurationDays: z.union([
+          z.literal(1),
+          z.literal(3),
+          z.literal(5),
+          z.literal(7),
+        ]),
+      }),
+      responses: {
+        200: z.custom<typeof artworks.$inferSelect>(),
+        400: errorSchemas.validation,
+        403: z.object({ message: z.string() }),
+        404: errorSchemas.notFound,
+      },
+    },
     delete: {
       method: 'DELETE' as const,
       path: '/api/artworks/:id',

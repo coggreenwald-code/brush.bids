@@ -28,7 +28,7 @@ export default function Admin() {
 
   return (
     <Layout>
-      <div className="space-y-6 pb-16 px-4 md:px-0">
+      <div className="max-w-7xl mx-auto space-y-6 pb-16 px-4 md:px-8">
         <div style={{ paddingLeft: "10px" }}>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Administration</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1" data-testid="text-admin-title">Admin Portal</h1>

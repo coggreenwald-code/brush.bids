@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
-import { useArtwork } from "@/hooks/use-artworks";
+import { useArtwork, useRelistArtwork } from "@/hooks/use-artworks";
 import { handleArtworkImageError } from "@/lib/imageFallback";
 import { useBids, usePlaceBid, useBuyNow } from "@/hooks/use-bids";
 import { useRoute, Link } from "wouter";
@@ -93,6 +93,8 @@ export default function ArtworkDetail() {
   const { user } = useAuth();
   const placeBid = usePlaceBid();
   const buyNow = useBuyNow();
+  const relistArtwork = useRelistArtwork();
+  const [relistDuration, setRelistDuration] = useState<1 | 3 | 5 | 7>(7);
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -356,7 +358,7 @@ export default function ArtworkDetail() {
   return (
     <Layout>
       <SEOHead title={`${artwork.title} | BrushBids`} description={artwork.description.slice(0, 160)} />
-      <div className="w-full px-4 md:px-0">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="mb-8">
           <Link href="/gallery">
             <span className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors text-sm cursor-pointer" data-testid="link-back-gallery">
@@ -605,10 +607,63 @@ export default function ArtworkDetail() {
                   )}
                 </Form>
               ) : isAuctionEnded && artwork.status === 'approved' ? (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-md text-center" data-testid="auction-ended-notice">
-                  <p className="font-semibold text-red-400">Auction Has Ended</p>
-                  <p className="text-sm text-red-400/70 mt-1">Bidding is no longer available for this artwork.</p>
-                </div>
+                isOwnArtwork && !artwork.paidAt ? (
+                  <div className="p-4 bg-white/[0.02] border border-white/10 rounded-md space-y-4" data-testid="relist-panel">
+                    <div>
+                      <p className="font-semibold text-white">Auction ended without a sale</p>
+                      <p className="text-sm text-white/50 mt-1">
+                        Relist this piece to start a fresh auction. It stays approved and goes live again right away.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-violet-400 uppercase tracking-[0.2em] mb-2">New auction length</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        {([1, 3, 5, 7] as const).map((d) => (
+                          <button
+                            key={d}
+                            type="button"
+                            onClick={() => setRelistDuration(d)}
+                            className={`h-10 rounded-full text-sm font-medium border transition-colors ${
+                              relistDuration === d
+                                ? 'bg-white text-[#0a0a0f] border-white'
+                                : 'bg-transparent text-white/70 border-white/20 hover:bg-white/10'
+                            }`}
+                            data-testid={`button-relist-duration-${d}`}
+                          >
+                            {d}d
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        relistArtwork.mutate(
+                          { id: artwork.id, auctionDurationDays: relistDuration },
+                          {
+                            onSuccess: () =>
+                              toast({
+                                title: "Artwork relisted",
+                                description: `Your auction is live again for ${relistDuration} day${relistDuration > 1 ? 's' : ''}.`,
+                              }),
+                            onError: (err: Error) =>
+                              toast({ title: "Couldn't relist", description: err.message, variant: "destructive" }),
+                          },
+                        )
+                      }
+                      disabled={relistArtwork.isPending}
+                      className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-semibold hover:opacity-90"
+                      data-testid="button-relist"
+                    >
+                      {relistArtwork.isPending ? "Relisting…" : "Relist Auction"}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-md text-center" data-testid="auction-ended-notice">
+                    <p className="font-semibold text-red-400">Auction Has Ended</p>
+                    <p className="text-sm text-red-400/70 mt-1">Bidding is no longer available for this artwork.</p>
+                  </div>
+                )
               ) : (
                 <div className="p-4 bg-white/[0.02] border border-white/5 rounded-md text-center text-white/40">
                   Bidding is not open for this item yet.

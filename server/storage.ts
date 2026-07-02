@@ -108,6 +108,8 @@ export interface IStorage {
   incrementArtworkViews(id: number): Promise<void>;
   deleteArtwork(id: number): Promise<void>;
   extendAuctionEndTime(id: number, newEndTime: Date): Promise<Artwork>;
+  relistArtwork(id: number, opts: { endTime: Date; auctionDurationDays: number }): Promise<Artwork>;
+  deleteBidsForArtwork(artworkId: number): Promise<void>;
 
   getBidsForArtwork(artworkId: number): Promise<Bid[]>;
   getBidsForUser(userId: string): Promise<Array<{
@@ -365,6 +367,22 @@ export class DatabaseStorage implements IStorage {
         isNull(artworks.paidAt),
         lte(artworks.endTime, new Date()),
       ),
+    );
+  }
+
+  async relistArtwork(id: number, opts: { endTime: Date; auctionDurationDays: number }): Promise<Artwork> {
+    const [updated] = await db.update(artworks)
+      .set({ endTime: opts.endTime, auctionDurationDays: opts.auctionDurationDays })
+      .where(eq(artworks.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Clears prior bids for a fresh relisted auction. Never removes a captured
+  // bid (a real sale) — those are protected so history/payout rows stay intact.
+  async deleteBidsForArtwork(artworkId: number): Promise<void> {
+    await db.delete(bids).where(
+      and(eq(bids.artworkId, artworkId), ne(bids.holdStatus, "captured")),
     );
   }
 

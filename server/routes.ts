@@ -208,6 +208,90 @@ export async function registerRoutes(
     res.json({ message: "Artwork deleted successfully" });
   });
 
+  // Relist an ended, unsold auction. Only the owning artist may relist, and
+  // only once the auction has ended without a sale. Keeps the artwork's
+  // approved status so it goes live again without re-review.
+  app.post(api.artworks.relist.path, async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    const id = Number(req.params.id);
+    const artwork = await storage.getArtwork(id);
+
+    if (!artwork) {
+      return res.status(404).json({ message: "Artwork not found" });
+    }
+
+    const userId = (req.user as any).id || (req.user as any).claims?.sub;
+    if (artwork.artistId !== userId) {
+      return res.status(403).json({ message: "Only the artist can relist their artwork" });
+    }
+
+    if (artwork.status !== "approved") {
+      return res.status(400).json({ message: "Only approved artwork can be relisted" });
+    }
+
+    if (artwork.paidAt) {
+      return res.status(400).json({ message: "This artwork has already sold and cannot be relisted" });
+    }
+
+    // Strict "unsold" guard: a captured bid means funds were taken, so the sale
+    // is (or is becoming) final even if paidAt hasn't been stamped yet.
+    const existingBids = await storage.getBidsForArtwork(id);
+    if (existingBids.some((b) => b.holdStatus === "captured")) {
+      return res.status(400).json({ message: "This artwork has a completed sale and cannot be relisted" });
+    }
+
+    const auctionEnd = artwork.endTime ? new Date(artwork.endTime) : null;
+    if (!auctionEnd || auctionEnd > new Date()) {
+      return res.status(400).json({ message: "This auction is still running" });
+    }
+
+    try {
+      const { auctionDurationDays } = api.artworks.relist.input.parse(req.body);
+
+      // Release any authorization holds still lingering from the previous
+      // auction BEFORE clearing bids. This is fail-closed: if any cancel fails,
+      // we abort so we never delete a bid row while a live card hold survives.
+      const leftover = await storage.getAuthorizedBidsForArtwork(id);
+      if (leftover.length > 0) {
+        const stripe = await getUncachableStripeClient();
+        for (const bid of leftover) {
+          if (!bid.stripePaymentIntentId) continue;
+          try {
+            await stripe.paymentIntents.cancel(bid.stripePaymentIntentId);
+            await storage.updateBidByPaymentIntent(bid.stripePaymentIntentId, { holdStatus: "canceled" });
+          } catch (err) {
+            console.error(`[relist] failed to release lingering hold for bid ${bid.id}:`, err);
+            return res.status(502).json({
+              message: "Could not release an existing card hold on this artwork. Please try again in a moment.",
+            });
+          }
+        }
+      }
+
+      // Clear prior (non-captured) bids so the auction starts from scratch.
+      await storage.deleteBidsForArtwork(id);
+
+      // The artwork's price is the original starting/reserve price — it is
+      // never mutated by bidding — so the relisted auction reopens at it
+      // automatically once the old bids are cleared.
+      const endTime = new Date();
+      endTime.setDate(endTime.getDate() + auctionDurationDays);
+      const updated = await storage.relistArtwork(id, { endTime, auctionDurationDays });
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: err.errors[0].message,
+          field: err.errors[0].path.join('.'),
+        });
+      }
+      throw err;
+    }
+  });
+
   app.patch(api.artworks.updatePromotion.path, async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authenticated" });

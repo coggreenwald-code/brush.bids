@@ -151,6 +151,35 @@ export function useUpdateArtworkImage() {
   });
 }
 
+export function useRelistArtwork() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, auctionDurationDays }: { id: number; auctionDurationDays: 1 | 3 | 5 | 7 }) => {
+      const url = buildUrl(api.artworks.relist.path, { id });
+      const res = await fetch(url, {
+        method: api.artworks.relist.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ auctionDurationDays }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        let message = 'Failed to relist artwork';
+        try {
+          const body = await res.json();
+          if (body?.message) message = body.message;
+        } catch {/* non-JSON body */}
+        throw new Error(message);
+      }
+      return api.artworks.relist.responses[200].parse(await res.json());
+    },
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: [api.artworks.list.path] });
+      queryClient.invalidateQueries({ queryKey: [api.artworks.get.path, id] });
+      queryClient.invalidateQueries({ queryKey: [api.bids.list.path, id] });
+    },
+  });
+}
+
 export function useAiReview() {
   const queryClient = useQueryClient();
   return useMutation({

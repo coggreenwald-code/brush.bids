@@ -142,7 +142,7 @@ export default function MyBids() {
 
   return (
     <Layout>
-      <div className="space-y-8 pb-16 px-4 md:px-0">
+      <div className="max-w-7xl mx-auto space-y-8 pb-16 px-4 md:px-8">
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Activity</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">My Bids</h1>

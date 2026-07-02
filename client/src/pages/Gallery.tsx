@@ -251,7 +251,7 @@ export default function Gallery() {
           </div>
         )}
 
-        <div className="mt-10 px-4 md:px-0">
+        <div className="max-w-7xl mx-auto mt-10 px-4 md:px-6">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
