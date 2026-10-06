@@ -1,7 +1,14 @@
 import { Link } from "wouter";
 import { Mail, MapPin } from "lucide-react";
 import { SiInstagram, SiX, SiFacebook } from "react-icons/si";
+import { SOCIAL_URLS, CONTACT_EMAIL } from "@shared/siteConfig";
 import logoImage from "@assets/BrushBids_Logo_1772561349423.png";
+
+const FOOTER_SOCIALS = [
+  { Icon: SiInstagram, href: SOCIAL_URLS.instagram, label: "Instagram" },
+  { Icon: SiX, href: SOCIAL_URLS.x, label: "X" },
+  { Icon: SiFacebook, href: SOCIAL_URLS.facebook, label: "Facebook" },
+].filter((s) => s.href);
 
 function OutlinedBrushBidsLogo() {
   return (
@@ -90,24 +97,22 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 text-white/40">
                 <Mail className="w-4 h-4" />
-                <span>charlie@brushbids.com</span>
+                <span>{CONTACT_EMAIL}</span>
               </li>
               <li className="flex items-center gap-2 text-white/40">
                 <MapPin className="w-4 h-4" />
                 <span>New York, NY</span>
               </li>
             </ul>
-            <div className="flex gap-3 mt-6">
-              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-instagram" aria-label="Instagram">
-                <SiInstagram className="w-4 h-4" />
-              </a>
-              <a href="https://www.x.com/" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-twitter" aria-label="X">
-                <SiX className="w-4 h-4" />
-              </a>
-              <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid="link-facebook" aria-label="Facebook">
-                <SiFacebook className="w-4 h-4" />
-              </a>
-            </div>
+            {FOOTER_SOCIALS.length > 0 && (
+              <div className="flex gap-3 mt-6">
+                {FOOTER_SOCIALS.map(({ Icon, href, label }) => (
+                  <a key={label} href={href} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/30 transition-all duration-200" data-testid={`link-${label.toLowerCase()}`} aria-label={label}>
+                    <Icon className="w-4 h-4" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -120,7 +125,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 py-8 text-xs text-white/30">
           <p>&copy; {currentYear} BrushBids. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/terms" className="hover:text-white/60 transition-colors duration-200">Privacy Policy</Link>
+            <Link href="/privacy" className="hover:text-white/60 transition-colors duration-200">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white/60 transition-colors duration-200">Terms of Service</Link>
           </div>
         </div>

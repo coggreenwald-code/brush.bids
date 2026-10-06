@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
+import { ARTIST_PERCENT, PLATFORM_PERCENT, CHARITY_PERCENT, PAYOUT_TIMING, MIN_BUYER_AGE, CONTACT_EMAIL } from "@shared/siteConfig";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 
@@ -21,15 +22,15 @@ export default function FAQ() {
     },
     {
       question: "How much do I earn from a sale?",
-      answer: "You receive 75% of the final sale price. 20% goes to BrushBids for platform operations, and 5% goes to the charity you select when submitting your artwork.",
+      answer: `You receive ${ARTIST_PERCENT}% of the final sale price. ${PLATFORM_PERCENT}% goes to BrushBids for platform operations, and ${CHARITY_PERCENT}% goes to charity.`,
     },
     {
       question: "How and when do I get paid?",
-      answer: "Once your artwork sells on BrushBids and the buyer completes payment, your earnings are deposited to your connected payment account within 5-7 business days.",
+      answer: `You are paid ${PAYOUT_TIMING}. Holding payment until delivery protects both you and the buyer if a piece is lost or damaged in shipping. Artists under 18 are paid through a parent or guardian.`,
     },
     {
       question: "Do I need to handle US sales tax on my sales?",
-      answer: "No. BrushBids operates as the marketplace facilitator and uses Stripe Tax to calculate, collect, and remit US sales tax to each state on your behalf. Your payout is always based on your pre-tax winning bid — the tax the buyer pays does not come out of your 75% share. You'll see the pre-tax sale amount on your earnings dashboard.",
+      answer: "No. BrushBids operates as the marketplace facilitator and uses Stripe Tax to calculate, collect, and remit US sales tax to each state on your behalf. Your payout is always based on your pre-tax winning bid — the tax the buyer pays does not come out of your ${ARTIST_PERCENT}% share. You'll see the pre-tax sale amount on your earnings dashboard.",
     },
     {
       question: "What happens if my artwork is rejected?",
@@ -44,7 +45,7 @@ export default function FAQ() {
     },
     {
       question: "What payment methods are accepted?",
-      answer: "BrushBids accepts all major credit cards, debit cards, and PayPal through our secure payment processor. Payment is collected when you win an auction.",
+      answer: `BrushBids accepts major credit and debit cards through Stripe. You must be ${MIN_BUYER_AGE} or older to buy or bid.`,
     },
     {
       question: "Will I be charged sales tax?",
@@ -52,22 +53,18 @@ export default function FAQ() {
     },
     {
       question: "How is artwork delivered?",
-      answer: "Physical artwork is shipped directly from the artist. Digital artwork is delivered via secure download link. Shipping costs and methods are displayed before you place your bid.",
+      answer: "Artwork ships directly from the artist with tracking. Shipping is calculated from the artist's location to your address before you pay.",
     },
     {
       question: "What if the artwork isn't as described?",
       answer: "BrushBids has a buyer protection policy. If the artwork differs significantly from the listing, you can request a return within 7 days of receipt. We mediate all disputes fairly.",
-    },
-    {
-      question: "Can I contact the artist directly?",
-      answer: "After winning an auction on BrushBids, you can message the artist through our platform for shipping coordination or questions about the piece. We encourage respectful collector-artist relationships.",
     },
   ];
 
   const generalFaqs = [
     {
       question: "What is BrushBids?",
-      answer: "BrushBids is a student art auction platform that connects emerging student artists with collectors worldwide. Founded by Charles Greenwald at The Dwight School in New York, BrushBids provides a curated marketplace where students can showcase, auction, and sell their original artwork — with 5% of every sale going to a charity of the artist's choice.",
+      answer: `BrushBids is a student art platform that connects emerging student artists with collectors worldwide. Founded by Charles Greenwald at The Dwight School in New York, BrushBids provides a curated marketplace where students can showcase and sell their original artwork, with ${CHARITY_PERCENT}% of every sale going to charity.`,
     },
     {
       question: "Who founded BrushBids?",
@@ -75,23 +72,23 @@ export default function FAQ() {
     },
     {
       question: "Is BrushBids free to use?",
-      answer: "Yes, BrushBids is completely free to join for both artists and collectors. There are no listing fees or membership costs. BrushBids only takes a 20% commission when an artwork sells, with 75% going to the artist and 5% to the artist's chosen charity.",
+      answer: `Yes, BrushBids is completely free to join for both artists and collectors. There are no listing fees or membership costs. BrushBids only takes a ${PLATFORM_PERCENT}% commission when an artwork sells, with ${ARTIST_PERCENT}% going to the artist and ${CHARITY_PERCENT}% to charity.`,
     },
     {
       question: "What makes BrushBids different from other art marketplaces?",
-      answer: "BrushBids focuses exclusively on student artists, uses expert curation for fair and unbiased reviews, and ensures 5% of every sale goes to charity. We're building a community, not just a marketplace.",
+      answer: `BrushBids focuses exclusively on student artists, uses expert curation for fair and unbiased reviews, and sends ${CHARITY_PERCENT}% of every sale to charity.`,
     },
     {
       question: "How do charities receive donations?",
-      answer: "BrushBids partners with verified charitable organizations. Donations are aggregated and transferred quarterly, with full transparency reports available to both artists and the public.",
+      answer: "We are finalizing written agreements with our charity partners and will publish the list, and how donations are transferred, once they are signed.",
     },
     {
       question: "Is my personal information secure?",
-      answer: "Absolutely. BrushBids uses industry-standard encryption for all data. Payment information is processed by certified payment providers and never stored on our servers.",
+      answer: "Card payments are processed by Stripe and card numbers never reach our servers. Artist contact, payout and address details are never shown publicly. See our Privacy Policy for what we collect and why.",
     },
     {
       question: "How can I report inappropriate content?",
-      answer: "Each listing has a 'Report' option. The BrushBids team reviews all reports within 24 hours and takes appropriate action. We have zero tolerance for plagiarism, offensive content, or misrepresentation.",
+      answer: `Email ${CONTACT_EMAIL} with a link to the listing. We review every report and remove plagiarized, offensive or misleading work.`,
     },
   ];
 

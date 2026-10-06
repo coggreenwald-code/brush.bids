@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { artistDisplayName } from "@/lib/artistName";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { handleArtworkImageError } from "@/lib/imageFallback";
@@ -53,9 +54,7 @@ export default function ArtistProfile() {
     );
   }
 
-  const artistName = artist.firstName && artist.lastName 
-    ? `${artist.firstName} ${artist.lastName}` 
-    : artist.username || `Artist #${artistId}`;
+  const artistName = artistDisplayName(artist);
 
   const totalEarnings = soldWorks.reduce((sum, work) => sum + Number(work.price) * 0.75, 0);
 

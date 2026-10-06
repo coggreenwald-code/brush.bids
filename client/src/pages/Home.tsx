@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback, type SyntheticEvent,
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence, useScroll, useTransform, useVelocity, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
+import { SOCIAL_URLS, CHARITY_PERCENT, ARTIST_PERCENT, PAYOUT_TIMING } from "@shared/siteConfig";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useArtworks } from "@/hooks/use-artworks";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,15 +13,6 @@ import { SiteMenu } from "@/components/SiteMenu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
-import client1 from "@assets/image_1780074825390.png";
-import client2 from "@assets/image_1780074832935.png";
-import client3 from "@assets/image_1780074875629.png";
-import client4 from "@assets/image_1780074919196.png";
-import client5 from "@assets/image_1780074936628.png";
-import client6 from "@assets/image_1780074957234.png";
-import client7 from "@assets/image_1780074996675.png";
-import client8 from "@assets/image_1780075007097.png";
-import client9 from "@assets/image_1780075043458.png";
 
 import artSunset from "@assets/art-sunset-mountains.png";
 import artPortrait from "@assets/art-abstract-portrait.png";
@@ -93,24 +85,11 @@ function sizedImage(url: string): string {
 }
 
 const SOCIALS = [
-  { Icon: SiInstagram, href: "https://www.instagram.com/", label: "Instagram Link", small: false },
-  { Icon: SiX, href: "https://www.x.com/", label: "X Link", small: true },
-  { Icon: SiLinkedin, href: "https://www.linkedin.com/", label: "Linkedin Link", small: false },
-  { Icon: SiFacebook, href: "https://www.facebook.com/", label: "Facebook Link", small: false },
-];
-
-const TESTIMONIALS: { quote: string; name: string; role: string }[] = [
-  { quote: "I discovered an incredible student painter here and won the piece in the final minute. The whole auction felt alive.", name: "Daniel Carter", role: "Collector" },
-  { quote: "As a student artist, BrushBids gave my work a real audience — and a portion of my sale went to a cause I care about.", name: "Sophia Mitchell", role: "Student Artist" },
-  { quote: "The curation is thoughtful and the bidding is genuinely exciting. It's the most fun I've had collecting art online.", name: "Ethan Walker", role: "Collector" },
-  { quote: "From submission to payout, everything was clear and supportive. It felt built for emerging artists like me.", name: "Isabella Reed", role: "Student Artist" },
-  { quote: "The anti-sniping timer keeps every auction fair and thrilling right up to the last second.", name: "Olivia Bennett", role: "Collector" },
-  { quote: "I love that buying a piece also gives back to charity. Beautiful art and a good cause in one place.", name: "Ryan Thompson", role: "Collector" },
-];
-
-const BUBBLES_OUTER = ["Impressive", "Unmatched", "Brilliant", "Exceptional"];
-const BUBBLES_INNER = ["I loved it", "Incredible", "Amazing"];
-const CLIENT_PHOTOS = [client1, client2, client3, client4, client5, client6, client7, client8, client9];
+  { Icon: SiInstagram, href: SOCIAL_URLS.instagram, label: "Instagram", small: false },
+  { Icon: SiX, href: SOCIAL_URLS.x, label: "X", small: true },
+  { Icon: SiLinkedin, href: SOCIAL_URLS.linkedin, label: "LinkedIn", small: false },
+  { Icon: SiFacebook, href: SOCIAL_URLS.facebook, label: "Facebook", small: false },
+].filter((s) => s.href);
 
 const PROCESS = [
   {
@@ -120,8 +99,8 @@ const PROCESS = [
     steps: [
       { n: "01", title: "Submit Your Art", text: "Upload your artwork with a description and set your starting price." },
       { n: "02", title: "Expert Review", text: "Our curators review your submission for quality, supported by advanced tools trained by art professionals." },
-      { n: "03", title: "Get Paid", text: "Immediately get paid when your art sells." },
-      { n: "04", title: "Give Back", text: "A portion of the sale goes to your chosen charity, making a positive impact." },
+      { n: "03", title: "Get Paid", text: `Get paid ${PAYOUT_TIMING}.` },
+      { n: "04", title: "Give Back", text: `${CHARITY_PERCENT}% of every sale goes to charity.` },
     ],
   },
   {
@@ -141,12 +120,12 @@ const PLANS = [
   {
     name: "✦ For Artists",
     tag: "Free to list",
-    price: "75%",
+    price: `${ARTIST_PERCENT}%`,
     per: "/you keep",
     desc: "Built for emerging student artists ready to share their work with collectors and earn from every sale.",
     features: [
       ["Submit", "your work for curated review"],
-      ["Choose", "a charity to support with each sale"],
+      ["Give", `${CHARITY_PERCENT}% of every sale to charity`],
       ["Track", "bids and earnings from your dashboard"],
       ["Promote", "listings with optional visibility boosts"],
       ["Flexible", "PayPal, Venmo, Zelle or Stripe payouts"],
@@ -174,8 +153,8 @@ const FAQS = [
   { q: "1. What is BrushBids?", a: "BrushBids is a student art auction platform that connects emerging student artists with collectors through curated, real-time auctions." },
   { q: "2. How does curation work?", a: "Every submission is reviewed by our curators with help from AI tools, so only strong, original pieces enter the auction gallery." },
   { q: "3. How does bidding work?", a: "Auctions run for a set duration with a live countdown. If a bid lands in the final two minutes, the auction extends to keep things fair." },
-  { q: "4. How do artists get paid?", a: "Artists keep the majority of every winning bid and can receive payouts via PayPal, Venmo, Zelle, or Stripe Connect." },
-  { q: "5. How does charity giving work?", a: "A portion of every sale goes to a charity chosen by the artist, so each purchase supports a cause alongside the art." },
+  { q: "4. How do artists get paid?", a: `Artists keep ${ARTIST_PERCENT}% of every sale and are paid ${PAYOUT_TIMING}, via PayPal, Venmo, Zelle, or Stripe.` },
+  { q: "5. How does charity giving work?", a: `${CHARITY_PERCENT}% of every sale goes to charity. We will publish our charity partners once written agreements are signed.` },
   { q: "6. Is BrushBids free to use?", a: "Yes. Browsing and bidding are free for collectors, and artists can list their work at no upfront cost." },
 ];
 
@@ -183,6 +162,7 @@ const FAQS = [
    Small building blocks
    ============================================================ */
 function SocialLinks() {
+  if (SOCIALS.length === 0) return null;
   return (
     <div className="social-media-wrapper">
       {SOCIALS.map(({ Icon, href, label, small }) => (
@@ -208,18 +188,6 @@ function MainButton({ href, label }: { href: string; label: string }) {
       </div>
       <div className="button-line"></div>
     </Link>
-  );
-}
-
-function ReviewStars() {
-  return (
-    <div className="review-wrap">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} className="review-icon" width="16" height="16" viewBox="0 0 24 24" fill="#F472B6" aria-hidden="true">
-          <path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7L12 2z" />
-        </svg>
-      ))}
-    </div>
   );
 }
 
@@ -829,110 +797,6 @@ function FeaturedWorks({ items }: { items: RingArt[] }) {
 }
 
 /* ============================================================
-   Testimonials (rotating avatar circle + slider)
-   ============================================================ */
-function Bubble({ text }: { text: string }) {
-  return (
-    <div className="message-bubble-wrap">
-      <p className="bubble-text">&quot;{text}&quot;</p>
-      <div className="bubble-icon-block">
-        <div className="bubble-icon w-embed">
-          <svg width="16" height="9" viewBox="0 0 16 9" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M8.00451 7.76042L1.1459 2.09935C0.422777 1.50248 0.84483 0.328126 1.78247 0.328126L8.69231 0.328126L14.5199 0.328125C15.4199 0.328126 15.8618 1.42415 15.2135 2.04845L9.33471 7.70951C8.96866 8.06201 8.39643 8.08391 8.00451 7.76042Z" fill="#1C1839"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Testimonials({ avatars }: { avatars: RingArt[] }) {
-  const [slide, setSlide] = useState(0);
-  const a = (i: number) => CLIENT_PHOTOS[i % CLIENT_PHOTOS.length];
-  const slides = useMemo(() => {
-    const out: typeof TESTIMONIALS[] = [];
-    for (let i = 0; i < TESTIMONIALS.length; i += 2) out.push(TESTIMONIALS.slice(i, i + 2));
-    return out;
-  }, []);
-
-  return (
-    <section className="section-home-testimonial">
-      <div className="padding-global">
-        <div className="container-medium">
-          <div className="padding-section-large">
-            <div className="content-wrapper">
-              <div className="top-content">
-                <div className="text-align-center">
-                  <div className="subtitle text-color-alternate">Trusted by Our Community</div>
-                  <div className="spacer-medium"></div>
-                  <h2 className="heading-style-h2 text-color-alternate" style={{ fontWeight: 700 }}>What People <span className="text-color-grey text-[2rem] md:text-[94px]">What Our <span style={{ color: "#ffffff" }}>Clients Say</span></span></h2>
-                </div>
-              </div>
-              <div className="testimonial-component">
-                <div className="testimonial-circle-wrap">
-                  <div className="testimonial-container">
-                    <div className="testimonial-circle-01">
-                      {BUBBLES_OUTER.map((b, i) => (
-                        <div className={`image-circle _${String(i + 1).padStart(2, "0")}`} key={b}>
-                          <Bubble text={b} />
-                          <img src={a(i)} onError={handleArtworkImageError} alt="Community" loading="lazy" className="testimonial-avatar" />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="testimonial-circle-03">
-                      {BUBBLES_INNER.map((b, i) => (
-                        <div className={`inner-image-circle _${String(i + 1).padStart(2, "0")}`} key={b}>
-                          <Bubble text={b} />
-                          <img src={a(i + 4)} onError={handleArtworkImageError} alt="Community" loading="lazy" className="testimonial-avatar" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="testimonial-slider w-slider">
-                  <div className="mask w-slider-mask">
-                    <div className="testimonial-slide w-slide">
-                      <div className="w-layout-grid slide-component-grid">
-                        {slides[slide].map((t, idx) => (
-                          <div className="testimonial-content-wrap" key={idx}>
-                            <div className="w-layout-grid testimonials-inner-grid">
-                              <div className="testimonial-content-item">
-                                <ReviewStars />
-                                <p className="testimonial-text">&quot;{t.quote}&quot;</p>
-                              </div>
-                              <div className="doted-line"></div>
-                              <div className="testimonial-content-item">
-                                <div className="client-info-block">
-                                  <div className="text-weight-semibold">
-                                    <div className="text-size-regular text-color-alternate">{t.name}</div>
-                                  </div>
-                                  <div className="text-size-small text-color-alternate">{t.role}</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="left-arrow w-slider-arrow-left" onClick={() => setSlide((s) => (s - 1 + slides.length) % slides.length)} role="button" aria-label="Previous" data-testid="button-testimonial-prev">
-                    <div className="arrow-wrap">‹</div>
-                  </div>
-                  <div className="right-arrow w-slider-arrow-right" onClick={() => setSlide((s) => (s + 1) % slides.length)} role="button" aria-label="Next" data-testid="button-testimonial-next">
-                    <div className="arrow-wrap">›</div>
-                  </div>
-                  <div className="slide-nav w-slider-nav"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
    Pricing
    ============================================================ */
 function Pricing() {
@@ -1230,7 +1094,6 @@ export default function Home() {
             </div>
           </div>
           <FeaturedWorks items={ringArts} />
-          <Testimonials avatars={ringArts} />
           <Pricing />
           <CallToAction ringArts={ringArts} />
         </main>

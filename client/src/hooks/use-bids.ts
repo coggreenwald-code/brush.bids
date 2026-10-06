@@ -18,12 +18,12 @@ export function useBids(artworkId: number) {
 export function usePlaceBid() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: InsertBid) => {
+    mutationFn: async (data: InsertBid & { confirmedAdult: boolean }) => {
       const validated = api.bids.create.input.parse(data);
       const res = await fetch(api.bids.create.path, {
         method: api.bids.create.method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validated),
+        body: JSON.stringify({ ...validated, confirmedAdult: data.confirmedAdult }),
         credentials: "include",
       });
       if (!res.ok) {
@@ -55,6 +55,7 @@ export function usePlaceBid() {
 type BuyNowInput = {
   artworkId: number;
   bidderId: string;
+  confirmedAdult: boolean;
   shippingStreet?: string;
   shippingCity?: string;
   shippingState?: string;
@@ -75,7 +76,7 @@ export function useBuyNow() {
       const res = await fetch(api.buyout.create.path, {
         method: api.buyout.create.method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validated),
+        body: JSON.stringify({ ...validated, confirmedAdult: data.confirmedAdult }),
         credentials: "include",
       });
       if (!res.ok) {

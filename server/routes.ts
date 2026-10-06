@@ -9,6 +9,8 @@ import { sendAdultUpgradeEmail } from "./emailService";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
 import type Stripe from "stripe";
+import type { User } from "@shared/models/auth";
+import { MIN_BUYER_AGE } from "@shared/siteConfig";
 import { getUncachableStripeClient, getStripeClient, getStripePublishableKey, getAppOrigin } from "./stripeClient";
 import multer from "multer";
 import path from "path";
@@ -32,6 +34,35 @@ function stripeProductImages(imageUrl?: string | null): string[] {
   if (imageUrl.length > 2048) return [];
   if (!/^https?:\/\//i.test(imageUrl)) return [];
   return [imageUrl];
+}
+
+// Public responses must never include the full user row: it holds email, date
+// of birth, payout handles, parent/guardian contact, ship-from address and the
+// Stripe account id, and some artists are minors. Whitelist display fields only.
+type PublicUser = Pick<User, "id" | "username" | "firstName" | "lastName" | "bio" | "profileImageUrl" | "role" | "createdAt">;
+function toPublicUser(user: User | null | undefined): PublicUser | null {
+  if (!user) return null;
+  const { id, firstName, bio, profileImageUrl, role, createdAt } = user;
+  // Artists under 18 are shown by first name and last initial only.
+  const lastName = user.lastName && isMinor(user) ? `${user.lastName.charAt(0)}.` : user.lastName;
+  // Sign-in providers can assign numeric usernames; never show those as names.
+  const username = user.username && !/^\d+$/.test(user.username) ? user.username : null;
+  return { id, username, firstName, lastName, bio, profileImageUrl, role, createdAt };
+}
+
+// Bids and purchases are binding contracts, so buyers must be adults. Require an
+// explicit attestation on every request, and reject accounts whose recorded
+// date of birth shows they are under the minimum age.
+async function buyerAgeError(userId: string, body: any): Promise<string | null> {
+  if (body?.confirmedAdult !== true) {
+    return `Please confirm you are ${MIN_BUYER_AGE} or older to buy or bid.`;
+  }
+  const buyer = await storage.getUser(userId);
+  const age = ageInYears(buyer?.dateOfBirth as any);
+  if (age !== null && age < MIN_BUYER_AGE) {
+    return `You must be ${MIN_BUYER_AGE} or older to buy or bid on BrushBids.`;
+  }
+  return null;
 }
 
 const upload = multer({
@@ -81,7 +112,7 @@ export async function registerRoutes(
     
     const artistIds = Array.from(new Set(artworkList.map(a => a.artistId)));
     const artists = await Promise.all(artistIds.map(id => storage.getUser(id)));
-    const artistMap = Object.fromEntries(artists.filter(Boolean).map(a => [a!.id, a]));
+    const artistMap = Object.fromEntries(artists.filter(Boolean).map(a => [a!.id, toPublicUser(a)]));
     const enriched = artworkList.map(a => ({ ...a, artist: artistMap[a.artistId] || null }));
     res.json(enriched);
   });
@@ -93,7 +124,7 @@ export async function registerRoutes(
     }
     storage.incrementArtworkViews(artwork.id).catch(() => {});
     const artist = await storage.getUser(artwork.artistId);
-    res.json({ ...artwork, artist: artist || null });
+    res.json({ ...artwork, artist: toPublicUser(artist) });
   });
 
   app.post(api.artworks.create.path, async (req, res) => {
@@ -405,6 +436,8 @@ export async function registerRoutes(
       if (input.bidderId !== bidderId) {
         return res.status(403).json({ message: "Bid bidder mismatch" });
       }
+      const bidAgeError = await buyerAgeError(bidderId, req.body);
+      if (bidAgeError) return res.status(403).json({ message: bidAgeError });
 
       const artwork = await storage.getArtwork(input.artworkId);
       if (!artwork) return res.status(404).json({ message: "Artwork not found" });
@@ -618,6 +651,8 @@ export async function registerRoutes(
       if (input.bidderId !== bidderId) {
         return res.status(403).json({ message: "Buyer mismatch" });
       }
+      const buyoutAgeError = await buyerAgeError(bidderId, req.body);
+      if (buyoutAgeError) return res.status(403).json({ message: buyoutAgeError });
 
       const artwork = await storage.getArtwork(input.artworkId);
       if (!artwork) return res.status(404).json({ message: "Artwork not found" });
@@ -759,6 +794,14 @@ export async function registerRoutes(
     }
   });
 
+  // "Notify me of the next drop" email list
+  app.post("/api/drop-signups", async (req, res) => {
+    const parsed = z.object({ email: z.string().trim().toLowerCase().email().max(254) }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Please enter a valid email address." });
+    await storage.addDropSignup(parsed.data.email);
+    res.status(201).json({ ok: true });
+  });
+
   // Charities
   app.get(api.charities.list.path, async (req, res) => {
     const charities = await storage.getCharities();
@@ -847,7 +890,7 @@ export async function registerRoutes(
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json(user);
+    res.json(toPublicUser(user));
   });
 
   app.patch(api.users.updateBio.path, async (req, res) => {

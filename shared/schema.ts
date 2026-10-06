@@ -145,6 +145,13 @@ export const emailLog = pgTable("email_log", {
 
 export type EmailLog = typeof emailLog.$inferSelect;
 
+// Visitors who asked to be emailed when the next drop goes live.
+export const dropSignups = pgTable("drop_signups", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertArtworkSchema = createInsertSchema(artworks).omit({ id: true, createdAt: true, endTime: true, aiScore: true, aiFeedback: true, status: true });
