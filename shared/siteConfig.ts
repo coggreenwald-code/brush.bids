@@ -11,8 +11,9 @@ export const CHARITY_PERCENT = 5;
 // say "charity" without naming an organization.
 export const SHOW_CHARITY_NAMES = false;
 
-// When artists are paid, in plain language.
-export const PAYOUT_TIMING = "within 5 business days after the buyer receives the artwork";
+// When artists are paid, in plain language. No fixed number of days: payout
+// timing depends on delivery and the payout provider, so we don't promise one.
+export const PAYOUT_TIMING = "after the buyer receives the artwork";
 
 // Buyers must be adults: purchases and bids are binding contracts.
 export const MIN_BUYER_AGE = 18;
@@ -21,8 +22,8 @@ export const CONTACT_EMAIL = "charlie@brushbids.com";
 
 // BrushBids profile URLs. Leave a value empty to hide that icon.
 export const SOCIAL_URLS = {
-  instagram: "",
+  instagram: "https://www.instagram.com/brushbids/",
   x: "",
-  linkedin: "",
+  linkedin: "https://www.linkedin.com/company/brushbids/",
   facebook: "",
 };
