@@ -1,6 +1,6 @@
 import { db } from "./db";
 import {
-  users, artworks, bids, charities, portfolioItems, emailLog, payouts,
+  users, artworks, bids, charities, portfolioItems, emailLog, payouts, dropSignups,
   type User,
   type Artwork, type InsertArtwork,
   type Bid, type InsertBid,
@@ -143,6 +143,7 @@ export interface IStorage {
   getTaxReportSales(opts?: { from?: Date; to?: Date }): Promise<TaxReportSaleRow[]>;
 
   getCharities(): Promise<Charity[]>;
+  addDropSignup(email: string): Promise<void>;
 
   getPortfolioItems(artistId: string): Promise<PortfolioItem[]>;
   getPortfolioItem(id: number): Promise<PortfolioItem | undefined>;
@@ -640,6 +641,10 @@ export class DatabaseStorage implements IStorage {
 
   async getCharities(): Promise<Charity[]> {
     return await db.select().from(charities);
+  }
+
+  async addDropSignup(email: string): Promise<void> {
+    await db.insert(dropSignups).values({ email }).onConflictDoNothing();
   }
 
   async updateArtworkPromotion(id: number, promotionPercentage: number): Promise<Artwork> {

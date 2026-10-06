@@ -6,7 +6,7 @@ import { FileText } from "lucide-react";
 export default function Terms() {
   return (
     <Layout>
-      <SEOHead title="Terms & Conditions | BrushBids" description="Read BrushBids terms of service, privacy policy, and auction rules." />
+      <SEOHead title="Terms & Conditions | BrushBids" description="Read the BrushBids terms of service." />
       <div className="space-y-12 pb-16 max-w-3xl mx-auto px-4 md:px-0">
         <section className="text-center space-y-6">
           <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">
@@ -14,7 +14,7 @@ export default function Terms() {
           </div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Legal</span>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-white">Terms & Conditions</h1>
-          <p className="text-white/40">Last updated: January 2026</p>
+          <p className="text-white/40">Last updated: October 2026</p>
         </section>
 
         <div className="space-y-8">
@@ -28,7 +28,7 @@ export default function Terms() {
           <section>
             <h2 className="text-xl font-display font-bold text-white">2. User Accounts</h2>
             <p className="text-white/50 mt-2 leading-relaxed">
-              To use certain features of BrushBids, you must create an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must be at least 13 years old to create an account. If you are under 18, you represent that you have your parent's or guardian's permission to use the platform.
+              To use certain features of BrushBids, you must create an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must be at least 13 years old to create an account. If you are under 18, you represent that you have your parent's or guardian's permission to use the platform. You must be 18 or older to place a bid, make an offer, or buy artwork, because those are binding commitments to pay.
             </p>
           </section>
 
@@ -84,7 +84,7 @@ export default function Terms() {
           <section>
             <h2 className="text-xl font-display font-bold text-white">10. Privacy</h2>
             <p className="text-white/50 mt-2 leading-relaxed">
-              Your use of BrushBids is governed by our Privacy Policy. We collect and use personal information as described therein. We do not sell personal information to third parties.
+              Your use of BrushBids is also governed by our Privacy Policy at brushbids.com/privacy, which explains what personal information we collect and how we use it. We do not sell personal information.
             </p>
           </section>
 

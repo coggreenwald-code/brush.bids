@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { artistDisplayName } from "@/lib/artistName";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { useArtwork, useRelistArtwork } from "@/hooks/use-artworks";
@@ -84,6 +85,7 @@ function CountdownTimer({ endDate }: { endDate: Date }) {
 
 import { SEOHead } from "@/components/SEOHead";
 import { ShippingRateModal } from "@/components/ShippingRateModal";
+import { ARTIST_PERCENT, PLATFORM_PERCENT, CHARITY_PERCENT, SHOW_CHARITY_NAMES, MIN_BUYER_AGE } from "@shared/siteConfig";
 
 export default function ArtworkDetail() {
   const [match, params] = useRoute("/artwork/:id");
@@ -101,6 +103,7 @@ export default function ArtworkDetail() {
   const [showQR, setShowQR] = useState(false);
   const [showShipping, setShowShipping] = useState(false);
   const [pendingBidAmount, setPendingBidAmount] = useState<number>(0);
+  const [confirmedAdult, setConfirmedAdult] = useState(false);
   // Which flow the shipping modal is collecting an address for.
   const [checkoutMode, setCheckoutMode] = useState<'bid' | 'buyout'>('bid');
 
@@ -196,18 +199,21 @@ export default function ArtworkDetail() {
     onboardTabRef.current = window.open("", "_blank", "noopener,noreferrer");
     onboard.mutate();
   };
-  const charityName = artwork?.charityId
+  const publicCharityNote = SHOW_CHARITY_NAMES ? artwork?.charityNote : undefined;
+  const charityName = !SHOW_CHARITY_NAMES
+    ? undefined
+    : artwork?.charityId
     ? charities?.find(c => c.id === artwork.charityId)?.name
     : null;
 
   useEffect(() => {
     if (!pendingBidSuccess || !artwork) return;
     if (artwork.charityId && !charities) return;
-    const charityLabel = artwork.charityNote || charityName;
+    const charityLabel = publicCharityNote || charityName;
     toast({
       title: "Bid hold authorized",
       description: charityLabel
-        ? `Your card has been authorized. We'll only charge it if you win. 5% of the sale goes to ${charityLabel}.`
+        ? `Your card has been authorized. We'll only charge it if you win. ${CHARITY_PERCENT}% of the sale goes to ${charityLabel}.`
         : "Your card has been authorized. We'll only charge it if you win.",
     });
     setPendingBidSuccess(false);
@@ -242,6 +248,7 @@ export default function ArtworkDetail() {
       artworkId: artwork.id,
       bidderId: user!.id as unknown as string,
       amount: amount.toString(),
+      confirmedAdult,
       ...(shipping ? {
         shippingStreet: shipping.toStreet,
         shippingCity: shipping.toCity,
@@ -279,6 +286,10 @@ export default function ArtworkDetail() {
       toast({ title: "Please login", description: "You must be logged in to place a bid", variant: "destructive" });
       return;
     }
+    if (!confirmedAdult) {
+      toast({ title: `Buyers must be ${MIN_BUYER_AGE} or older`, description: `Please confirm you are ${MIN_BUYER_AGE} or older to continue.`, variant: "destructive" });
+      return;
+    }
     setCheckoutMode('bid');
     setPendingBidAmount(amount);
     setShowShipping(true);
@@ -288,6 +299,7 @@ export default function ArtworkDetail() {
     buyNow.mutate({
       artworkId: artwork.id,
       bidderId: user!.id as unknown as string,
+      confirmedAdult,
       ...(shipping ? {
         shippingStreet: shipping.toStreet,
         shippingCity: shipping.toCity,
@@ -313,6 +325,10 @@ export default function ArtworkDetail() {
   const handleBuyNowClick = () => {
     if (!user) {
       toast({ title: "Please login", description: "You must be logged in to buy this artwork", variant: "destructive" });
+      return;
+    }
+    if (!confirmedAdult) {
+      toast({ title: `Buyers must be ${MIN_BUYER_AGE} or older`, description: `Please confirm you are ${MIN_BUYER_AGE} or older to continue.`, variant: "destructive" });
       return;
     }
     if (artwork.buyNowPrice == null) return;
@@ -348,9 +364,9 @@ export default function ArtworkDetail() {
   const displayImage = artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800&auto=format&fit=crop";
 
   const revenueSplit = {
-    artist: currentPrice * 0.75,
-    platform: currentPrice * 0.20,
-    charity: currentPrice * 0.05,
+    artist: currentPrice * ARTIST_PERCENT / 100,
+    platform: currentPrice * PLATFORM_PERCENT / 100,
+    charity: currentPrice * CHARITY_PERCENT / 100,
   };
 
   const isActiveAuction = artwork.status === 'approved' && !isAuctionEnded;
@@ -399,33 +415,33 @@ export default function ArtworkDetail() {
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-white/60">Artist (75%)</span>
+                    <span className="text-sm text-white/60">Artist ({ARTIST_PERCENT}%)</span>
                     <span className="font-mono text-sm font-semibold text-white">${revenueSplit.artist.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-violet-500" style={{ width: '75%' }} />
+                    <div className="h-full rounded-full bg-violet-500" style={{ width: `${ARTIST_PERCENT}%` }} />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-white/60">BrushBids (20%)</span>
+                    <span className="text-sm text-white/60">BrushBids ({PLATFORM_PERCENT}%)</span>
                     <span className="font-mono text-sm text-white/70">${revenueSplit.platform.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-blue-400" style={{ width: '20%' }} />
+                    <div className="h-full rounded-full bg-blue-400" style={{ width: `${PLATFORM_PERCENT}%` }} />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-emerald-400/80">
-                      {artwork.charityNote || charityName
-                        ? <>Charity (5%) <span className="text-white/40">—</span> <span className="text-emerald-300/90 font-medium truncate max-w-[160px] inline-block align-bottom" title={artwork.charityNote || charityName || undefined}>{artwork.charityNote || charityName}</span></>
-                        : "Charity (5%)"}
+                      {publicCharityNote || charityName
+                        ? <>Charity ({CHARITY_PERCENT}%) <span className="text-white/40">—</span> <span className="text-emerald-300/90 font-medium truncate max-w-[160px] inline-block align-bottom" title={publicCharityNote || charityName || undefined}>{publicCharityNote || charityName}</span></>
+                        : `Charity (${CHARITY_PERCENT}%)`}
                     </span>
                     <span className="font-mono text-sm font-semibold text-emerald-400 shrink-0">${revenueSplit.charity.toFixed(2)}</span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-white/5">
-                    <div className="h-full rounded-full bg-emerald-500" style={{ width: '5%' }} />
+                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${CHARITY_PERCENT}%` }} />
                   </div>
                 </div>
               </div>
@@ -452,9 +468,7 @@ export default function ArtworkDetail() {
                   <div>
                     <p className="text-xs text-white/40 uppercase tracking-widest">Artist</p>
                     <p className="text-sm font-medium text-white group-hover:text-violet-400 transition-colors">
-                      {artist?.firstName && artist?.lastName 
-                        ? `${artist.firstName} ${artist.lastName}` 
-                        : artist?.username || `Artist #${artwork.artistId}`}
+                      {artistDisplayName(artist)}
                     </p>
                   </div>
                 </div>
@@ -477,7 +491,7 @@ export default function ArtworkDetail() {
               {(artwork.charityId || artwork.charityNote) && (
                 <div className="flex items-center gap-2 text-sm text-white/40" data-testid={`text-charity-${artwork.id}`}>
                   <Heart className="w-4 h-4 text-emerald-400/70" />
-                  <span>5% of sale goes to <span className="text-emerald-400/80 font-medium">{artwork.charityNote || charityName || "a chosen charity"}</span></span>
+                  <span>{CHARITY_PERCENT}% of sale goes to <span className="text-emerald-400/80 font-medium">{publicCharityNote || charityName || "charity"}</span></span>
                 </div>
               )}
             </div>
@@ -495,9 +509,7 @@ export default function ArtworkDetail() {
                     </Avatar>
                     <div className="flex-1">
                       <p className="font-medium text-white group-hover:text-violet-400 transition-colors">
-                        {artist.firstName && artist.lastName 
-                          ? `${artist.firstName} ${artist.lastName}` 
-                          : artist.username || `Artist #${artwork.artistId}`}
+                        {artistDisplayName(artist)}
                       </p>
                       {artist.bio ? (
                         <p className="text-sm text-white/50 mt-1 line-clamp-3">{artist.bio}</p>
@@ -583,6 +595,16 @@ export default function ArtworkDetail() {
                       )}
                     />
                   </form>
+                  <label className="flex items-start gap-2 text-xs text-white/50 mt-3 cursor-pointer" data-testid="label-confirm-adult">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 accent-violet-500"
+                      checked={confirmedAdult}
+                      onChange={(e) => setConfirmedAdult(e.target.checked)}
+                      data-testid="checkbox-confirm-adult"
+                    />
+                    <span>I am {MIN_BUYER_AGE} or older. Bids and purchases are binding, so buyers must be adults.</span>
+                  </label>
                   {artwork.buyNowPrice != null && !isOwnArtwork && (
                     <div className="pt-2">
                       <div className="relative flex items-center my-1">

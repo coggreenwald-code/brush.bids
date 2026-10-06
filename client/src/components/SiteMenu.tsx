@@ -2,6 +2,7 @@ import "../pages/cyrclo.css";
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
+import { SOCIAL_URLS } from "@shared/siteConfig";
 import { LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -16,13 +17,14 @@ import {
 import brushBidsLogo from "@assets/BrushBids_Logo_1772561349423.png";
 
 const SOCIALS = [
-  { Icon: SiInstagram, href: "https://www.instagram.com/", label: "Instagram Link", small: false },
-  { Icon: SiX, href: "https://www.x.com/", label: "X Link", small: true },
-  { Icon: SiLinkedin, href: "https://www.linkedin.com/", label: "Linkedin Link", small: false },
-  { Icon: SiFacebook, href: "https://www.facebook.com/", label: "Facebook Link", small: false },
-];
+  { Icon: SiInstagram, href: SOCIAL_URLS.instagram, label: "Instagram", small: false },
+  { Icon: SiX, href: SOCIAL_URLS.x, label: "X", small: true },
+  { Icon: SiLinkedin, href: SOCIAL_URLS.linkedin, label: "LinkedIn", small: false },
+  { Icon: SiFacebook, href: SOCIAL_URLS.facebook, label: "Facebook", small: false },
+].filter((s) => s.href);
 
 function SocialLinks() {
+  if (SOCIALS.length === 0) return null;
   return (
     <div className="social-media-wrapper">
       {SOCIALS.map(({ Icon, href, label, small }) => (

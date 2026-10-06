@@ -8,6 +8,10 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { authStorage } from "./storage";
 
+// Local development only: sign in as a fake user without Replit. Requires
+// LOCAL_DEV_AUTH=1 and refuses to run on Replit, so it can never be live.
+const localDevAuth = process.env.LOCAL_DEV_AUTH === "1" && !process.env.REPL_ID && !process.env.REPLIT_DEPLOYMENT;
+
 const getOidcConfig = memoize(
   async () => {
     return await client.discovery(
@@ -34,7 +38,7 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: !localDevAuth,
       maxAge: sessionTtl,
     },
   });
@@ -65,6 +69,14 @@ export async function setupAuth(app: Express) {
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
+
+  passport.serializeUser((user: Express.User, cb) => cb(null, user));
+  passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+
+  if (localDevAuth) {
+    setupLocalDevAuth(app);
+    return;
+  }
 
   const config = await getOidcConfig();
 
@@ -99,9 +111,6 @@ export async function setupAuth(app: Express) {
     }
   };
 
-  passport.serializeUser((user: Express.User, cb) => cb(null, user));
-  passport.deserializeUser((user: Express.User, cb) => cb(null, user));
-
   app.get("/api/login", (req, res, next) => {
     ensureStrategy(req.hostname);
     passport.authenticate(`replitauth:${req.hostname}`, {
@@ -127,6 +136,27 @@ export async function setupAuth(app: Express) {
         }).href
       );
     });
+  });
+}
+
+// /api/login?as=<name> signs in as a fake local user (e.g. ?as=buyer, ?as=artist2).
+function setupLocalDevAuth(app: Express) {
+  console.warn("LOCAL_DEV_AUTH is on: /api/login signs in fake users. Never enable this on Replit.");
+  app.get("/api/login", async (req, res, next) => {
+    const name = String(req.query.as || "dev").replace(/[^a-z0-9]/gi, "").slice(0, 20) || "dev";
+    const claims = {
+      sub: `local-${name}`,
+      email: `${name}@example.test`,
+      first_name: name.charAt(0).toUpperCase() + name.slice(1),
+      last_name: "Tester",
+      profile_image_url: null,
+    };
+    await upsertUser(claims);
+    const user = { claims, expires_at: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60 };
+    req.login(user, (err) => (err ? next(err) : res.redirect("/")));
+  });
+  app.get("/api/logout", (req, res) => {
+    req.logout(() => res.redirect("/"));
   });
 }
 

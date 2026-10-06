@@ -26,6 +26,17 @@ async function getCredentials(): Promise<CachedCreds> {
 }
 
 async function fetchCredentials(): Promise<CachedCreds> {
+  // Off Replit (local development), read test-mode keys from the environment.
+  // Live keys are refused so local testing can never move real money.
+  if (!process.env.REPLIT_CONNECTORS_HOSTNAME && process.env.STRIPE_SECRET_KEY) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY || "";
+    if (!secretKey.startsWith("sk_test_") && !secretKey.startsWith("rk_test_")) {
+      throw new Error("Local development only accepts Stripe test-mode keys (sk_test_ or rk_test_).");
+    }
+    return { publishableKey, secretKey };
+  }
+
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY
     ? 'repl ' + process.env.REPL_IDENTITY

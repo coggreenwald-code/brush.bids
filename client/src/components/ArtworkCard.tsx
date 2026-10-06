@@ -1,7 +1,9 @@
 import { Link } from "wouter";
+import { artistDisplayName } from "@/lib/artistName";
 import { type Artwork, type User } from "@shared/schema";
 import { Rocket, Clock } from "lucide-react";
 import { useCharities } from "@/hooks/use-charities";
+import { CHARITY_PERCENT, SHOW_CHARITY_NAMES } from "@shared/siteConfig";
 import { handleArtworkImageError } from "@/lib/imageFallback";
 
 function getAuctionEndDate(artwork: Artwork): Date {
@@ -30,7 +32,9 @@ interface ArtworkCardProps {
 export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
   const displayImage = artwork.imageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?q=80&w=800&auto=format&fit=crop";
   const { data: charities } = useCharities();
-  const charityLabel = artwork.charityNote || charities?.find(c => c.id === artwork.charityId)?.name;
+  const charityLabel = SHOW_CHARITY_NAMES
+    ? artwork.charityNote || charities?.find(c => c.id === artwork.charityId)?.name
+    : (artwork.charityId || artwork.charityNote) ? "charity" : undefined;
 
   return (
     <Link href={`/artwork/${artwork.id}`}>
@@ -90,14 +94,12 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
           <p className="text-sm text-white/50 mt-1">
             by{" "}
             <span className="font-medium text-white/70">
-              {artwork.artist
-                ? `${artwork.artist.firstName || ""} ${artwork.artist.lastName || ""}`.trim() || artwork.artistId
-                : artwork.artistId}
+              {artistDisplayName(artwork.artist)}
             </span>
           </p>
           {charityLabel && (
             <p className="text-xs text-emerald-400/70 mt-1" data-testid={`text-charity-${artwork.id}`}>
-              5% → {charityLabel}
+              {CHARITY_PERCENT}% to {charityLabel}
             </p>
           )}
           {artwork.status === "approved" && (

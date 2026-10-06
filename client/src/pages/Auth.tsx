@@ -61,7 +61,7 @@ export default function Auth() {
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="/terms" className="underline underline-offset-2 text-[#A78BFA]/70 hover:text-[#A78BFA] transition-colors" data-testid="link-privacy">
+              <a href="/privacy" className="underline underline-offset-2 text-[#A78BFA]/70 hover:text-[#A78BFA] transition-colors" data-testid="link-privacy">
                 Privacy Policy
               </a>
               .

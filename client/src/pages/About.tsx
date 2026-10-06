@@ -1,52 +1,8 @@
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
+import { ARTIST_PERCENT, PLATFORM_PERCENT, CHARITY_PERCENT } from "@shared/siteConfig";
 import { Heart, Users, Award, TrendingUp, Sparkles, GraduationCap, Palette } from "lucide-react";
-import logoUnicef from "@assets/unicef.png";
-import logoWwf from "@assets/wwf.png";
-import logoCharityWater from "@assets/charity-water.png";
-import logoMet from "@assets/met.png";
-import logoStudioMuseum from "@assets/studio-museum.png";
-import logoYoungarts from "@assets/youngarts.png";
-
-const featuredCharities = [
-  {
-    name: "United Nations Children's Fund",
-    description: "UNICEF works in over 190 countries to protect the rights of every child, providing healthcare, nutrition, education, and emergency relief to children in need worldwide.",
-    category: "Child Welfare",
-    logo: logoUnicef,
-  },
-  {
-    name: "World Wildlife Fund",
-    description: "WWF leads global efforts to protect wildlife and conserve natural habitats, working with communities to reduce humanity's impact on the environment.",
-    category: "Environment",
-    logo: logoWwf,
-  },
-  {
-    name: "Charity: Water",
-    description: "Bringing clean, safe drinking water to people in developing countries through sustainable water projects, transforming health, education, and livelihoods.",
-    category: "Clean Water",
-    logo: logoCharityWater,
-  },
-  {
-    name: "The Metropolitan Museum of Art",
-    description: "The Met's education programs provide free public access to 5,000 years of art, offering workshops, lectures, and resources for students and artists of all backgrounds.",
-    category: "Art Education",
-    logo: logoMet,
-  },
-  {
-    name: "The Studio Museum in Harlem",
-    description: "A leading institution that champions the work of artists of African descent, providing studio residencies, exhibitions, and community programs in New York City.",
-    category: "Artist Diversity",
-    logo: logoStudioMuseum,
-  },
-  {
-    name: "National YoungArts Foundation",
-    description: "Identifies and supports the next generation of artists through scholarships, mentorship, and professional development, nurturing talent from high school onward.",
-    category: "Emerging Artists",
-    logo: logoYoungarts,
-  },
-];
 
 const values = [
   {
@@ -70,21 +26,21 @@ const values = [
   {
     icon: TrendingUp,
     title: "Fair Compensation",
-    description: "Artists receive 75% of every sale, ensuring they're fully compensated for their creative work.",
+    description: `Artists receive ${ARTIST_PERCENT}% of every sale, ensuring they're fully compensated for their creative work.`,
     iconColor: "text-[#34D399]",
   },
 ];
 
 const revenueSplits = [
-  { percent: 75, label: "Artist", sublabel: "Goes directly to the creator", color: "#A78BFA" },
-  { percent: 20, label: "BrushBids", sublabel: "Platform & operations", color: "#60A5FA" },
-  { percent: 5, label: "Charity", sublabel: "Artist's chosen cause", color: "#34D399" },
+  { percent: ARTIST_PERCENT, label: "Artist", sublabel: "Goes directly to the creator", color: "#A78BFA" },
+  { percent: PLATFORM_PERCENT, label: "BrushBids", sublabel: "Platform & operations", color: "#60A5FA" },
+  { percent: CHARITY_PERCENT, label: "Charity", sublabel: "Artist's chosen cause", color: "#34D399" },
 ];
 
 export default function About() {
   return (
     <Layout>
-      <SEOHead title="About BrushBids — Student Art Auction Platform | BrushBids" description="BrushBids is a student art auction platform founded by Charles Greenwald at The Dwight School, New York. 75% of every sale goes to the artist, 5% to charity. Discover our mission, values, and the charities we support." />
+      <SEOHead title="About BrushBids | Student Art Marketplace" description={`BrushBids is a student art marketplace founded by Charles Greenwald at The Dwight School, New York. ${ARTIST_PERCENT}% of every sale goes to the artist and ${CHARITY_PERCENT}% to charity.`} />
       <div className="pb-0">
         <section
           aria-label="About BrushBids"
@@ -260,53 +216,6 @@ export default function About() {
 
         <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
-        <section
-          aria-label="Featured Charities"
-          className="py-20 md:py-28 relative bg-mesh-mixed bg-dots-sparse"
-          style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}
-          data-testid="section-featured-charities"
-        >
-          <div className="watermark-text" aria-hidden="true">Partners</div>
-          <div className="floating-orb w-60 h-60 gradient-orb-emerald animate-float-slow" style={{ top: '-5%', left: '-3%' }} />
-          <div className="floating-orb-sm w-52 h-52 gradient-orb-pink animate-float" style={{ bottom: '5%', right: '-2%' }} />
-          <div className="floating-orb-sm w-36 h-36 gradient-orb-blue animate-float-reverse" style={{ top: '40%', right: '5%' }} />
-          <div className="max-w-5xl mx-auto px-6 space-y-12 relative z-10">
-            <div className="text-center space-y-3">
-              <span className="text-xs font-medium text-[#34D399] uppercase tracking-[0.3em]">
-                Giving Back
-              </span>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
-                Charities We Champion
-              </h2>
-              <p className="text-white/50 max-w-2xl mx-auto">
-                Every sale on BrushBids directs 5% to a charity chosen by the artist. Here are some of the causes closest to our mission.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredCharities.map((charity) => (
-                <div
-                  key={charity.name}
-                  className="section-outlined bg-white/[0.02] p-6 flex flex-col gap-4 transition-colors duration-300 hover:border-white/10"
-                  data-testid={`card-charity-${charity.name.toLowerCase().replace(/\s+/g, '-').slice(0, 30)}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-md bg-white/90 flex items-center justify-center p-1.5">
-                      <img src={charity.logo} alt={`${charity.name} logo`} className="w-full h-full object-contain" />
-                    </div>
-                    <span className="text-xs font-medium uppercase tracking-wider text-[#34D399]">{charity.category}</span>
-                  </div>
-                  <h3 className="font-semibold text-lg text-white leading-tight">{charity.name}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed flex-1">{charity.description}</p>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-white/40 text-center">
-              Artists can choose from <span className="font-semibold text-white/70">50 charities</span> when submitting artwork, including global organizations, NYC art institutions, and U.S. art foundations.
-            </p>
-          </div>
-        </section>
-
-        <div className="divider-line" style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }} />
 
         <section
           aria-label="Expert Curation"

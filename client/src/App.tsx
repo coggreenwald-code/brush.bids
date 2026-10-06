@@ -15,11 +15,11 @@ import Admin from "@/pages/Admin";
 import About from "@/pages/About";
 import FAQ from "@/pages/FAQ";
 import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
 import Contact from "@/pages/Contact";
 import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
-import HeroPreview from "@/pages/HeroPreview";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { SignupPopup } from "@/components/SignupPopup";
 import { useAuth } from "@/hooks/use-auth";
@@ -37,11 +37,11 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/faq" component={FAQ} />
       <Route path="/terms" component={Terms} />
+      <Route path="/privacy" component={Privacy} />
       <Route path="/contact" component={Contact} />
       <Route path="/my-bids" component={MyBids} />
       <Route path="/portfolio"><Redirect to="/dashboard" /></Route>
       <Route path="/auth" component={Auth} />
-      <Route path="/hero-preview" component={HeroPreview} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -99,18 +99,6 @@ function SmoothScroll({ children }: { children: React.ReactNode }) {
 }
 
 function AppShell() {
-  const [location] = useLocation();
-  const isIsolatedPreview = location === "/hero-preview";
-
-  if (isIsolatedPreview) {
-    return (
-      <>
-        <Toaster />
-        <HeroPreview />
-      </>
-    );
-  }
-
   return (
     <SmoothScroll>
       <Toaster />
