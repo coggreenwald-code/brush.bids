@@ -125,16 +125,16 @@ export default function About() {
             </div>
             <div className="space-y-6 text-white/60 text-base md:text-lg leading-relaxed">
               <p>
-                BrushBids was founded in 2024 by <span className="text-white/80 font-medium">Charles Greenwald</span>, who serves as the company's Founder and CEO. The idea emerged during a junior-year course selection lecture led by the director of the art department. While the discussion focused on academics, a more structural issue stood out: exceptional student artwork filled the halls, yet there was no real infrastructure to help student artists gain exposure or sell their work through a credible online marketplace.
+                BrushBids was founded in 2024 by <span className="text-white/80 font-medium">Charles Greenwald</span>, its Founder and CEO. The company started from a simple observation about a market that doesn't work: student art is abundant and often exceptional, yet there is no credible channel connecting student artists to buyers. The talent exists. The distribution does not.
               </p>
               <p>
-                During that lecture, the first version of BrushBids was sketched on a napkin in the high school's Quad, the central gathering space of the campus. That napkin remained pinned to a bulletin board throughout the year, serving as a constant reminder of a simple but persistent problem in student art: talent without access.
+                Greenwald saw the gap during a junior-year course selection session led by his school's art department director. The discussion was about academics, but the hallways made the real point. Strong work hung on every wall with no path to exposure or sale beyond the building. During that session he sketched the first version of the platform on a napkin in the school's Quad. It stayed pinned to a bulletin board for the rest of the year as a reminder of the problem worth solving.
               </p>
               <p>
-                The concept was rigorously developed through hands-on iteration during the <span className="text-white/80 font-medium">Venture Accelerator Program at Tufts University</span>, where constant pitching, mentorship, and feedback refined the original model. Further progress came through collaboration with the <span className="text-white/80 font-medium">Derby School of Entrepreneurship</span>, helping transition BrushBids from an early idea into a working product.
+                The idea was built through iteration rather than theory. At the <span className="text-white/80 font-medium">Venture Accelerator Program at Tufts University</span>, constant pitching, mentorship, and critical feedback reshaped the original model. Work with the <span className="text-white/80 font-medium">Derby School of Entrepreneurship</span> then helped turn the concept into a working product.
               </p>
               <p>
-                Today, BrushBids is a student-first art marketplace. The platform creates a direct pathway for student artists to share, sell, and be discovered without relying on elite galleries, institutions, or traditional gatekeepers.
+                Today, BrushBids is a student-first art marketplace. It gives young artists a direct route to share, sell, and be discovered, without relying on elite galleries, institutions, or traditional gatekeepers.
               </p>
             </div>
           </div>
