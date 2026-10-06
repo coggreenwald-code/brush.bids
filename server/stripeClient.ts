@@ -141,7 +141,7 @@ export function getAppOrigin(): string {
   const domain = process.env.REPLIT_DOMAINS?.split(',')[0];
   if (isProduction && domain) return `https://${domain}`;
   if (domain) return `https://${domain}`;
-  return 'http://localhost:5000';
+  return `http://localhost:${process.env.PORT || 5000}`;
 }
 
 let stripeSync: any = null;

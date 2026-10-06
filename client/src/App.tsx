@@ -21,6 +21,7 @@ import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { NameRequiredModal } from "@/components/NameRequiredModal";
 import { SignupPopup } from "@/components/SignupPopup";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -50,12 +51,17 @@ function Router() {
 function OnboardingWrapper({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
+  const [nameSaved, setNameSaved] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user && !user.hasCompletedOnboarding) {
       setShowWelcome(true);
     }
   }, [isAuthenticated, user]);
+
+  const needsName = !!user && !!user.hasCompletedOnboarding && !nameSaved
+    && (user.role === "artist" || user.role === "both")
+    && (!user.firstName?.trim() || !user.lastName?.trim());
 
   return (
     <>
@@ -68,6 +74,9 @@ function OnboardingWrapper({ children }: { children: React.ReactNode }) {
           existingLastName={user.lastName}
           onComplete={() => setShowWelcome(false)}
         />
+      )}
+      {user && needsName && (
+        <NameRequiredModal userId={user.id} isOpen onComplete={() => setNameSaved(true)} />
       )}
     </>
   );

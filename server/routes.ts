@@ -81,7 +81,9 @@ const upload = multer({
 });
 
 const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  // Off Replit there is no key; use a placeholder so the server still starts
+  // and AI review requests fail on their own instead of crashing boot.
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured",
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 

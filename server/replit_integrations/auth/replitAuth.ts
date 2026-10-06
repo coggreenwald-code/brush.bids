@@ -144,12 +144,14 @@ function setupLocalDevAuth(app: Express) {
   console.warn("LOCAL_DEV_AUTH is on: /api/login signs in fake users. Never enable this on Replit.");
   app.get("/api/login", async (req, res, next) => {
     const name = String(req.query.as || "dev").replace(/[^a-z0-9]/gi, "").slice(0, 20) || "dev";
+    // Seeded test users keep their own names; new names get a placeholder.
+    const existing = await authStorage.getUser(`local-${name}`);
     const claims = {
       sub: `local-${name}`,
-      email: `${name}@example.test`,
-      first_name: name.charAt(0).toUpperCase() + name.slice(1),
-      last_name: "Tester",
-      profile_image_url: null,
+      email: existing?.email ?? `${name}@example.test`,
+      first_name: existing ? existing.firstName : name.charAt(0).toUpperCase() + name.slice(1),
+      last_name: existing ? existing.lastName : "Tester",
+      profile_image_url: existing?.profileImageUrl ?? null,
     };
     await upsertUser(claims);
     const user = { claims, expires_at: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60 };
