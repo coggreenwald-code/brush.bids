@@ -29,6 +29,12 @@ async function initStripe() {
 
     const stripeSync = await getStripeSync();
 
+    if (!process.env.REPLIT_DOMAINS) {
+      // Local development: don't register a webhook for a non-public URL.
+      console.log('Skipping managed webhook (not on Replit).');
+      return;
+    }
+
     console.log('Setting up managed webhook...');
     const webhookBaseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
     try {
