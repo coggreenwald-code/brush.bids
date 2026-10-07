@@ -189,6 +189,8 @@ export const orders = pgTable("orders", {
   labelUrl: text("label_url"),
   easypostShipmentId: text("easypost_shipment_id"),
   easypostTrackerId: text("easypost_tracker_id"),
+  // ARTA quote request to book from (white-glove pieces).
+  artaRequestId: text("arta_request_id"),
   // True when the artist paid for postage themselves (reimbursed at payout).
   artistPaidShipping: boolean("artist_paid_shipping").default(false).notNull(),
   paidAt: timestamp("paid_at"),

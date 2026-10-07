@@ -9,8 +9,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Truck, ShieldCheck, Loader2, Tag } from "lucide-react";
 import type { Artwork } from "@shared/schema";
-import { askingPrice, minOfferAmount, needsWhiteGlove } from "@shared/pricing";
-import { CONTACT_EMAIL, INSPECTION_DAYS, MIN_BUYER_AGE, OFFER_WINDOW_HOURS, WHITE_GLOVE_SHIPPING_TIERS } from "@shared/siteConfig";
+import { askingPrice, minOfferAmount, needsWhiteGlove, tooLargeToShipOnline } from "@shared/pricing";
+import { CONTACT_EMAIL, INSPECTION_DAYS, MIN_BUYER_AGE, OFFER_WINDOW_HOURS } from "@shared/siteConfig";
 
 type MyOffer = { id: number; artworkId: number; amount: string; status: string; expiresAt: string };
 type ShipTo = { name: string; street1: string; street2: string; city: string; state: string; zip: string };
@@ -33,7 +33,7 @@ export function PurchasePanel({ artwork, isOwnArtwork }: { artwork: Artwork; isO
   const available = artwork.status === "approved" && !sold;
   // Oversized or high-value pieces need specialist shipping; until those
   // rates are set, buyers arrange the purchase by email.
-  const contactToBuy = needsWhiteGlove(artwork as any) && WHITE_GLOVE_SHIPPING_TIERS.length === 0;
+  const contactToBuy = needsWhiteGlove(artwork as any) && tooLargeToShipOnline(artwork);
 
   const [confirmedAdult, setConfirmedAdult] = useState(false);
   const [zip, setZip] = useState("");

@@ -1,4 +1,6 @@
 import { Layout } from "@/components/Layout";
+import { PriceSuggestion } from "@/components/PriceSuggestion";
+import { CONTACT_EMAIL } from "@shared/siteConfig";
 import { SEOHead } from "@/components/SEOHead";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -183,16 +185,11 @@ export default function SubmitArtwork() {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     const { dimensionLength, dimensionWidth, ...rest } = data;
-    const isOther = charitySelection === "other";
-    if (isOther && !rest.charityNote?.trim()) {
-      form.setError("charityNote", { message: "Please describe where the 5% should go" });
-      return;
-    }
     const dimensions = `${dimensionLength} x ${dimensionWidth} inches`;
     createArtwork.mutate({
       ...rest,
-      charityId: isOther ? undefined : rest.charityId,
-      charityNote: isOther ? rest.charityNote : undefined,
+      charityId: rest.charityId,
+      charityNote: undefined,
       artistId: user.id,
       price: data.price.toString(),
       dimensions,
@@ -217,6 +214,8 @@ export default function SubmitArtwork() {
   };
 
   const selectedReviewType = form.watch("reviewType");
+  const watchedLength = Number(form.watch("dimensionLength")) || 0;
+  const watchedWidth = Number(form.watch("dimensionWidth")) || 0;
 
   return (
     <Layout>
@@ -278,7 +277,7 @@ export default function SubmitArtwork() {
                         data-testid="textarea-description"
                       />
                     </FormControl>
-                    <FormDescription className="text-white/30">Good stories increase sales by 25%. Let us help you craft the perfect description!</FormDescription>
+                    <FormDescription className="text-white/30">A good story helps collectors connect with your work.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -295,8 +294,10 @@ export default function SubmitArtwork() {
                         <Input type="number" placeholder="150.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
                       </FormControl>
                       <FormDescription className="text-white/40">
-                        Buyers can buy at this price or offer at least 75% of it. You keep 75% of the sale.
+                        You choose the price. Buyers can buy at it or offer at least 75% of it, and you keep 75% of the sale.
                       </FormDescription>
+                      <PriceSuggestion width={watchedLength} height={watchedWidth}
+                        onUse={(p) => form.setValue("price", p, { shouldValidate: true })} />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -355,7 +356,7 @@ export default function SubmitArtwork() {
                     value={charitySelection}
                     onValueChange={(val) => {
                       setCharitySelection(val);
-                      if (val === "other" || val === "") {
+                      if (val === "") {
                         form.setValue("charityId", undefined);
                       } else {
                         form.setValue("charityId", Number(val));
@@ -390,31 +391,13 @@ export default function SubmitArtwork() {
                           ) : null
                         ));
                       })()}
-                      <SelectItem value="other" data-testid="charity-option-other">Other (describe below)</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
+                  <FormDescription className="text-white/30">
+                    5% of the sale goes to the charity you choose. Want it to go somewhere not on the list?{" "}
+                    <a className="underline text-white/60" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Charity suggestion for my BrushBids listing")}`} data-testid="link-email-charity">Email us</a> and we'll look into adding it.
+                  </FormDescription>
                 </FormItem>
-                {charitySelection === "other" && (
-                  <FormField
-                    control={form.control}
-                    name="charityNote"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/70">Where should the 5% go?</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g. Local after-school art program"
-                            className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
-                            {...field}
-                            data-testid="input-charity-note"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </div>
 
               <FormField

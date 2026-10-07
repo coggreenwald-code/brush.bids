@@ -1,5 +1,5 @@
 import {
-  MIN_OFFER_PERCENT, ARTIST_PERCENT, WHITE_GLOVE_MIN_PRICE, WHITE_GLOVE_MAX_SIDE_IN, WHITE_GLOVE_MAX_WEIGHT_OZ,
+  MIN_OFFER_PERCENT, WHITE_GLOVE_SHIPPING_TIERS, ARTIST_PERCENT, WHITE_GLOVE_MIN_PRICE, WHITE_GLOVE_MAX_SIDE_IN, WHITE_GLOVE_MAX_WEIGHT_OZ,
 } from "./siteConfig";
 
 type Priced = { price: string | number; buyNowPrice?: string | number | null };
@@ -35,4 +35,12 @@ export function needsWhiteGlove(artwork: Priced & { dimensions?: string | null; 
 export function artistShareCents(itemCents: number, promotionPercentage: number | string | null | undefined): number {
   const boost = Number(promotionPercentage || 0);
   return Math.round((itemCents * Math.max(0, ARTIST_PERCENT - boost)) / 100);
+}
+
+// White-glove pieces longer than every configured shipping tier can't be
+// priced online; buyers arrange those by email.
+export function tooLargeToShipOnline(artwork: { dimensions?: string | null }): boolean {
+  const longest = Math.max(0, ...parseDimensions(artwork.dimensions));
+  const maxTier = Math.max(0, ...WHITE_GLOVE_SHIPPING_TIERS.map((t) => t.maxSideIn));
+  return longest > maxTier;
 }

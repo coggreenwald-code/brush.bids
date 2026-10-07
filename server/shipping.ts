@@ -32,11 +32,12 @@ type ShipFrom = {
 export type ShippingQuote = {
   amountCents: number;         // postage + insurance, what the buyer pays
   insuranceCents: number;
-  method: "easypost" | "flat";
+  method: "easypost" | "flat" | "arta";
   label: string;               // e.g. "USPS Priority" or "Medium parcel"
   carrier: string | null;
   service: string | null;
   easypostShipmentId: string | null;
+  artaRequestId?: string | null;
   whiteGlove: boolean;
   insuredValue: number;        // dollars
 };
@@ -109,7 +110,71 @@ export class WhiteGloveUnavailableError extends Error {
   }
 }
 
-// White-glove price from the configured tiers, or null if none apply yet.
+// Live ARTA quote (white-glove art shipping). Returns null if ARTA isn't
+// configured or can't price this shipment instantly.
+async function artaQuote(artwork: ShippableArtwork, artist: ShipFrom, to: ShipAddress, insuredValue: number): Promise<ShippingQuote | null> {
+  const key = process.env.ARTA_API_KEY;
+  if (!key || !artist.shipFromZip) return null;
+  const sides = parseDimensions(artwork.dimensions).sort((a, b) => b - a);
+  try {
+    const resp = await fetch("https://api.arta.io/requests", {
+      method: "POST",
+      headers: { Authorization: `ARTA_APIKey ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        request: {
+          objects: [{
+            subtype: "painting_unframed",
+            value: insuredValue,
+            value_currency: "USD",
+            height: sides[0] ?? 36,
+            width: sides[1] ?? 24,
+            depth: Math.max(2, sides[2] ?? 2),
+            unit_of_measurement: "in",
+            weight: Math.max(1, Math.ceil((artwork.weightOz ?? 160) / 16)),
+            weight_unit: "lb",
+          }],
+          origin: {
+            address_line_1: artist.shipFromStreet ?? undefined, city: artist.shipFromCity ?? undefined,
+            region: artist.shipFromState ?? undefined, postal_code: artist.shipFromZip, country: "US",
+          },
+          destination: {
+            address_line_1: to.street1, address_line_2: to.street2 || undefined, city: to.city,
+            region: to.state, postal_code: to.zip, country: "US",
+          },
+        },
+      }),
+    });
+    const data: any = await resp.json().catch(() => null);
+    if (!resp.ok) {
+      console.error(`[shipping] ARTA quote ${resp.status}:`, JSON.stringify(data?.errors ?? data).slice(0, 300));
+      return null;
+    }
+    const quotes = (data?.quotes ?? [])
+      .map((q: any) => ({ ...q, cents: Math.round(Number(q.total) * 100) }))
+      .filter((q: any) => Number.isFinite(q.cents) && q.cents > 0)
+      .sort((a: any, b: any) => a.cents - b.cents);
+    if (quotes.length === 0) return null;
+    const best = quotes[0];
+    return {
+      amountCents: best.cents,
+      insuranceCents: 0,
+      method: "arta",
+      label: `White-glove art shipping (ARTA ${best.quote_type ?? ""})`.replace(" )", ")"),
+      carrier: "ARTA",
+      service: best.quote_type ?? null,
+      easypostShipmentId: null,
+      artaRequestId: data?.id ?? null,
+      whiteGlove: true,
+      insuredValue,
+    };
+  } catch (err: any) {
+    console.error("[shipping] ARTA quote failed:", err.message);
+    return null;
+  }
+}
+
+// White-glove estimate from the configured tiers, or null if the piece is
+// larger than every tier.
 function whiteGloveQuote(artwork: ShippableArtwork, insuredValue: number): ShippingQuote | null {
   const longest = Math.max(0, ...parseDimensions(artwork.dimensions));
   const tier = WHITE_GLOVE_SHIPPING_TIERS.find((t) => longest <= t.maxSideIn);
@@ -117,7 +182,7 @@ function whiteGloveQuote(artwork: ShippableArtwork, insuredValue: number): Shipp
   const insuranceCents = insuranceCentsFor(insuredValue);
   return {
     amountCents: Math.round(tier.priceUsd * 100) + insuranceCents,
-    insuranceCents, method: "flat", label: "White-glove art shipping",
+    insuranceCents, method: "flat", label: "White-glove art shipping (insured)",
     carrier: "ARTA", service: null, easypostShipmentId: null, whiteGlove: true, insuredValue,
   };
 }
@@ -129,6 +194,8 @@ export async function quoteShipping(artwork: ShippableArtwork, artist: ShipFrom,
   const insuredValue = askingPrice(artwork);
   const whiteGlove = needsWhiteGlove(artwork);
   if (whiteGlove) {
+    const live = to.street1 ? await artaQuote(artwork, artist, to, insuredValue) : null;
+    if (live) return live;
     const quote = whiteGloveQuote(artwork, insuredValue);
     if (!quote) throw new WhiteGloveUnavailableError();
     return quote;

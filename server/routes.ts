@@ -6,6 +6,7 @@ import { z } from "zod";
 import { hasStripeConnectReady, hasReadyPayout, isMinor, resolvePayoutTarget, ageInYears } from "@shared/payoutHelpers";
 import { getEasyPostRates } from "./easypost";
 import { registerOrderRoutes } from "./orders";
+import { registerPricingRoutes } from "./pricingSuggest";
 import { sendAdultUpgradeEmail } from "./emailService";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
@@ -96,6 +97,7 @@ export async function registerRoutes(
   await setupAuth(app);
   registerAuthRoutes(app);
   registerOrderRoutes(app);
+  registerPricingRoutes(app);
 
   // Artworks
   app.get(api.artworks.list.path, async (req, res) => {

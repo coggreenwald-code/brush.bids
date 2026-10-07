@@ -33,11 +33,15 @@ export const WHITE_GLOVE_MIN_PRICE = 1000;
 export const WHITE_GLOVE_MAX_SIDE_IN = 48;
 export const WHITE_GLOVE_MAX_WEIGHT_OZ = 50 * 16;
 
-// Shipping charged for white-glove (ARTA) pieces, by longest side in inches.
-// Leave empty until you have real ARTA quotes: while it's empty, white-glove
-// pieces can't be bought online and show "email us to buy" instead, so
-// BrushBids never undercharges for oversized or high-value shipping.
-export const WHITE_GLOVE_SHIPPING_TIERS: { maxSideIn: number; priceUsd: number }[] = [];
+// White-glove (ARTA) shipping. With an ARTA_API_KEY set, buyers pay ARTA's
+// live quote. Without one, they pay these estimates by the artwork's longest
+// side. They're deliberately on the high side; replace them with real ARTA
+// quotes once you have a few. Pieces longer than the last tier are "email us
+// to buy".
+export const WHITE_GLOVE_SHIPPING_TIERS: { maxSideIn: number; priceUsd: number }[] = [
+  { maxSideIn: 60, priceUsd: 295 },
+  { maxSideIn: 96, priceUsd: 495 },
+];
 
 // Shipping charged when live EasyPost rates are unavailable, by package size.
 // Insurance is added on top. Adjust these to match real costs.

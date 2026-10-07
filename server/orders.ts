@@ -18,9 +18,9 @@ import {
   emailOfferReceived, emailOfferAccepted, emailOfferDeclined, emailOrderConfirmed, emailArtistSold,
   emailOrderShipped, emailOrderIssue, emailArtistPaid,
 } from "./orderEmails";
-import { askingPrice, minOfferAmount, artistShareCents, needsWhiteGlove } from "@shared/pricing";
+import { askingPrice, minOfferAmount, artistShareCents, needsWhiteGlove, tooLargeToShipOnline } from "@shared/pricing";
 import { ageInYears, hasStripeConnectReady, isMinor, resolvePayoutTarget } from "@shared/payoutHelpers";
-import { CONTACT_EMAIL, INSPECTION_DAYS, MIN_BUYER_AGE, OFFER_WINDOW_HOURS, WHITE_GLOVE_SHIPPING_TIERS } from "@shared/siteConfig";
+import { CONTACT_EMAIL, INSPECTION_DAYS, MIN_BUYER_AGE, OFFER_WINDOW_HOURS } from "@shared/siteConfig";
 import type { Order, Offer, Artwork, User } from "@shared/schema";
 
 const HOUR = 60 * 60 * 1000;
@@ -186,6 +186,7 @@ export function registerOrderRoutes(app: Express) {
       insuredValue: quote.insuredValue.toFixed(2),
       carrier: quote.carrier,
       easypostShipmentId: quote.easypostShipmentId,
+      artaRequestId: quote.artaRequestId ?? null,
     });
 
     try {
@@ -382,7 +383,7 @@ export function registerOrderRoutes(app: Express) {
     const artwork = await storage.getArtwork(parsed.data.artworkId);
     if (!isAvailable(artwork)) return res.status(409).json({ message: "This artwork is no longer available." });
     if (artwork.artistId === buyerId) return res.status(400).json({ message: "You can't make an offer on your own artwork." });
-    if (needsWhiteGlove(artwork as any) && WHITE_GLOVE_SHIPPING_TIERS.length === 0) {
+    if (needsWhiteGlove(artwork as any) && tooLargeToShipOnline(artwork as any)) {
       return res.status(409).json({ message: new WhiteGloveUnavailableError().message });
     }
     const amount = Math.round(parsed.data.amount * 100) / 100;
@@ -477,6 +478,19 @@ export function registerOrderRoutes(app: Express) {
       if (action === "mark-delivered") {
         const updated = await markDelivered(order, new Date());
         if (!updated) return res.status(409).json({ message: "Only paid or shipped orders can be marked delivered." });
+        return res.json(updated);
+      }
+      if (action === "mark-shipped") {
+        // White-glove pieces: ARTA picks up; admin records the tracking link.
+        const parsed = z.object({ trackingNumber: z.string().trim().max(80).optional(), trackingUrl: z.string().trim().url().optional().or(z.literal("")) }).safeParse(req.body ?? {});
+        if (!parsed.success) return res.status(400).json({ message: "Enter a valid tracking link." });
+        const updated = await orderStorage.transitionOrder(order.id, ["paid"], {
+          status: "shipped", shippedAt: new Date(), carrier: order.whiteGlove ? "ARTA" : order.carrier,
+          trackingNumber: parsed.data.trackingNumber || order.trackingNumber, trackingUrl: parsed.data.trackingUrl || order.trackingUrl,
+        });
+        if (!updated) return res.status(409).json({ message: "Only paid orders can be marked shipped." });
+        const artwork = await storage.getArtwork(order.artworkId);
+        await emailOrderShipped({ userId: order.buyerId, email: order.buyerEmail }, artwork?.title ?? "your artwork", updated.trackingUrl, order.statusToken);
         return res.json(updated);
       }
       if (action === "release-now") {

@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { EditPriceButton } from "@/components/EditPriceButton";
+import { CONTACT_EMAIL } from "@shared/siteConfig";
 import { SellerPanel } from "@/components/SellerPanel";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/use-auth";
@@ -562,10 +564,7 @@ export default function Dashboard() {
                             )}
                           </div>
                           <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
-                            <div>
-                              <div className="text-xs text-white/40">Current Bid</div>
-                              <div className="font-bold text-emerald-400">${Number(artwork.price).toLocaleString()}</div>
-                            </div>
+                            <EditPriceButton artwork={artwork} />
                             <div className="flex gap-2 flex-wrap">
                               {!artwork.paidAt && (
                                 <ReuploadImageButton
@@ -1299,22 +1298,13 @@ export default function Dashboard() {
                   {charities?.map(c => (
                     <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                   ))}
-                  <SelectItem value="other" data-testid="charity-option-other-dashboard">Other (describe below)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            {convertOpts.charityId === "other" && (
-              <div>
-                <Label className="text-white/60">Where should the 5% go?</Label>
-                <input
-                  className="w-full mt-1 px-3 py-2 rounded-md bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
-                  placeholder="e.g. Local after-school art program"
-                  value={convertOpts.charityNote}
-                  onChange={(e) => setConvertOpts(p => ({ ...p, charityNote: e.target.value }))}
-                  data-testid="input-charity-note-dashboard"
-                />
-              </div>
-            )}
+            <p className="text-xs text-white/40">
+              Want the 5% to go somewhere not listed?{" "}
+              <a className="underline text-white/60" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Charity suggestion for my BrushBids listing")}`}>Email us</a>.
+            </p>
             <div>
               <Label className="text-white/60">Review Type</Label>
               <Select value={convertOpts.reviewType} onValueChange={(v: "ai_instant" | "human_curator") => setConvertOpts(p => ({ ...p, reviewType: v }))}>

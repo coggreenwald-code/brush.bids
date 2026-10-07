@@ -10,6 +10,7 @@ type AdminOrder = {
   whiteGlove: boolean; carrier: string | null; trackingNumber: string | null; trackingUrl: string | null;
   paidAt: string | null; shippedAt: string | null; deliveredAt: string | null; payoutReleaseAt: string | null;
   payoutReleasedAt: string | null; stripeTransferId: string | null; issueNote: string | null; adminNote: string | null;
+  artaRequestId: string | null; shippingLabel: string | null;
 };
 
 const money = (n: string | null) => (n == null ? "-" : `$${Number(n).toFixed(2)}`);
@@ -19,7 +20,7 @@ export function AdminOrdersTab() {
   const { toast } = useToast();
   const { data, isLoading } = useQuery<AdminOrder[]>({ queryKey: ["/api/admin/orders"] });
   const act = useMutation({
-    mutationFn: ({ id, action }: { id: number; action: string }) => apiRequest("POST", `/api/admin/orders/${id}/${action}`),
+    mutationFn: ({ id, action, body }: { id: number; action: string; body?: unknown }) => apiRequest("POST", `/api/admin/orders/${id}/${action}`, body),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] }),
     onError: (err: Error) => toast({ title: "Action failed", description: err.message.replace(/^\d+:\s*/, ""), variant: "destructive" }),
   });
@@ -52,6 +53,11 @@ export function AdminOrdersTab() {
           </p>
           <pre className="font-sans whitespace-pre-wrap text-white/50">{o.shipTo}</pre>
           {o.trackingNumber && <p className="text-white/50">{o.carrier} {o.trackingNumber}{o.trackingUrl && <> · <a className="underline" href={o.trackingUrl} target="_blank" rel="noreferrer">track</a></>}</p>}
+          {o.whiteGlove && o.status === "paid" && (
+            <p className="text-violet-200">
+              Book white-glove pickup in ARTA{o.artaRequestId ? ` using quote request ${o.artaRequestId}` : ` (charged: ${o.shippingLabel ?? "white-glove estimate"}; request a quote in ARTA)`}, then mark it shipped with ARTA's tracking.
+            </p>
+          )}
           {o.issueNote && <p className="text-amber-200">Buyer reported: {o.issueNote}</p>}
           {o.adminNote && <p className="text-white/40">Note: {o.adminNote}</p>}
           {o.payoutReleasedAt ? (
@@ -60,6 +66,13 @@ export function AdminOrdersTab() {
             <p className="text-white/50">Artist payout releases {new Date(o.payoutReleaseAt).toLocaleString()}</p>
           ) : null}
           <div className="flex flex-wrap gap-2 pt-1">
+            {o.status === "paid" && (
+              <Button size="sm" variant="outline" className="rounded-full border-white/20 text-white" onClick={() => {
+                const trackingUrl = window.prompt("Tracking link (from ARTA or the carrier). Leave blank if you don't have one yet.") ?? null;
+                if (trackingUrl === null) return;
+                act.mutate({ id: o.id, action: "mark-shipped", body: { trackingUrl } });
+              }}>Mark shipped</Button>
+            )}
             {(o.status === "paid" || o.status === "shipped") && (
               <Button size="sm" variant="outline" className="rounded-full border-white/20 text-white" onClick={() => confirmAct(o.id, "mark-delivered", "Mark this order delivered? The inspection window starts now.")}>Mark delivered</Button>
             )}
