@@ -116,7 +116,7 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      if (capturedJsonResponse && process.env.NODE_ENV !== "production") {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
@@ -132,6 +132,8 @@ app.use((req, res, next) => {
   await registerRoutes(httpServer, app);
   const { startAuctionScheduler } = await import("./auctionScheduler");
   startAuctionScheduler();
+  const { startOrderScheduler } = await import("./orders");
+  startOrderScheduler();
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

@@ -126,6 +126,87 @@ export const payouts = pgTable("payouts", {
   index("idx_payouts_artist").on(table.artistId),
 ]);
 
+export const offerStatusEnum = pgEnum("offer_status", ["pending", "accepted", "declined", "expired", "withdrawn", "purchased"]);
+
+// Make an Offer. The artist accepts or declines within the offer window; an
+// accepted offer then gives the buyer the same window to pay.
+export const offers = pgTable("offers", {
+  id: serial("id").primaryKey(),
+  artworkId: integer("artwork_id").references(() => artworks.id).notNull(),
+  buyerId: varchar("buyer_id").references(() => users.id).notNull(),
+  artistId: varchar("artist_id").references(() => users.id).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  status: offerStatusEnum("status").default("pending").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  respondedAt: timestamp("responded_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_offers_artwork").on(table.artworkId),
+  index("idx_offers_status").on(table.status),
+]);
+
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending_payment", "paid", "shipped", "delivered", "completed", "issue", "cancelled", "refunded",
+]);
+
+// One fixed-price sale, from checkout through delivery and artist payout.
+// Money stays on the platform until delivery + the inspection window, then
+// moves to the artist (Stripe transfer or the manual payout queue).
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  artworkId: integer("artwork_id").references(() => artworks.id).notNull(),
+  buyerId: varchar("buyer_id").references(() => users.id).notNull(),
+  artistId: varchar("artist_id").references(() => users.id).notNull(),
+  offerId: integer("offer_id").references(() => offers.id),
+  // Payment record for tax reporting and payout linkage.
+  bidId: integer("bid_id").references(() => bids.id),
+  status: orderStatusEnum("status").default("pending_payment").notNull(),
+  // Private token for the buyer's no-login order status page.
+  statusToken: varchar("status_token", { length: 64 }).notNull().unique(),
+  itemAmount: decimal("item_amount", { precision: 10, scale: 2 }).notNull(),
+  shippingAmount: decimal("shipping_amount", { precision: 10, scale: 2 }).notNull(),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+  stripeChargeId: text("stripe_charge_id"),
+  buyerEmail: text("buyer_email"),
+  shipName: text("ship_name"),
+  shipStreet1: text("ship_street1"),
+  shipStreet2: text("ship_street2"),
+  shipCity: text("ship_city"),
+  shipState: text("ship_state"),
+  shipZip: text("ship_zip"),
+  // Shipping: "easypost" (live rate), "flat" (size tier), with whiteGlove set
+  // when the piece should go through ARTA instead.
+  shippingMethod: text("shipping_method").notNull(),
+  shippingLabel: text("shipping_label"),
+  whiteGlove: boolean("white_glove").default(false).notNull(),
+  insuredValue: decimal("insured_value", { precision: 10, scale: 2 }),
+  carrier: text("carrier"),
+  trackingNumber: text("tracking_number"),
+  trackingUrl: text("tracking_url"),
+  labelUrl: text("label_url"),
+  easypostShipmentId: text("easypost_shipment_id"),
+  easypostTrackerId: text("easypost_tracker_id"),
+  // True when the artist paid for postage themselves (reimbursed at payout).
+  artistPaidShipping: boolean("artist_paid_shipping").default(false).notNull(),
+  paidAt: timestamp("paid_at"),
+  shippedAt: timestamp("shipped_at"),
+  deliveredAt: timestamp("delivered_at"),
+  payoutReleaseAt: timestamp("payout_release_at"),
+  payoutReleasedAt: timestamp("payout_released_at"),
+  stripeTransferId: text("stripe_transfer_id"),
+  issueNote: text("issue_note"),
+  adminNote: text("admin_note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_orders_status").on(table.status),
+  index("idx_orders_artist").on(table.artistId),
+  index("idx_orders_buyer").on(table.buyerId),
+]);
+
 export const charities = pgTable("charities", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -170,4 +251,7 @@ export type InsertCharity = z.infer<typeof insertCharitySchema>;
 export type PortfolioItem = typeof portfolioItems.$inferSelect;
 export type InsertPortfolioItem = z.infer<typeof insertPortfolioItemSchema>;
 export type Payout = typeof payouts.$inferSelect;
+export type Offer = typeof offers.$inferSelect;
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
 export type InsertPayout = z.infer<typeof insertPayoutSchema>;

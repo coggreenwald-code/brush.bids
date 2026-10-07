@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { ARTIST_PERCENT, PLATFORM_PERCENT, CHARITY_PERCENT, PAYOUT_TIMING, MIN_BUYER_AGE, CONTACT_EMAIL } from "@shared/siteConfig";
+import { ARTIST_PERCENT, PLATFORM_PERCENT, CHARITY_PERCENT, PAYOUT_TIMING, MIN_BUYER_AGE, CONTACT_EMAIL, MIN_OFFER_PERCENT, OFFER_WINDOW_HOURS, INSPECTION_DAYS } from "@shared/siteConfig";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function FAQ() {
     },
     {
       question: "How does the BrushBids curation process work?",
-      answer: "Our expert curators, supported by advanced review tools, evaluate every submission based on technical execution, composition, creativity, and presentation. You can choose instant feedback or wait for a detailed human curator review. Works meeting our standards are approved for auction; others receive constructive feedback for improvement.",
+      answer: "Our expert curators, supported by advanced review tools, evaluate every submission based on technical execution, composition, creativity, and presentation. You can choose instant feedback or wait for a detailed human curator review. Works meeting our standards are approved for sale; others receive constructive feedback for improvement.",
     },
     {
       question: "How much do I earn from a sale?",
@@ -40,16 +40,16 @@ export default function FAQ() {
 
   const buyerFaqs = [
     {
-      question: "How do BrushBids auctions work?",
-      answer: "Each artwork has a starting price set by the artist. You can place bids above the current highest bid. Auctions run for a set duration chosen by the artist (between 1 and 30 days). If a bid is placed in the last 2 minutes, the auction automatically extends to prevent sniping. The highest bidder when the auction closes wins the artwork.",
+      question: "How does buying work?",
+      answer: `Every piece has a fixed price set by the artist. Buy it now, or make an offer of at least ${MIN_OFFER_PERCENT}% of the price; the artist has ${OFFER_WINDOW_HOURS} hours to accept, and then you have ${OFFER_WINDOW_HOURS} hours to pay.`,
     },
     {
       question: "What payment methods are accepted?",
-      answer: `BrushBids accepts major credit and debit cards through Stripe. You must be ${MIN_BUYER_AGE} or older to buy or bid.`,
+      answer: `BrushBids accepts major credit and debit cards through Stripe. You must be ${MIN_BUYER_AGE} or older to buy or make an offer.`,
     },
     {
       question: "Will I be charged sales tax?",
-      answer: "If your shipping address is in a US state where BrushBids is required to collect sales tax, the appropriate tax will be calculated by Stripe and added on top of your winning bid at checkout. As the marketplace facilitator, BrushBids collects and remits the tax to the relevant authorities — artists do not need to handle sales tax themselves. Your tax is shown as a separate line on your receipt.",
+      answer: "If your shipping address is in a US state where BrushBids is required to collect sales tax, the appropriate tax will be calculated by Stripe and added on top of the price at checkout. As the marketplace facilitator, BrushBids collects and remits the tax to the relevant authorities — artists do not need to handle sales tax themselves. Your tax is shown as a separate line on your receipt.",
     },
     {
       question: "How is artwork delivered?",
@@ -57,7 +57,7 @@ export default function FAQ() {
     },
     {
       question: "What if the artwork isn't as described?",
-      answer: "BrushBids has a buyer protection policy. If the artwork differs significantly from the listing, you can request a return within 7 days of receipt. We mediate all disputes fairly.",
+      answer: `Report it from your order page within ${INSPECTION_DAYS} days of delivery. The artist isn't paid until that window passes, so we can hold the payment and make it right, including a full refund for damaged or misdescribed work.`,
     },
   ];
 
@@ -124,7 +124,7 @@ export default function FAQ() {
 
   return (
     <Layout>
-      <SEOHead title="FAQ | BrushBids" description="Frequently asked questions about BrushBids, the student art auction platform. Learn how to submit artwork, bid on pieces, understand our 75/20/5 revenue split, and more." />
+      <SEOHead title="FAQ | BrushBids" description="Frequently asked questions about BrushBids: buying, offers, shipping, selling and payouts." />
       <div className="space-y-16 pb-16 max-w-3xl mx-auto px-4 md:px-0">
         <section className="text-center space-y-6" aria-label="FAQ Introduction">
           <div className="w-16 h-16 rounded-2xl bg-[#A78BFA]/10 flex items-center justify-center mx-auto">

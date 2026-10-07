@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { storage } from "./storage";
 
-function getTransporter() {
+export function getTransporter() {
   const host = process.env.SMTP_HOST;
   const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
   const user = process.env.SMTP_USER;

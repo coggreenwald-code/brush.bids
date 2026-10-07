@@ -70,7 +70,7 @@ export function SiteMenu() {
 
   if (isAuthenticated) {
     if (user?.role === "buyer" || user?.role === "both") {
-      links.push({ label: "My Bids", href: "/my-bids" });
+      links.push({ label: "My Purchases", href: "/purchases" });
     }
     if (user?.role === "artist" || user?.role === "both") {
       links.push({ label: "Dashboard", href: "/dashboard" });

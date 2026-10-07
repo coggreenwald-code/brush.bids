@@ -29,7 +29,7 @@ const roleOptions: { id: RoleOption; title: string; description: string; icon: t
   {
     id: "buyer",
     title: "I'm a Collector",
-    description: "Discover and bid on unique student artwork",
+    description: "Discover and buy original student artwork",
     icon: ShoppingBag,
   },
   {

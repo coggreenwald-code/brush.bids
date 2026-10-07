@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback, type SyntheticEvent,
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence, useScroll, useTransform, useVelocity, useSpring, useMotionValue, useAnimationFrame } from "framer-motion";
 import { SiInstagram, SiX, SiLinkedin, SiFacebook } from "react-icons/si";
-import { SOCIAL_URLS, CHARITY_PERCENT, ARTIST_PERCENT, PAYOUT_TIMING } from "@shared/siteConfig";
+import { SOCIAL_URLS, CHARITY_PERCENT, ARTIST_PERCENT, PAYOUT_TIMING, MIN_OFFER_PERCENT } from "@shared/siteConfig";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useArtworks } from "@/hooks/use-artworks";
 import { useAuth } from "@/hooks/use-auth";
@@ -109,7 +109,7 @@ const PROCESS = [
     cta: { href: "/gallery", label: "Browse Gallery" },
     steps: [
       { n: "01", title: "Browse Gallery", text: "Explore curated student artwork from talented emerging artists." },
-      { n: "02", title: "Place Bids", text: "Bid on pieces you love and watch the auction unfold." },
+      { n: "02", title: "Buy or Offer", text: "Buy at the listed price or make an offer the artist can accept." },
       { n: "03", title: "Win Artwork", text: "Secure unique pieces while supporting student artists." },
       { n: "04", title: "Support Causes", text: "Part of your purchase goes to charity." },
     ],
@@ -126,10 +126,10 @@ const PLANS = [
     features: [
       ["Submit", "your work for curated review"],
       ["Give", `${CHARITY_PERCENT}% of every sale to charity`],
-      ["Track", "bids and earnings from your dashboard"],
+      ["Track", "offers, sales and earnings from your dashboard"],
       ["Promote", "listings with optional visibility boosts"],
       ["Flexible", "PayPal, Venmo, Zelle or Stripe payouts"],
-      ["Keep", "the majority of every winning bid"],
+      ["Ship", "with a prepaid, insured label"],
     ],
   },
   {
@@ -137,10 +137,10 @@ const PLANS = [
     tag: "No fees to bid",
     price: "Free",
     per: "/to join",
-    desc: "For collectors who want to discover, follow, and win original student art in real-time auctions.",
+    desc: "For collectors who want to discover and own original student art at fair prices.",
     features: [
       ["Browse", "a curated gallery of approved artwork"],
-      ["Bid", "live with fair anti-sniping protection"],
+      ["Offer", "a price that works for you, or buy now"],
       ["Discover", "emerging talent before anyone else"],
       ["Support", "charities through every purchase"],
       ["Checkout", "securely with taxes handled for you"],
@@ -150,12 +150,12 @@ const PLANS = [
 ];
 
 const FAQS = [
-  { q: "1. What is BrushBids?", a: "BrushBids is a student art auction platform that connects emerging student artists with collectors through curated, real-time auctions." },
-  { q: "2. How does curation work?", a: "Every submission is reviewed by our curators with help from AI tools, so only strong, original pieces enter the auction gallery." },
-  { q: "3. How does bidding work?", a: "Auctions run for a set duration with a live countdown. If a bid lands in the final two minutes, the auction extends to keep things fair." },
+  { q: "1. What is BrushBids?", a: "BrushBids is a curated marketplace where you buy original work directly from student artists." },
+  { q: "2. How does curation work?", a: "Every submission is reviewed by our curators with help from AI tools, so only strong, original pieces reach the gallery." },
+  { q: "3. How does buying work?", a: `Buy at the listed price, or offer at least ${MIN_OFFER_PERCENT}% of it. Shipping is insured, and the artist is paid only after your piece arrives safely.` },
   { q: "4. How do artists get paid?", a: `Artists keep ${ARTIST_PERCENT}% of every sale and are paid ${PAYOUT_TIMING}, via PayPal, Venmo, Zelle, or Stripe.` },
   { q: "5. How does charity giving work?", a: `${CHARITY_PERCENT}% of every sale goes to charity. We will publish our charity partners once written agreements are signed.` },
-  { q: "6. Is BrushBids free to use?", a: "Yes. Browsing and bidding are free for collectors, and artists can list their work at no upfront cost." },
+  { q: "6. Is BrushBids free to use?", a: "Yes. Browsing is free for collectors, and artists can list their work at no upfront cost." },
 ];
 
 /* ============================================================
@@ -364,7 +364,7 @@ function HeroRing({ ringArts }: { ringArts: RingArt[] }) {
    Rotating circle text (decorative badge)
    ============================================================ */
 function CircleText() {
-  const text = "BRUSHBIDS · STUDENT ART AUCTIONS · ";
+  const text = "BRUSHBIDS · ORIGINAL STUDENT ART · ";
   return (
     <div className="circle-text-wrap">
       <svg className="circle-text" viewBox="0 0 200 200" width="160" height="160" aria-hidden="true">
@@ -424,12 +424,12 @@ function Intro() {
         <div className="container-large">
           <div className="padding-section-large">
             <div className="intro-wrap">
-              <p className="intro-text">A curated auction experience built for emerging student artists, <span className="text-color-secondary">turning original work into real opportunity.</span></p>
+              <p className="intro-text">A curated marketplace built for emerging student artists, <span className="text-color-secondary">turning original work into real opportunity.</span></p>
               <div className="spacer-xlarge"></div>
             </div>
             <div className="w-layout-grid intro-grid">
               <div className="max-width-medium">
-                <p className="text-size-regular">✦ BrushBids connects student artists with collectors through expert curation, real-time bidding, and built-in charitable giving — so every piece you discover supports a young artist and a good cause.</p>
+                <p className="text-size-regular">✦ BrushBids connects student artists with collectors through curation, fair fixed prices, and built-in charitable giving — so every piece you discover supports a young artist and a good cause.</p>
                 <div className="spacer-medium"></div>
                 <div className="intro-contact-wrap">
                   <SocialLinks />
@@ -1074,8 +1074,8 @@ export default function Home() {
   return (
     <div className="cyrclo-page">
       <SEOHead
-        title="BrushBids — Student Art Auctions for a Good Cause"
-        description="Discover and bid on curated student artwork in real-time auctions. A portion of every sale supports charity."
+        title="BrushBids | Original Art by Student Artists"
+        description="Buy original artwork directly from student artists. Insured shipping, and 5% of every sale supports charity."
       />
       <div className="page-wrapper">
         <SiteMenu />

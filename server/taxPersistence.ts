@@ -15,7 +15,10 @@ type ExpandedSession = Stripe.Checkout.Session & {
 };
 
 function pickAddress(session: ExpandedSession): Stripe.Address | null {
+  // Newer Stripe API versions return the shipping address under
+  // collected_information; older ones under shipping_details.
   return (
+    (session as any).collected_information?.shipping_details?.address ??
     session.shipping_details?.address ??
     session.customer_details?.address ??
     null
@@ -65,7 +68,9 @@ export async function persistTaxFromCheckoutSession(
   let session: ExpandedSession;
   try {
     session = (await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['total_details.breakdown', 'shipping_details', 'customer_details'],
+      // shipping_details is no longer expandable (it errors on current API
+      // versions, which silently dropped tax records); it's returned inline.
+      expand: ['total_details.breakdown'],
     })) as ExpandedSession;
   } catch (err) {
     console.error(`[tax] retrieve session ${sessionId} failed:`, err);

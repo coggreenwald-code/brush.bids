@@ -3,6 +3,7 @@
 // payment_intent.amount_capturable_updated are both routed through
 // ensureBidAuthorized (idempotent on session id / PI id).
 
+import { handleOrderCheckoutCompleted, handleOrderCheckoutExpired } from './orders';
 import type Stripe from 'stripe';
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
@@ -262,6 +263,10 @@ export class WebhookHandlers {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  if (session.metadata?.kind === 'order') {
+    await handleOrderCheckoutCompleted(session);
+    return;
+  }
   const kind = session.metadata?.kind;
 
   if (kind === 'bid_hold') {
@@ -351,6 +356,10 @@ async function handlePaymentIntentSucceeded(pi: Stripe.PaymentIntent) {
 }
 
 async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
+  if (session.metadata?.kind === 'order') {
+    await handleOrderCheckoutExpired(session);
+    return;
+  }
   if (session.metadata?.kind !== 'bid_hold') return;
   // Bid row may not exist (we only create on authorization). If it does, mark failed.
   const bid = await storage.getBidByCheckoutSession(session.id);

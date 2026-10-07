@@ -1,28 +1,11 @@
 import { Link } from "wouter";
 import { artistDisplayName } from "@/lib/artistName";
 import { type Artwork, type User } from "@shared/schema";
-import { Rocket, Clock } from "lucide-react";
+import { Rocket } from "lucide-react";
+import { askingPrice } from "@shared/pricing";
 import { useCharities } from "@/hooks/use-charities";
 import { CHARITY_PERCENT, SHOW_CHARITY_NAMES } from "@shared/siteConfig";
 import { handleArtworkImageError } from "@/lib/imageFallback";
-
-function getAuctionEndDate(artwork: Artwork): Date {
-  if (artwork.endTime) return new Date(artwork.endTime);
-  const d = new Date(artwork.createdAt || new Date());
-  d.setDate(d.getDate() + (artwork.auctionDurationDays || 7));
-  return d;
-}
-
-function getTimeLeftLabel(endDate: Date): string {
-  const diff = endDate.getTime() - Date.now();
-  if (diff <= 0) return "Ended";
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  if (days > 0) return `${days}d ${hours}h left`;
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  if (hours > 0) return `${hours}h ${minutes}m left`;
-  return `${minutes}m left`;
-}
 
 interface ArtworkCardProps {
   artwork: Artwork & { artist?: User };
@@ -79,11 +62,9 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
 
           <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
             <p className="text-white/80 text-sm font-medium">View artwork</p>
-            {artwork.price && (
-              <p className="text-[#34D399] text-sm font-semibold mt-1">
-                Starting at ${Number(artwork.price).toLocaleString()}
-              </p>
-            )}
+            <p className="text-[#34D399] text-sm font-semibold mt-1">
+              {artwork.paidAt ? "Sold" : `$${askingPrice(artwork).toLocaleString()}`}
+            </p>
           </div>
         </div>
 
@@ -103,20 +84,11 @@ export function ArtworkCard({ artwork, showStatus = false }: ArtworkCardProps) {
             </p>
           )}
           {artwork.status === "approved" && (
-            <div
-              className="flex items-center gap-1 mt-3 text-xs text-[#60A5FA]/70"
-              data-testid={`auction-time-${artwork.id}`}
-            >
-              <Clock className="w-3 h-3" />
-              {(() => {
-                const endDate = getAuctionEndDate(artwork);
-                const label = getTimeLeftLabel(endDate);
-                return (
-                  <span className={label === "Ended" ? "text-red-400 font-medium" : ""}>
-                    {label}
-                  </span>
-                );
-              })()}
+            <div className="flex items-center justify-between mt-3 text-sm" data-testid={`price-${artwork.id}`}>
+              <span className={artwork.paidAt ? "text-white/40 line-through" : "font-semibold text-[#34D399]"}>
+                ${askingPrice(artwork).toLocaleString()}
+              </span>
+              {artwork.paidAt && <span className="text-xs font-medium uppercase tracking-wider text-white/50">Sold</span>}
             </div>
           )}
         </div>

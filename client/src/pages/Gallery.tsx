@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { askingPrice } from "@shared/pricing";
 import { Layout } from "@/components/Layout";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -23,7 +24,8 @@ const categories = [
 const sortOptions = [
   { value: "newest", label: "Newest First" },
   { value: "oldest", label: "Oldest First" },
-  { value: "ending-soon", label: "Ending Soon" },
+  { value: "price-low", label: "Price: Low to High" },
+  { value: "price-high", label: "Price: High to Low" },
 ];
 
 export default function Gallery() {
@@ -62,18 +64,18 @@ export default function Gallery() {
       case "oldest":
         filtered.sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
         break;
-      case "ending-soon":
-        filtered.sort((a, b) => {
-          const aEnd = new Date(a.createdAt || 0);
-          const bEnd = new Date(b.createdAt || 0);
-          aEnd.setDate(aEnd.getDate() + 7);
-          bEnd.setDate(bEnd.getDate() + 7);
-          return aEnd.getTime() - bEnd.getTime();
-        });
+      case "price-low":
+        filtered.sort((a, b) => askingPrice(a) - askingPrice(b));
+        break;
+      case "price-high":
+        filtered.sort((a, b) => askingPrice(b) - askingPrice(a));
         break;
     }
     
     filtered.sort((a, b) => {
+      // Available pieces before sold ones, then boosted pieces first.
+      const soldDiff = Number(!!a.paidAt) - Number(!!b.paidAt);
+      if (soldDiff !== 0) return soldDiff;
       const aBoost = a.promotionPercentage ?? 0;
       const bBoost = b.promotionPercentage ?? 0;
       return bBoost - aBoost;
@@ -94,7 +96,7 @@ export default function Gallery() {
 
   return (
     <Layout>
-      <SEOHead title="Art Gallery | BrushBids" description="Browse and bid on original student artwork. Discover emerging talent from student artists across the country." />
+      <SEOHead title="Art Gallery | BrushBids" description="Browse and buy original student artwork. Discover emerging talent from student artists across the country." />
       <div className="pb-24">
         <div
           style={{ width: "100vw", marginLeft: "calc(-50vw + 50%)" }}

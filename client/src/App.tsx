@@ -16,8 +16,9 @@ import About from "@/pages/About";
 import FAQ from "@/pages/FAQ";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import OrderStatus from "@/pages/OrderStatus";
+import Purchases from "@/pages/Purchases";
 import Contact from "@/pages/Contact";
-import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -40,7 +41,9 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/contact" component={Contact} />
-      <Route path="/my-bids" component={MyBids} />
+      <Route path="/purchases" component={Purchases} />
+      <Route path="/order/:token" component={OrderStatus} />
+      <Route path="/my-bids"><Redirect to="/purchases" /></Route>
       <Route path="/portfolio"><Redirect to="/dashboard" /></Route>
       <Route path="/auth" component={Auth} />
       <Route component={NotFound} />

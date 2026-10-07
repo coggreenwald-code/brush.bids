@@ -23,19 +23,14 @@ const formSchema = z.object({
   description: z.string().min(10, "Description too short"),
   imageUrl: z.string().min(1, "Please upload an image of your artwork"),
   price: z.coerce.number().min(1, "Price must be positive"),
-  // Optional Buy It Now price. 0 / empty means no buyout. When set it must be
-  // higher than the reserve price (validated in the refine below).
-  buyNowPrice: z.coerce.number().min(0).optional(),
   dimensionLength: z.coerce.number().min(0.1, "Length is required"),
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
-  weightOz: z.coerce.number().min(1, "Weight is required").optional(),
+  // Packed weight; needed to quote insured shipping.
+  weightOz: z.coerce.number({ invalid_type_error: "Weight is required" }).min(1, "Weight is required"),
   auctionDurationDays: z.coerce.number().refine(v => [1, 3, 5, 7].includes(v), { message: "Auction duration must be 1, 3, 5, or 7 days" }).default(7),
   charityId: z.coerce.number().optional(),
   charityNote: z.string().max(200).optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
-}).refine((d) => !d.buyNowPrice || d.buyNowPrice > d.price, {
-  message: "Buy It Now price must be higher than the reserve price",
-  path: ["buyNowPrice"],
 });
 
 export default function SubmitArtwork() {
@@ -200,7 +195,6 @@ export default function SubmitArtwork() {
       charityNote: isOther ? rest.charityNote : undefined,
       artistId: user.id,
       price: data.price.toString(),
-      buyNowPrice: data.buyNowPrice && data.buyNowPrice > 0 ? data.buyNowPrice.toString() : undefined,
       dimensions,
     } as any, {
       onSuccess: () => {
@@ -226,12 +220,12 @@ export default function SubmitArtwork() {
 
   return (
     <Layout>
-      <SEOHead title="Submit Artwork | BrushBids" description="Submit your artwork for expert curation and auction on BrushBids." />
+      <SEOHead title="Submit Artwork | BrushBids" description="Submit your artwork for curation and sale on BrushBids." />
       <div className="max-w-2xl mx-auto space-y-8 px-4 md:px-0">
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Create Listing</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">Submit Artwork</h1>
-          <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
+          <p className="text-white/50">Upload your work for review. Once approved, it goes on sale at your price.</p>
         </div>
 
 
@@ -296,51 +290,13 @@ export default function SubmitArtwork() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white/70">Reserve Price ($)</FormLabel>
+                      <FormLabel className="text-white/70">Price ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="50.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="buyNowPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/70">Buy It Now Price ($) <span className="text-white/40 font-normal">— optional</span></FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="e.g. 250.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} value={field.value ?? ""} data-testid="input-buy-now-price" />
+                        <Input type="number" placeholder="150.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
                       </FormControl>
                       <FormDescription className="text-white/40">
-                        Let collectors purchase instantly at this price, ending the auction early. Must be higher than the reserve price.
+                        Buyers can buy at this price or offer at least 75% of it. You keep 75% of the sale.
                       </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="auctionDurationDays"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/70">Auction Duration</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-auction-duration">
-                            <SelectValue placeholder="Select duration" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">1 Day</SelectItem>
-                          <SelectItem value="3">3 Days</SelectItem>
-                          <SelectItem value="5">5 Days</SelectItem>
-                          <SelectItem value="7">7 Days</SelectItem>
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

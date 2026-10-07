@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { SellerPanel } from "@/components/SellerPanel";
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/hooks/use-auth";
 import { useArtworks } from "@/hooks/use-artworks";
@@ -128,7 +129,7 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/portfolio', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['/api/artworks'] });
-      toast({ title: "Submitted for Auction", description: "Your portfolio piece has been submitted for curation review." });
+      toast({ title: "Submitted for sale", description: "Your portfolio piece has been submitted for curation review." });
       setShowConvertDialog(null);
     },
     onError: () => { toast({ title: "Error", description: "Failed to convert item.", variant: "destructive" }); },
@@ -449,6 +450,7 @@ export default function Dashboard() {
               <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                 <TabsList className="bg-white/[0.03] border border-white/5 rounded-full p-1 max-sm:w-full max-sm:justify-start max-sm:overflow-x-auto">
                   <TabsTrigger value="artworks" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">My Artworks</TabsTrigger>
+                  <TabsTrigger value="sales" data-testid="tab-sales" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">Sales &amp; Offers</TabsTrigger>
                   <TabsTrigger value="portfolio" data-testid="tab-portfolio" className="rounded-full text-white/50 data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-none px-4 py-1.5 text-sm max-sm:px-3">
                     <FolderOpen className="w-4 h-4 mr-1" /> Portfolio
                   </TabsTrigger>
@@ -553,7 +555,7 @@ export default function Dashboard() {
                             <h3 className="font-semibold text-white line-clamp-1">{artwork.title}</h3>
                             <div className="flex items-center gap-2 text-xs text-white/40 mt-1">
                               <Clock className="w-3 h-3" />
-                              <span>Auction active</span>
+                              <span>For sale</span>
                             </div>
                             {(artwork.charityId || artwork.charityNote) && (
                               <p className="text-xs text-emerald-400/70 mt-1">5% → {artwork.charityNote || charities?.find(c => c.id === artwork.charityId)?.name || "Chosen charity"}</p>
@@ -609,9 +611,13 @@ export default function Dashboard() {
                 )}
               </TabsContent>
               
+              <TabsContent value="sales" className="space-y-6" data-testid="tabcontent-sales">
+                <SellerPanel />
+              </TabsContent>
+
               <TabsContent value="portfolio" className="space-y-6">
                 <div className="flex justify-between items-center flex-wrap gap-2">
-                  <p className="text-sm text-white/50">Showcase your artwork. List pieces for sale or submit them to auction.</p>
+                  <p className="text-sm text-white/50">Showcase your artwork. List pieces for sale when you're ready.</p>
                   <Button onClick={() => setShowAddForm(true)} size="sm" className="rounded-full bg-white text-[#0a0a0f] gap-1 hover:bg-white/90" data-testid="button-add-portfolio">
                     <Plus className="w-4 h-4" /> Add Artwork
                   </Button>
@@ -664,13 +670,13 @@ export default function Dashboard() {
                                   <DollarSign className="w-3 h-3" /> List for Sale
                                 </Button>
                                 <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs rounded-full border-white/10 text-white/70" onClick={() => setShowConvertDialog(item)} data-testid={`button-convert-auction-${item.id}`}>
-                                  <ArrowRight className="w-3 h-3" /> Submit to Auction
+                                  <ArrowRight className="w-3 h-3" /> List for Sale
                                 </Button>
                               </>
                             )}
                             {item.listedForSale && !(item as any).expired && (
                               <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs rounded-full border-white/10 text-white/70" onClick={() => setShowConvertDialog(item)} data-testid={`button-convert-auction-listed-${item.id}`}>
-                                <ArrowRight className="w-3 h-3" /> Submit to Auction
+                                <ArrowRight className="w-3 h-3" /> List for Sale
                               </Button>
                             )}
                             <Button size="sm" variant="ghost" className="text-red-400" onClick={() => deletePortfolioItem.mutate(item.id)} data-testid={`button-delete-portfolio-${item.id}`}>
@@ -1281,23 +1287,10 @@ export default function Dashboard() {
       <Dialog open={!!showConvertDialog} onOpenChange={(open) => { if (!open) setShowConvertDialog(null); }}>
         <DialogContent className="sm:max-w-md bg-[#0d0d14] border-white/10" data-testid="dialog-convert-auction">
           <DialogHeader>
-            <DialogTitle className="font-display text-white">Submit to Auction</DialogTitle>
-            <DialogDescription className="text-white/50">Convert "{showConvertDialog?.title}" into an auction listing. It will go through curation review first.</DialogDescription>
+            <DialogTitle className="font-display text-white">List for Sale</DialogTitle>
+            <DialogDescription className="text-white/50">List "{showConvertDialog?.title}" for sale at its price. It goes through curation review first.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label className="text-white/60">Auction Duration</Label>
-              <Select value={convertOpts.auctionDurationDays} onValueChange={(v) => setConvertOpts(p => ({ ...p, auctionDurationDays: v }))}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-convert-duration"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#0d0d14] border-white/10">
-                  <SelectItem value="1">1 Day</SelectItem>
-                  <SelectItem value="3">3 Days</SelectItem>
-                  <SelectItem value="7">7 Days</SelectItem>
-                  <SelectItem value="14">14 Days</SelectItem>
-                  <SelectItem value="30">30 Days</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div>
               <Label className="text-white/60">Charity (Optional)</Label>
               <Select value={convertOpts.charityId} onValueChange={(v) => setConvertOpts(p => ({ ...p, charityId: v, charityNote: v !== "other" ? "" : p.charityNote }))}>
