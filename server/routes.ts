@@ -5,6 +5,8 @@ import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
 import { hasStripeConnectReady, hasReadyPayout, isMinor, resolvePayoutTarget, ageInYears } from "@shared/payoutHelpers";
 import { getEasyPostRates } from "./easypost";
+import { registerOrderRoutes } from "./orders";
+import { registerPricingRoutes } from "./pricingSuggest";
 import { sendAdultUpgradeEmail } from "./emailService";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import OpenAI from "openai";
@@ -81,7 +83,9 @@ const upload = multer({
 });
 
 const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  // Off Replit there is no key; use a placeholder so the server still starts
+  // and AI review requests fail on their own instead of crashing boot.
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured",
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 
@@ -92,6 +96,8 @@ export async function registerRoutes(
   // Setup Auth
   await setupAuth(app);
   registerAuthRoutes(app);
+  registerOrderRoutes(app);
+  registerPricingRoutes(app);
 
   // Artworks
   app.get(api.artworks.list.path, async (req, res) => {

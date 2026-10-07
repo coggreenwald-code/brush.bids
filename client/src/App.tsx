@@ -16,11 +16,13 @@ import About from "@/pages/About";
 import FAQ from "@/pages/FAQ";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import OrderStatus from "@/pages/OrderStatus";
+import Purchases from "@/pages/Purchases";
 import Contact from "@/pages/Contact";
-import MyBids from "@/pages/MyBids";
 import ArtistProfile from "@/pages/ArtistProfile";
 import Auth from "@/pages/Auth";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { NameRequiredModal } from "@/components/NameRequiredModal";
 import { SignupPopup } from "@/components/SignupPopup";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -39,7 +41,9 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/contact" component={Contact} />
-      <Route path="/my-bids" component={MyBids} />
+      <Route path="/purchases" component={Purchases} />
+      <Route path="/order/:token" component={OrderStatus} />
+      <Route path="/my-bids"><Redirect to="/purchases" /></Route>
       <Route path="/portfolio"><Redirect to="/dashboard" /></Route>
       <Route path="/auth" component={Auth} />
       <Route component={NotFound} />
@@ -50,12 +54,17 @@ function Router() {
 function OnboardingWrapper({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated } = useAuth();
   const [showWelcome, setShowWelcome] = useState(false);
+  const [nameSaved, setNameSaved] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user && !user.hasCompletedOnboarding) {
       setShowWelcome(true);
     }
   }, [isAuthenticated, user]);
+
+  const needsName = !!user && !!user.hasCompletedOnboarding && !nameSaved
+    && (user.role === "artist" || user.role === "both")
+    && (!user.firstName?.trim() || !user.lastName?.trim());
 
   return (
     <>
@@ -68,6 +77,9 @@ function OnboardingWrapper({ children }: { children: React.ReactNode }) {
           existingLastName={user.lastName}
           onComplete={() => setShowWelcome(false)}
         />
+      )}
+      {user && needsName && (
+        <NameRequiredModal userId={user.id} isOpen onComplete={() => setNameSaved(true)} />
       )}
     </>
   );

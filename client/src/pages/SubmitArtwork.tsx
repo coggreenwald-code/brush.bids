@@ -1,4 +1,6 @@
 import { Layout } from "@/components/Layout";
+import { PriceSuggestion } from "@/components/PriceSuggestion";
+import { CONTACT_EMAIL } from "@shared/siteConfig";
 import { SEOHead } from "@/components/SEOHead";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,19 +25,14 @@ const formSchema = z.object({
   description: z.string().min(10, "Description too short"),
   imageUrl: z.string().min(1, "Please upload an image of your artwork"),
   price: z.coerce.number().min(1, "Price must be positive"),
-  // Optional Buy It Now price. 0 / empty means no buyout. When set it must be
-  // higher than the reserve price (validated in the refine below).
-  buyNowPrice: z.coerce.number().min(0).optional(),
   dimensionLength: z.coerce.number().min(0.1, "Length is required"),
   dimensionWidth: z.coerce.number().min(0.1, "Width is required"),
-  weightOz: z.coerce.number().min(1, "Weight is required").optional(),
+  // Packed weight; needed to quote insured shipping.
+  weightOz: z.coerce.number({ invalid_type_error: "Weight is required" }).min(1, "Weight is required"),
   auctionDurationDays: z.coerce.number().refine(v => [1, 3, 5, 7].includes(v), { message: "Auction duration must be 1, 3, 5, or 7 days" }).default(7),
   charityId: z.coerce.number().optional(),
   charityNote: z.string().max(200).optional(),
   reviewType: z.enum(["ai_instant", "human_curator"]),
-}).refine((d) => !d.buyNowPrice || d.buyNowPrice > d.price, {
-  message: "Buy It Now price must be higher than the reserve price",
-  path: ["buyNowPrice"],
 });
 
 export default function SubmitArtwork() {
@@ -188,19 +185,13 @@ export default function SubmitArtwork() {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     const { dimensionLength, dimensionWidth, ...rest } = data;
-    const isOther = charitySelection === "other";
-    if (isOther && !rest.charityNote?.trim()) {
-      form.setError("charityNote", { message: "Please describe where the 5% should go" });
-      return;
-    }
     const dimensions = `${dimensionLength} x ${dimensionWidth} inches`;
     createArtwork.mutate({
       ...rest,
-      charityId: isOther ? undefined : rest.charityId,
-      charityNote: isOther ? rest.charityNote : undefined,
+      charityId: rest.charityId,
+      charityNote: undefined,
       artistId: user.id,
       price: data.price.toString(),
-      buyNowPrice: data.buyNowPrice && data.buyNowPrice > 0 ? data.buyNowPrice.toString() : undefined,
       dimensions,
     } as any, {
       onSuccess: () => {
@@ -223,15 +214,17 @@ export default function SubmitArtwork() {
   };
 
   const selectedReviewType = form.watch("reviewType");
+  const watchedLength = Number(form.watch("dimensionLength")) || 0;
+  const watchedWidth = Number(form.watch("dimensionWidth")) || 0;
 
   return (
     <Layout>
-      <SEOHead title="Submit Artwork | BrushBids" description="Submit your artwork for expert curation and auction on BrushBids." />
+      <SEOHead title="Submit Artwork | BrushBids" description="Submit your artwork for curation and sale on BrushBids." />
       <div className="max-w-2xl mx-auto space-y-8 px-4 md:px-0">
         <div>
           <span className="text-xs font-medium text-[#A78BFA] uppercase tracking-[0.3em]">Create Listing</span>
           <h1 className="text-3xl font-display font-bold text-white mt-1">Submit Artwork</h1>
-          <p className="text-white/50">Upload your masterpiece for expert review and global auction.</p>
+          <p className="text-white/50">Upload your work for review. Once approved, it goes on sale at your price.</p>
         </div>
 
 
@@ -284,7 +277,7 @@ export default function SubmitArtwork() {
                         data-testid="textarea-description"
                       />
                     </FormControl>
-                    <FormDescription className="text-white/30">Good stories increase sales by 25%. Let us help you craft the perfect description!</FormDescription>
+                    <FormDescription className="text-white/30">A good story helps collectors connect with your work.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -296,51 +289,15 @@ export default function SubmitArtwork() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white/70">Reserve Price ($)</FormLabel>
+                      <FormLabel className="text-white/70">Price ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="50.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="buyNowPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/70">Buy It Now Price ($) <span className="text-white/40 font-normal">— optional</span></FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="e.g. 250.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} value={field.value ?? ""} data-testid="input-buy-now-price" />
+                        <Input type="number" placeholder="150.00" className="bg-white/5 border-white/10 text-white placeholder:text-white/30" {...field} data-testid="input-price" />
                       </FormControl>
                       <FormDescription className="text-white/40">
-                        Let collectors purchase instantly at this price, ending the auction early. Must be higher than the reserve price.
+                        You choose the price. Buyers can buy at it or offer at least 75% of it, and you keep 75% of the sale.
                       </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="auctionDurationDays"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white/70">Auction Duration</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white" data-testid="select-auction-duration">
-                            <SelectValue placeholder="Select duration" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">1 Day</SelectItem>
-                          <SelectItem value="3">3 Days</SelectItem>
-                          <SelectItem value="5">5 Days</SelectItem>
-                          <SelectItem value="7">7 Days</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <PriceSuggestion width={watchedLength} height={watchedWidth}
+                        onUse={(p) => form.setValue("price", p, { shouldValidate: true })} />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -399,7 +356,7 @@ export default function SubmitArtwork() {
                     value={charitySelection}
                     onValueChange={(val) => {
                       setCharitySelection(val);
-                      if (val === "other" || val === "") {
+                      if (val === "") {
                         form.setValue("charityId", undefined);
                       } else {
                         form.setValue("charityId", Number(val));
@@ -434,31 +391,13 @@ export default function SubmitArtwork() {
                           ) : null
                         ));
                       })()}
-                      <SelectItem value="other" data-testid="charity-option-other">Other (describe below)</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription className="text-white/30">5% of proceeds go to your chosen charity.</FormDescription>
+                  <FormDescription className="text-white/30">
+                    5% of the sale goes to the charity you choose. Want it to go somewhere not on the list?{" "}
+                    <a className="underline text-white/60" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Charity suggestion for my BrushBids listing")}`} data-testid="link-email-charity">Email us</a> and we'll look into adding it.
+                  </FormDescription>
                 </FormItem>
-                {charitySelection === "other" && (
-                  <FormField
-                    control={form.control}
-                    name="charityNote"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-white/70">Where should the 5% go?</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g. Local after-school art program"
-                            className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
-                            {...field}
-                            data-testid="input-charity-note"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </div>
 
               <FormField

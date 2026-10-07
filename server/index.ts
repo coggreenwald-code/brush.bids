@@ -116,7 +116,7 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      if (capturedJsonResponse && process.env.NODE_ENV !== "production") {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
@@ -132,6 +132,8 @@ app.use((req, res, next) => {
   await registerRoutes(httpServer, app);
   const { startAuctionScheduler } = await import("./auctionScheduler");
   startAuctionScheduler();
+  const { startOrderScheduler } = await import("./orders");
+  startOrderScheduler();
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -164,8 +166,11 @@ app.use((req, res, next) => {
   httpServer.listen(
     {
       port,
-      host: "0.0.0.0",
-      reusePort: true,
+      // Local testing (fake sign-in enabled) must only be reachable from this
+      // machine, never from other devices on the network.
+      host: process.env.LOCAL_DEV_AUTH === "1" ? "127.0.0.1" : "0.0.0.0",
+      // reusePort is Linux-only; macOS rejects it.
+      reusePort: process.platform === "linux",
     },
     () => {
       log(`serving on port ${port}`);

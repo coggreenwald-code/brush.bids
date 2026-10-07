@@ -47,16 +47,16 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-xl font-display font-bold text-white">5. Bidding and Sales</h2>
+            <h2 className="text-xl font-display font-bold text-white">5. Purchases and Offers</h2>
             <p className="text-white/50 mt-2 leading-relaxed">
-              When you place a bid, you enter a binding commitment to purchase the artwork at your bid price if you are the winning bidder. All sales are final unless the artwork is materially different from its listing. The sale price is distributed as follows: 75% to the artist, 20% to BrushBids, and 5% to the artist's designated charity.
+              Artwork is sold at the price the artist sets. Buyers may also make an offer of at least 75% of that price; an offer is a binding commitment to buy at the offered price if the artist accepts it within 48 hours, after which the buyer has 48 hours to complete payment. Buyers may report a problem within 3 days of delivery; otherwise sales are final unless the artwork is materially different from its listing. The sale price is distributed as follows: 75% to the artist, 20% to BrushBids, and 5% to charity.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-display font-bold text-white">6. Payments</h2>
             <p className="text-white/50 mt-2 leading-relaxed">
-              Payment processing is handled by third-party payment providers. BrushBids does not store credit card information. Buyers must complete payment within 48 hours of winning an auction. Artists receive payment within 5-7 business days after the buyer's payment is confirmed.
+              Payment processing is handled by third-party payment providers. BrushBids does not store credit card information. Buyers pay BrushBids at checkout for the artwork, insured shipping and any sales tax. BrushBids holds the artist's share until the artwork is delivered and the 3-day inspection window has passed, then pays the artist (or, for artists under 18, their parent or guardian).
             </p>
           </section>
 
