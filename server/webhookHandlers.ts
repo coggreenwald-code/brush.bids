@@ -211,11 +211,17 @@ export class WebhookHandlers {
       );
     }
 
-    const sync = await getStripeSync();
-    await sync.processWebhook(payload, signature);
-
     const stripe = await getUncachableStripeClient();
-    const webhookSecret = await sync.getWebhookSecret();
+    let webhookSecret: string;
+    if (!process.env.REPLIT_DOMAINS && process.env.STRIPE_WEBHOOK_SECRET) {
+      // Local testing: events arrive from `stripe listen`, signed with its
+      // secret. Replit's managed webhook (and its sync tables) isn't used.
+      webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    } else {
+      const sync = await getStripeSync();
+      await sync.processWebhook(payload, signature);
+      webhookSecret = await sync.getWebhookSecret();
+    }
 
     let event;
     try {
